@@ -61,9 +61,11 @@ const Layout: React.FC<LayoutProps> = ({ children, currentTool, onToolChange }) 
                   {tool.icon} {tool.title}
                 </button>
               ))}
-              <button className="flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 text-gray-600 hover:text-gray-900 hover:bg-gray-100">
-                Docs <ExternalLink className="inline pl-2" />
-              </button>
+              <a href="https://docs.tulbox.app" target="_blank" rel="noopender noreferrer">
+                <button className="flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 text-gray-600 hover:text-gray-900 hover:bg-gray-100">
+                  Docs <ExternalLink className="inline pl-2" />
+                </button>
+              </a>
             </nav>
           </div>
         </div>
