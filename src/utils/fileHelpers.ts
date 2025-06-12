@@ -81,7 +81,6 @@ const parseFilenameForCueSheet = (filename: string): {
   section2?: string;
   section3: string;
 } => {
-  // This is a basic parser - you might want to enhance this based on your specific needs
   // For now, we'll assume the filename needs to be restructured
   
   // Extract episode number if present
