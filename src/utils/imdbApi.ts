@@ -1,8 +1,10 @@
 import { IMDBProduction, IMDBSearchResult, productionType, ApiTitleSearchResponse, ApiProductionDetails, AKATitle, ApiAkaResponse, AkaEdge } from '../types';
 import { transliterate } from 'transliteration';
 import PosterPlaceHolder from '../static/imdb.jpg'
+import { languageArticles } from './articles';
+import { detectLanguageCode } from './detectLanguage';
 import axios from 'axios'
-import LanguageDetect from 'languagedetect';
+
 
 const uniqueByTitle = (arr: AKATitle[]): AKATitle[] => {
   const seen = new Set();
@@ -13,6 +15,38 @@ const uniqueByTitle = (arr: AKATitle[]): AKATitle[] => {
     seen.add(item.title);
     return true;
   });
+};
+
+const reorderName = (name: string): string => {
+  const parts = name.trim().split(/\s+/);
+  if (parts.length < 2) return name; // can't reorder if there's only one name
+
+  const lastName = parts.pop(); // assume last word is the last name
+  const firstAndMiddle = parts.join(' ');
+  return `${lastName}, ${firstAndMiddle}`;
+};
+
+const seperateAticle = (akaTitle: string, languageCode: string) => {
+  const articles = languageArticles[languageCode.toLowerCase()] || [];
+  const lowerTitle = akaTitle.trim().toLowerCase();
+
+  for (const article of articles) {
+    if (lowerTitle.startsWith(article + ' ')) {
+      return {
+        article,
+        title: akaTitle.slice(article.length).trimStart()
+      };
+    }
+    // Handle cases like "L'amour" in French
+    if (article.endsWith("'") && lowerTitle.startsWith(article)) {
+      return {
+        article,
+        title: akaTitle.slice(article.length).trimStart()
+      };
+    }
+  }
+
+  return { article: '', title: akaTitle };
 };
 
 
@@ -70,14 +104,23 @@ export const getProductionDetails = async (result: IMDBSearchResult): Promise<IM
 };
   const results: ApiProductionDetails = await axios.request(productionDetailOptions);
   const akaResults: ApiAkaResponse = await axios.request(productionAkaOptions);
-  const lngDetector = new LanguageDetect();
   
-  const akas: AKATitle[] = akaResults.data.data.title.akas.edges.map((title: AkaEdge) => ({
-    title: title.node.displayableProperty.value.plainText,
-    language: lngDetector.detect(title.node.displayableProperty.value.plainText)[0][0],
-    transliterated: transliterate(title.node.displayableProperty.value.plainText),
-    country: title.node.country?.id || 'Unknown'
-  }));
+  const akas: AKATitle[] = await Promise.all(
+    akaResults.data.data.title.akas.edges.map(async (edge: AkaEdge) => {
+      const akaTitle = edge.node.displayableProperty.value.plainText;
+      const languageCode = await detectLanguageCode(akaTitle);
+      const { article, title } = seperateAticle(akaTitle, languageCode);
+      const transliteratedTitle = transliterate(title);
+      const type = languageCode === 'en' ? 'TT' : 'AT';
+      return {
+        title: akaTitle,
+        transliterated: transliteratedTitle.toUpperCase(),
+        article: article.toUpperCase(),
+        language: languageCode.toUpperCase(),
+        type: type
+      }
+    })
+  );
 
   const uniqueAkas = uniqueByTitle(akas); 
 
@@ -97,8 +140,8 @@ export const getProductionDetails = async (result: IMDBSearchResult): Promise<IM
     releaseYear: results.data.startYear || 0,
     actors: results.data.cast
       .slice(0, Math.min(4, results.data.cast.length))
-      .map(item => item.fullName) || 'None',
-    director: results.data.directors[0]?.fullName || 'None',
+      .map(item => reorderName(item.fullName)) || 'None Found',
+    director: reorderName(results.data.directors[0]?.fullName) || 'None Found',
     plot: results.data.description || 'No description.',
     rating: results.data.averageRating || 0,
     poster: results.data.primaryImage || PosterPlaceHolder,
