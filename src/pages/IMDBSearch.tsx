@@ -14,10 +14,11 @@ import {
   User, 
   Star, 
   ExternalLink, 
-  Loader2 
+  Loader2
 } from 'lucide-react';
 import { IMDBProduction, IMDBSearchResult, productionType } from '../types';
 import { searchIMDB, getProductionDetails } from '../utils/imdbApi';
+import { showToast } from '../utils/toast';
 
 const IMDBSearch: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -154,6 +155,7 @@ const IMDBSearch: React.FC = () => {
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
               <input
                 type="text"
+                name="search"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
@@ -275,18 +277,23 @@ const IMDBSearch: React.FC = () => {
           <div className="p-6 space-y-6">
             {/* IMDB Code */}
             <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-              <div className="flex items-center space-x-2">
-                <ExternalLink className="w-5 h-5 text-gray-600" />
+              <div 
+              onClick={() => {
+                navigator.clipboard.writeText(`${selectedProduction.imdbCode}`);
+                showToast();
+              }}
+              className="flex items-center space-x-2">
                 <span className="font-medium text-gray-900">IMDB Code:</span>
-                <code className="px-2 py-1 bg-gray-200 rounded text-sm font-mono">{selectedProduction.imdbCode}</code>
+                <code className="px-2 py-1 bg-gray-200 rounded text-sm font-mono hover:cursor-pointer">{selectedProduction.imdbCode}</code>
               </div>
               <a
                 href={`https://www.imdb.com/title/${selectedProduction.imdbCode}/`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-blue-600 hover:text-blue-700 transition-colors"
+                className="flex items-center gap-2 text-blue-600 hover:text-blue-700 transition-colors"
               >
                 View on IMDB
+                <ExternalLink className="inline w-5 h-5 text-gray-600" />
               </a>
             </div>
 
@@ -308,7 +315,13 @@ const IMDBSearch: React.FC = () => {
                 </h3>
                 <div className="space-y-2">
                   {selectedProduction.actors.map((actor, index) => (
-                    <div key={index} className="flex items-center space-x-2 p-2 bg-gray-50 rounded">
+                    <div 
+                    key={index} 
+                    onClick={() => {
+                      navigator.clipboard.writeText(`${actor}`);
+                      showToast();
+                    }}
+                    className="flex items-center space-x-2 p-2 bg-gray-50 rounded hover:cursor-pointer">
                       <User className="w-4 h-4 text-gray-500" />
                       <span className="text-gray-900">{actor}</span>
                     </div>
@@ -319,11 +332,16 @@ const IMDBSearch: React.FC = () => {
               {/* Director */}
               {selectedProduction.director && (
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center hover:cursor-pointer">
                     <User className="w-5 h-5 mr-2" />
                     Director
                   </h3>
-                  <div className="flex items-center space-x-2 p-2 bg-gray-50 rounded">
+                  <div 
+                  onClick={() => {
+                    navigator.clipboard.writeText(`${selectedProduction.director}`);
+                    showToast();
+                  }}
+                  className="flex items-center space-x-2 p-2 bg-gray-50 rounded hover:cursor-pointer">
                     <User className="w-4 h-4 text-gray-500" />
                     <span className="text-gray-900">{selectedProduction.director}</span>
                   </div>
@@ -341,7 +359,11 @@ const IMDBSearch: React.FC = () => {
                 {selectedProduction.productionCompanies.map((company, index) => (
                   <span
                     key={index}
-                    className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800"
+                    onClick={() => {
+                      navigator.clipboard.writeText(`${company}`);
+                      showToast();
+                    }}
+                    className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800 hover:cursor-pointer"
                   >
                     {company}
                   </span>
@@ -360,19 +382,25 @@ const IMDBSearch: React.FC = () => {
                   <table className="w-full">
                     <thead className="bg-gray-50">
                       <tr>
-                        <th className="px-4 py-2 text-left text-sm font-medium text-gray-600">Title</th>
+                        <th className="px-4 py-2 text-left text-sm font-medium text-gray-600">Transliterated Title</th>
+                        <th className="px-4 py-2 text-left text-sm font-medium text-gray-600">Article</th>
                         <th className="px-4 py-2 text-left text-sm font-medium text-gray-600">Language</th>
-                        <th className="px-4 py-2 text-left text-sm font-medium text-gray-600">Transliterated</th>
-                        <th className="px-4 py-2 text-left text-sm font-medium text-gray-600">Country</th>
+                        <th className="px-4 py-2 text-left text-sm font-medium text-gray-600">Type</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-200">
                       {selectedProduction.akaTitle?.map((aka, index) => (
-                        <tr key={index} className="hover:bg-gray-50">
-                          <td className="px-4 py-2 text-sm text-gray-900">{aka.title}</td>
-                          <td className="px-4 py-2 text-sm text-gray-600">{aka.language}</td>
+                        <tr 
+                          key={index} 
+                          onClick={() => {
+                            navigator.clipboard.writeText(`${aka.transliterated}\t${aka.language}\t${aka.article}\t${aka.type}`);
+                            showToast();
+                          }} 
+                          className="hover:bg-gray-50 hover:cursor-pointer">
                           <td className="px-4 py-2 text-sm text-gray-600 font-mono">{aka.transliterated}</td>
-                          <td className="px-4 py-2 text-sm text-gray-600">{aka.country || '-'}</td>
+                          <td className="px-4 py-2 text-sm text-gray-600">{aka.article}</td>
+                          <td className="px-4 py-2 text-sm text-gray-600">{aka.language}</td>
+                          <td className="px-4 py-2 text-sm text-gray-600">{aka.type}</td>
                         </tr>
                       ))}
                     </tbody>

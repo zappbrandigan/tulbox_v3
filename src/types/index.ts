@@ -47,9 +47,10 @@ export interface IMDBProduction {
 
 export interface AKATitle {
   title: string;
-  language: string;
   transliterated: string;
-  country?: string;
+  article: string;
+  language: string;
+  type: string;
 }
 
 export interface IMDBSearchResult {

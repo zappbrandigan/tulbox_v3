@@ -1,5 +1,5 @@
 import React from 'react';
-import { FileText, Zap, PocketKnife, Search } from 'lucide-react';
+import { FileText, Zap, PocketKnife, Search, ExternalLink } from 'lucide-react';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -13,19 +13,19 @@ const Layout: React.FC<LayoutProps> = ({ children, currentTool, onToolChange }) 
       id: 'pdf-manager',
       title: 'PDF Manager',
       description: 'Rename and organize PDF files',
-      icon: FileText,
+      icon: <FileText className="inline pr-2" />,
     },
     {
       id: 'imdb-search',
       title: 'IMDB Search',
       description: 'Search movies, TV shows, and games',
-      icon: Search,
+      icon: <Search className="inline pr-2" />,
     },
     {
       id: 'coming-soon',
       title: 'More Tools',
       description: 'Additional automation tools coming soon',
-      icon: Zap,
+      icon: <Zap className="inline pr-2" />,
     }
   ];
 
@@ -40,8 +40,9 @@ const Layout: React.FC<LayoutProps> = ({ children, currentTool, onToolChange }) 
                 <PocketKnife className="w-5 h-5 text-white" />
               </div>
               <h1 className="text-xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
-                Tu&#x305;lBOX
+                TūlBOX
               </h1>
+
             </div>
             <nav className="hidden sm:flex space-x-1">
               {tools.map((tool) => (
@@ -49,7 +50,7 @@ const Layout: React.FC<LayoutProps> = ({ children, currentTool, onToolChange }) 
                   key={tool.id}
                   onClick={() => onToolChange(tool.id)}
                   disabled={tool.id === 'coming-soon'}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                  className={`flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
                     currentTool === tool.id
                       ? 'bg-blue-100 text-blue-700 shadow-sm'
                       : tool.id === 'coming-soon'
@@ -57,9 +58,12 @@ const Layout: React.FC<LayoutProps> = ({ children, currentTool, onToolChange }) 
                       : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
                   }`}
                 >
-                  {tool.title}
+                  {tool.icon} {tool.title}
                 </button>
               ))}
+              <button className="flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 text-gray-600 hover:text-gray-900 hover:bg-gray-100">
+                Docs <ExternalLink className="inline pl-2" />
+              </button>
             </nav>
           </div>
         </div>
@@ -68,6 +72,13 @@ const Layout: React.FC<LayoutProps> = ({ children, currentTool, onToolChange }) 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {children}
+        <div id="clipboard-toast"
+          className="hidden fixed right-10 bottom-10 px-5 py-4 border-r-8 border-blue-500 bg-white drop-shadow-lg">
+          <p className="text-sm">
+              <span className="mr-2 inline-block px-3 py-1 rounded-full bg-blue-500 text-white font-extrabold">i</span>
+              Copied to clipboard.
+          </p>
+        </div>
       </main>
     </div>
   );
