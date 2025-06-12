@@ -133,7 +133,7 @@ const FileTable: React.FC<FileTableProps> = ({ files, onFileUpdate, onFileRemove
                     </div>
                   ) : (
                     <div className="flex items-center space-x-2 group">
-                      <span className="flex-1 font-medium text-gray-900">
+                      <span className="flex-1 font-medium text-gray-900 whitespace-pre">
                         {file.currentName}
                       </span>
                       <button

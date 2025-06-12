@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Plus, Search, Trash2, ToggleLeft, ToggleRight, AlertCircle } from 'lucide-react';
+import { Plus, Search, Trash2, ToggleLeft, ToggleRight, AlertCircle, FileText } from 'lucide-react';
 import { SearchReplaceRule } from '../types';
 
 interface SearchReplaceProps {
@@ -41,9 +41,20 @@ const SearchReplace: React.FC<SearchReplaceProps> = ({ rules, onRulesChange, onA
     }
   };
 
+  const applyCueSheetTemplate = () => {
+  const cueSheetRule: SearchReplaceRule = {
+    id: Date.now().toString(),
+    searchPattern: '.*',
+    replaceWith: 'CUE_SHEET_TEMPLATE',
+    isRegex: true,
+    isEnabled: true,
+  };
+    onRulesChange([...rules, cueSheetRule]);
+  };
+
   const commonReplacements = [
+    { name: 'Dotify filename', search: 'dotify', replace: '', regex: false },
     { name: 'Remove spaces', search: ' ', replace: '_', regex: false },
-    { name: 'Remove numbers', search: '\\d+', replace: '', regex: true },
     { name: 'Replace underscores', search: '_', replace: '-', regex: false },
     { name: 'Lowercase extension', search: '\\.PDF$', replace: '.pdf', regex: true },
   ];
@@ -68,6 +79,22 @@ const SearchReplace: React.FC<SearchReplaceProps> = ({ rules, onRulesChange, onA
           >
             <Plus className="w-4 h-4 mr-1" />
             Add Rule
+          </button>
+        </div>
+      </div>
+
+      {/* Cue Sheet Template */}
+      <div className="mb-6 p-4 bg-gradient-to-r from-purple-50 to-indigo-50 rounded-lg border border-purple-200">
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center space-x-2">
+            <FileText className="w-5 h-5 text-purple-600" />
+            <h4 className="text-sm font-semibold text-purple-900">Cue Sheet Convention</h4>
+          </div>
+          <button
+            onClick={applyCueSheetTemplate}
+            className="px-3 py-1.5 bg-purple-600 text-white text-sm font-medium rounded-lg hover:bg-purple-700 transition-colors"
+          >
+            Apply Template
           </button>
         </div>
       </div>
