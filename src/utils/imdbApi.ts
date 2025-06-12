@@ -1,18 +1,17 @@
-import { IMDBProduction, IMDBSearchResult, productionType, ApiTitleSearchResponse, ApiProductionDetails, AKATitle, ApiAkaResponse, AkaEdge } from '../types';
+import { IMDBProduction, IMDBSearchResult, productionType, ApiTitleSearchResponse, ApiProductionDetails, ApiAkaResponse, AkaEdge, DetectedLanguage, LanguageDetectionResponse, AKATitle } from '../types';
 import { transliterate } from 'transliteration';
 import PosterPlaceHolder from '../static/imdb.jpg'
 import { languageArticles } from './articles';
-import { detectLanguageCode } from './detectLanguage';
 import axios from 'axios'
 
 
-const uniqueByTitle = (arr: AKATitle[]): AKATitle[] => {
+const uniqueByTitle = (arr: {text: string}[]): {text: string}[] => {
   const seen = new Set();
   return arr.filter(item => {
-    if (seen.has(item.title)) {
+    if (seen.has(item.text)) {
       return false;
     }
-    seen.add(item.title);
+    seen.add(item.text);
     return true;
   });
 };
@@ -90,39 +89,50 @@ export const getProductionDetails = async (result: IMDBSearchResult): Promise<IM
         'x-rapidapi-host': 'imdb236.p.rapidapi.com'
       }
   };
-  const productionAkaOptions = {
-    method: 'GET',
-    url: 'https://imdb232.p.rapidapi.com/api/title/get-akas',
-    params: {
-      tt: result.id,
-      limit: '25'
-    },
-    headers: {
-      'x-rapidapi-key': import.meta.env.VITE_API_KEY,
-      'x-rapidapi-host': 'imdb232.p.rapidapi.com'
-    }
-};
+//   const productionAkaOptions = {
+//     method: 'GET',
+//     url: 'https://imdb232.p.rapidapi.com/api/title/get-akas',
+//     params: {
+//       tt: result.id,
+//       limit: '25'
+//     },
+//     headers: {
+//       'x-rapidapi-key': import.meta.env.VITE_API_KEY,
+//       'x-rapidapi-host': 'imdb232.p.rapidapi.com'
+//     }
+// };
   const results: ApiProductionDetails = await axios.request(productionDetailOptions);
-  const akaResults: ApiAkaResponse = await axios.request(productionAkaOptions);
-  
-  const akas: AKATitle[] = await Promise.all(
-    akaResults.data.data.title.akas.edges.map(async (edge: AkaEdge) => {
-      const akaTitle = edge.node.displayableProperty.value.plainText;
-      const languageCode = await detectLanguageCode(akaTitle);
-      const { article, title } = seperateAticle(akaTitle, languageCode);
-      const transliteratedTitle = transliterate(title);
-      const type = languageCode === 'en' ? 'TT' : 'AT';
-      return {
-        title: akaTitle,
-        transliterated: transliteratedTitle.toUpperCase(),
-        article: article.toUpperCase(),
-        language: languageCode.toUpperCase(),
-        type: type
-      }
-    })
-  );
+  // const akaResults: ApiAkaResponse = await axios.request(productionAkaOptions);
 
-  const uniqueAkas = uniqueByTitle(akas); 
+  // // isolate aka title strings and remove duplicates
+  // const akaTitles = akaResults
+  //   .data.data.title.akas.edges.map((edge: AkaEdge) => ({
+  //     text: edge.node.displayableProperty.value.plainText
+  //   }));
+  // const uniqueAkaTitles = uniqueByTitle(akaTitles);
+
+  // const akaTitleLanguageDetails: LanguageDetectionResponse = await axios.post(
+  //   'https://lang-detect-memr.onrender.com/detect-language-batch',
+  //   {
+  //     texts: uniqueAkaTitles
+  //   }
+  // )
+
+  // const akas: AKATitle[] = 
+  //   akaTitleLanguageDetails.data.map((item: DetectedLanguage) => {
+  //     const akaTitle = item.detected_text;
+  //     const languageCode = item.language_code;
+  //     const { article, title } = seperateAticle(akaTitle, languageCode);
+  //     const transliteratedTitle = transliterate(title);
+  //     const type = languageCode === 'en' ? 'AT' : 'TT';
+  //     return {
+  //       title: akaTitle,
+  //       transliterated: transliteratedTitle.toUpperCase(),
+  //       article: article.toUpperCase(),
+  //       language: languageCode.toUpperCase(),
+  //       type: type
+  //     }
+  //   });
 
   const productionDetails: IMDBProduction = {
     id: results.data.id,
@@ -145,10 +155,62 @@ export const getProductionDetails = async (result: IMDBSearchResult): Promise<IM
     plot: results.data.description || 'No description.',
     rating: results.data.averageRating || 0,
     poster: results.data.primaryImage || PosterPlaceHolder,
-    akaTitle: uniqueAkas
+    // akaTitle: akas
   };
   if (!productionDetails) {
     throw new Error('Production not found');
   }
   return productionDetails;
+};
+
+export const getAkas = async (result: IMDBSearchResult): Promise<AKATitle[]> => {
+  const productionAkaOptions = {
+    method: 'GET',
+    url: 'https://imdb232.p.rapidapi.com/api/title/get-akas',
+    params: {
+      tt: result.id,
+      limit: '25'
+    },
+    headers: {
+      'x-rapidapi-key': import.meta.env.VITE_API_KEY,
+      'x-rapidapi-host': 'imdb232.p.rapidapi.com'
+    }
+  };
+
+  const akaResults: ApiAkaResponse = await axios.request(productionAkaOptions);
+
+    // isolate aka title strings and remove duplicates
+  const akaTitles = akaResults
+    .data.data.title.akas.edges.map((edge: AkaEdge) => ({
+      text: edge.node.displayableProperty.value.plainText
+    }));
+  const uniqueAkaTitles = uniqueByTitle(akaTitles);
+
+  const akaTitleLanguageDetails: LanguageDetectionResponse = await axios.post(
+    'https://lang-detect-memr.onrender.com/detect-language-batch',
+    {
+      texts: uniqueAkaTitles
+    }
+  )
+
+  const akas: AKATitle[] = akaTitleLanguageDetails.data.map((item: DetectedLanguage) => {
+    const akaTitle = item.detected_text;
+    const languageCode = item.language_code;
+    const { article, title } = seperateAticle(akaTitle, languageCode);
+    const transliteratedTitle = transliterate(title);
+    const type = languageCode === 'en' ? 'AT' : 'TT';
+    return {
+      title: akaTitle,
+      transliterated: transliteratedTitle.toUpperCase(),
+      article: article.toUpperCase(),
+      language: languageCode.toUpperCase(),
+      type: type
+    }
+  });
+  
+  if (!akas) {
+    throw new Error('Error fetching AKAs');
+  }
+
+  return akas;
 };

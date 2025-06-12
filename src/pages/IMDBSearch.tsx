@@ -16,16 +16,18 @@ import {
   ExternalLink, 
   Loader2
 } from 'lucide-react';
-import { IMDBProduction, IMDBSearchResult, productionType } from '../types';
-import { searchIMDB, getProductionDetails } from '../utils/imdbApi';
+import { AKATitle, IMDBProduction, IMDBSearchResult, productionType } from '../types';
+import { searchIMDB, getProductionDetails, getAkas } from '../utils/imdbApi';
 import { showToast } from '../utils/toast';
 
 const IMDBSearch: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<IMDBSearchResult[]>([]);
   const [selectedProduction, setSelectedProduction] = useState<IMDBProduction | null>(null);
+  const [akaTitles, setAkaTitles] = useState<AKATitle[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [isLoadingDetails, setIsLoadingDetails] = useState(false);
+  const [isLoadingAkas, setIsLoadingAkas] = useState(false);
   const [searchType, setSearchType] = useState<productionType>('all');
 
   const handleSearch = async () => {
@@ -45,6 +47,19 @@ const IMDBSearch: React.FC = () => {
     }
   };
 
+  const handleGetAkas = async (result: IMDBSearchResult) => {
+    setIsLoadingAkas(true);
+    try {
+      const akas = await getAkas(result);
+      setAkaTitles(akas);
+      setIsLoadingAkas(false);
+    } catch (error) {
+      console.error('Failed to load AKAs:', error);
+    } finally {
+      setIsLoadingAkas(false);
+    }
+  };
+
   const handleSelectProduction = async (result: IMDBSearchResult) => {
     setIsLoadingDetails(true);
     setSelectedProduction(null);
@@ -58,8 +73,11 @@ const IMDBSearch: React.FC = () => {
       setIsLoadingDetails(false);
       setSearchQuery('')
       setSearchResults([])
+      handleGetAkas(result);
     }
   };
+
+
 
   const getTypeIcon = (type: string) => {
     switch (type) {
@@ -371,8 +389,16 @@ const IMDBSearch: React.FC = () => {
               </div>
             </div>
 
+            {/* Loading AKAs */}
+            {isLoadingAkas && (
+              <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center">
+                <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4 text-blue-600" />
+                <p className="text-gray-600">Detecting AKA Languages...</p>
+              </div>
+            )}
+
             {/* AKA Titles */}
-            {selectedProduction.akaTitle?.length > 0 && (
+            {akaTitles?.length > 0 && (
               <div>
                 <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center">
                   <Globe className="w-5 h-5 mr-2" />
@@ -389,7 +415,7 @@ const IMDBSearch: React.FC = () => {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-200">
-                      {selectedProduction.akaTitle?.map((aka, index) => (
+                      {akaTitles?.map((aka, index) => (
                         <tr 
                           key={index} 
                           onClick={() => {

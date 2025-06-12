@@ -39,7 +39,6 @@ export interface IMDBProduction {
   releaseYear: number;
   actors: string[];
   director: string | null;
-  akaTitle: AKATitle[];
   plot?: string;
   rating?: number;
   poster?: string;
@@ -60,6 +59,22 @@ export interface IMDBSearchResult {
   type: string;
   poster?: string;
 }
+
+/*
+* type for API language detction
+*/
+export interface DetectedLanguage {
+  confidence: number;
+  detected_text: string;
+  language_code: string;
+  language_name: string;
+  text_length: number;
+}
+
+export interface LanguageDetectionResponse {
+  data: DetectedLanguage[];
+}
+
 
 /*
 * type for API title details response from imdb236
