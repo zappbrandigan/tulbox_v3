@@ -34,7 +34,13 @@ const FileTable: React.FC<FileTableProps> = ({ files, onFileUpdate, onFileRemove
     switch (status) {
       case 'valid':
         return <CheckCircle className="w-5 h-5 text-emerald-500" />;
+      case 'dotified':
+        return <CheckCircle className="w-5 h-5 text-blue-500" />;
+      case 'modified':
+        return <CheckCircle className="w-5 h-5 text-emerald-500" />;
       case 'invalid':
+        return <AlertCircle className="w-5 h-5 text-red-500" />;
+      case 'error':
         return <AlertCircle className="w-5 h-5 text-red-500" />;
       case 'duplicate':
         return <Copy className="w-5 h-5 text-amber-500" />;
@@ -49,6 +55,14 @@ const FileTable: React.FC<FileTableProps> = ({ files, onFileUpdate, onFileRemove
         return 'Invalid name';
       case 'duplicate':
         return 'Duplicate name';
+      case 'dotified':
+        return 'Dotified';
+      case 'modified':
+        return 'Modified';
+      case 'error':
+        return 'Error';
+      default:
+        return 'Error';
     }
   };
 
@@ -57,6 +71,8 @@ const FileTable: React.FC<FileTableProps> = ({ files, onFileUpdate, onFileRemove
     switch (status) {
       case 'valid':
         return `${base} border-l-4 border-l-emerald-500`;
+      case 'dotified':
+        return `${base} border-l-4 border-l-blue-500`;
       case 'invalid':
         return `${base} border-l-4 border-l-red-500 bg-red-50/30`;
       case 'duplicate':
@@ -156,6 +172,9 @@ const FileTable: React.FC<FileTableProps> = ({ files, onFileUpdate, onFileRemove
                     <span className={`text-sm font-medium ${
                       file.status === 'valid' ? 'text-emerald-700' :
                       file.status === 'invalid' ? 'text-red-700' :
+                      file.status === 'dotified' ? 'text-blue-700' :
+                      file.status === 'modified' ? 'text-green-700' :
+                      file.status === 'error' ? 'text-red-700' :
                       'text-amber-700'
                     }`}>
                       {getStatusText(file.status)}

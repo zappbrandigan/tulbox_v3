@@ -55,12 +55,12 @@ const PDFManager: React.FC = () => {
   };
 
   const handleDownloadAll = async () => {
-    const validFiles = files.filter(file => file.status === 'valid');
-    if (validFiles.length === 0) return;
+    const downloadableFiles = files.filter(file => ['valid', 'modified', 'dotified'].includes(file.status));
+    if (downloadableFiles.length === 0) return;
 
     setIsDownloading(true);
     try {
-      await downloadRenamedFiles(validFiles);
+      await downloadRenamedFiles(downloadableFiles);
     } catch (error) {
       console.error('Error downloading files:', error);
     } finally {
@@ -70,23 +70,26 @@ const PDFManager: React.FC = () => {
 
   const handleClearAll = () => {
     setFiles([]);
+    setSearchReplaceRules([]);
   };
 
-  const validFiles = files.filter(file => file.status === 'valid').length;
+  const validFiles = files.filter(file => ['valid', 'modified', 'dotified'].includes(file.status)).length;
   const totalFiles = files.length;
 
   return (
     <div className="space-y-8">
       {/* Header */}
-      <div className="text-center">
-        <h1 className="text-3xl font-bold text-gray-900 mb-4">
-          PDF File Manager
-        </h1>
-        <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-          Upload PDF files, rename them individually or in batches using search & replace rules, 
-          then download your organized files.
-        </p>
-      </div>
+      {files.length === 0 && 
+        (<div className="text-center">
+          <h1 className="text-3xl font-bold text-gray-900 mb-4">
+            PDF File Manager
+          </h1>
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            Upload PDF files, rename them individually or in batches using search & replace rules, 
+            then download your organized files.
+          </p>
+        </div>)
+      }
 
       {/* Upload Zone */}
       {files.length === 0 && (<DragDropZone onFilesAdded={handleFilesAdded} />)}

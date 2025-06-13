@@ -36,6 +36,7 @@ const IMDBSearch: React.FC = () => {
     setIsSearching(true);
     setSearchResults([]);
     setSelectedProduction(null);
+    setAkaTitles([]);
     
     try {
       const results = await searchIMDB(searchQuery, searchType);
@@ -133,9 +134,9 @@ const IMDBSearch: React.FC = () => {
       {/* Header */}
       <div className="text-center">
         <h1 className="text-3xl font-bold text-gray-900 mb-4">
-          IMDB Production Search
+          IMDb Production Search
         </h1>
-        <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+        <p className="text-sm text-gray-600 max-w-2xl mx-auto">
           Search for movies, TV shows, games and more. Get detailed production information including cast, crew, and international titles.
         </p>
       </div>
@@ -319,7 +320,11 @@ const IMDBSearch: React.FC = () => {
             {selectedProduction.plot && (
               <div>
                 <h3 className="text-lg font-semibold text-gray-900 mb-3">Plot</h3>
-                <p className="text-gray-700 leading-relaxed">{selectedProduction.plot}</p>
+                <p className="text-gray-700 leading-relaxed">
+                  {selectedProduction.plot.length > 500 
+                    ? `${selectedProduction.plot.substring(0, 500)}. . .` 
+                    : selectedProduction.plot }
+                </p>
               </div>
             )}
 
