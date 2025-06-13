@@ -85,7 +85,7 @@ export const escapeRegExp = (string: string): string => {
 
 export const downloadRenamedFiles = async (files: FileItem[]): Promise<void> => {
   for (const fileItem of files) {
-    if (fileItem.status !== 'valid') continue;
+    if (!['valid', 'modified', 'dotified'].includes(fileItem.status)) continue;
     
     try {
       // Create a new blob with the original file data
