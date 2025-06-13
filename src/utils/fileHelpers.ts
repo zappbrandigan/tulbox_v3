@@ -1,4 +1,6 @@
 import { FileItem, fileStatus, SearchReplaceRule } from '../types';
+import JSZip from 'jszip';
+import { saveAs } from 'file-saver';
 import dotifyTitle from './dotify'
 
 export const generateFileId = (): string => {
@@ -84,32 +86,30 @@ export const escapeRegExp = (string: string): string => {
 };
 
 export const downloadRenamedFiles = async (files: FileItem[]): Promise<void> => {
+  const zip = new JSZip();
+
   for (const fileItem of files) {
     if (!['valid', 'modified', 'dotified'].includes(fileItem.status)) continue;
-    
+
     try {
       // Create a new blob with the original file data
       const blob = new Blob([fileItem.file], { type: fileItem.file.type });
-      
-      // Create download link
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = ensurePdfExtension(fileItem.currentName);
-      
-      // Trigger download
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      
-      // Clean up
-      URL.revokeObjectURL(url);
-      
-      // Small delay between downloads to avoid browser blocking
+
+      // Add file to zip
+      zip.file(ensurePdfExtension(fileItem.currentName), blob);
+
+      // Small delay between processing files to avoid browser blocking
       await new Promise(resolve => setTimeout(resolve, 100));
     } catch (error) {
       console.error('Error downloading file:', fileItem.currentName, error);
     }
+  }
+
+  try {
+    const content = await zip.generateAsync({ type: "blob" });
+    saveAs(content, "dotified.zip");
+  } catch {
+    console.log("Error. Please reload and try again.");
   }
 };
 
