@@ -1,4 +1,5 @@
-import { FileItem, SearchReplaceRule } from '../types';
+import { FileItem, fileStatus, SearchReplaceRule } from '../types';
+import dotifyTitle from './dotify'
 
 export const generateFileId = (): string => {
   return Date.now().toString(36) + Math.random().toString(36).substring(2);
@@ -11,38 +12,27 @@ export const validateFileName = (name: string): boolean => {
 };
 
 export const checkForDuplicates = (files: FileItem[]): FileItem[] => {
-  const nameCounts = new Map<string, number>();
-  
-  // Count occurrences of each name
-  files.forEach(file => {
-    const count = nameCounts.get(file.currentName) || 0;
-    nameCounts.set(file.currentName, count + 1);
-  });
+  const nameCounts = files.reduce((map, file) => {
+    map.set(file.currentName, (map.get(file.currentName) || 0) + 1);
+    return map;
+  }, new Map<string, number>());
 
-  // Update status based on duplicates and validation
-  return files.map(file => ({
-    ...file,
-    status: !validateFileName(file.currentName) 
-      ? 'invalid' 
-      : nameCounts.get(file.currentName)! > 1 
-        ? 'duplicate' 
-        : 'valid'
-  }));
+  return files.map(file => {
+    if (!validateFileName(file.currentName)) {
+      return { ...file, status: 'invalid' };
+    }
+    if (nameCounts.get(file.currentName)! > 1) {
+      return { ...file, status: 'duplicate' };
+    }
+    if (['dotified', 'modified', 'error'].includes(file.status)) {
+      return file;
+    }
+    return { ...file, status: 'valid' };
+  });
 };
 
-export const checkFormatConvention = (files: FileItem[]): FileItem[] => {
-  // TODO: Validate standard file name convention
-  const separatorTokens = true
-  
-  // Update status based on file name convention and validation
-  return files.map(file => ({
-    ...file,
-    status: !validateFileName(file.currentName) 
-      ? 'invalid' 
-      : separatorTokens
-        ? 'valid' 
-        : 'invalid'
-  }));
+export const applyCueSheetConvention = (filename: string): [string, fileStatus] => {
+  return dotifyTitle(filename);
 };
 
 export const applySearchReplace = (
@@ -51,9 +41,22 @@ export const applySearchReplace = (
 ): FileItem[] => {
   return files.map(file => {
     let newName = file.currentName;
+    let status = file.status;
     
     rules.forEach(rule => {
       if (!rule.isEnabled) return;
+
+      // Handle cue sheet template
+      if (rule.replaceWith === 'CUE_SHEET_TEMPLATE') {
+        const results = applyCueSheetConvention(newName);
+        newName = Array.isArray(results) ? results[0] : results;
+        if (newName !== file.currentName) {
+          status = 'modified';
+        } else {
+          status = Array.isArray(results) ? results[1] as FileItem['status'] : file.status;
+        }
+        return;
+      }
       
       try {
         if (rule.isRegex) {
@@ -70,7 +73,8 @@ export const applySearchReplace = (
     return {
       ...file,
       currentName: newName,
-      characterCount: newName.length
+      characterCount: newName.length,
+      status: status
     };
   });
 };

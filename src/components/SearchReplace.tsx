@@ -42,8 +42,8 @@ const SearchReplace: React.FC<SearchReplaceProps> = ({ rules, onRulesChange, onA
   };
 
   const commonReplacements = [
+    { name: 'Cue Sheet Template', search: '.*', replace: 'CUE_SHEET_TEMPLATE', regex: true },
     { name: 'Remove spaces', search: ' ', replace: '_', regex: false },
-    { name: 'Remove numbers', search: '\\d+', replace: '', regex: true },
     { name: 'Replace underscores', search: '_', replace: '-', regex: false },
     { name: 'Lowercase extension', search: '\\.PDF$', replace: '.pdf', regex: true },
   ];
@@ -60,7 +60,7 @@ const SearchReplace: React.FC<SearchReplaceProps> = ({ rules, onRulesChange, onA
             onClick={() => setShowAdvanced(!showAdvanced)}
             className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
           >
-            {showAdvanced ? 'Hide Advanced' : 'Show Advanced'}
+            {showAdvanced ? 'Hide Templates' : 'Show Templates'}
           </button>
           <button
             onClick={addRule}
@@ -186,11 +186,11 @@ const SearchReplace: React.FC<SearchReplaceProps> = ({ rules, onRulesChange, onA
         ))}
       </div>
 
-      {rules.length === 0 && (
+      {rules.length === 0 && !showAdvanced && (
         <div className="text-center py-8 text-gray-500">
           <Search className="w-8 h-8 mx-auto mb-2 text-gray-300" />
-          <p>No search and replace rules yet</p>
-          <p className="text-sm">Add rules to batch rename your files</p>
+          {/* <p>No search and replace rules yet</p> */}
+          <p>Add rules to batch rename your files</p>
         </div>
       )}
 

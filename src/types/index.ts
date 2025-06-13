@@ -2,13 +2,15 @@ export type productionType =
 'all' | 'movie' | 'tvMovie' |'tvSeries' | 'tvEpisode' | 'short' |
 'videoGame' | 'podcast' | 'musicVideo' |'name' | 'video'
 
+export type fileStatus = 'valid' | 'invalid' | 'duplicate' | 'dotified' | 'modified' | 'error';
+
 export interface FileItem {
   id: string;
   originalName: string;
   currentName: string;
   file: File;
   characterCount: number;
-  status: 'valid' | 'invalid' | 'duplicate';
+  status: fileStatus;
   lastModified: Date;
 }
 
