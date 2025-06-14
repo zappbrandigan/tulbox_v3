@@ -1,5 +1,11 @@
 import { FileItem } from "../types";
 
+const titleCase = (title: string): string => {
+    const titleWords = title.split(' ');
+    const newTitle = titleWords.map( (word: string) => word.charAt(0).toUpperCase() + word.slice(1) );
+    return newTitle.join(' ');
+}
+
 const removeExtension = (title: string) => {
     const posFileExtension = title.search(/(\.pdf)$/i);
     return posFileExtension !== -1 ? title.substring(0, posFileExtension) : title;  
@@ -87,7 +93,7 @@ const capitalizeAB = (
 };
 
 const buildFullTitle = (prodTitle: string, epTitle: string, epNumber: string): string => {
-    return `${prodTitle}   ${epTitle}  ${epNumber}`
+    return `${prodTitle.toUpperCase()}   ${titleCase(epTitle)}  ${epNumber}`
 };
 
 const dotify = (
@@ -133,7 +139,7 @@ const dotify = (
     }
 
 
-    const newTitle = `${prodTitle}   ${epTitle}  ${epNumber}`;
+    const newTitle = buildFullTitle(prodTitle, epTitle, epNumber);
     return [newTitle, status];
 };
 
