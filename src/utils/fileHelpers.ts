@@ -34,7 +34,8 @@ export const checkForDuplicates = (files: FileItem[]): FileItem[] => {
 };
 
 export const applyCueSheetConvention = (filename: string): [string, fileStatus] => {
-  return dotifyTitle(filename);
+  const cleanTitle =  dotifyTitle(filename);
+  return cleanTitle;
 };
 
 export const applySearchReplace = (
@@ -52,7 +53,7 @@ export const applySearchReplace = (
       if (rule.replaceWith === 'CUE_SHEET_TEMPLATE') {
         const results = applyCueSheetConvention(newName);
         newName = Array.isArray(results) ? results[0] : results;
-        if (newName !== file.currentName) {
+        if (newName !== file.currentName && results[1] !== 'dotified') {
           status = 'modified';
         } else {
           status = Array.isArray(results) ? results[1] as FileItem['status'] : file.status;
