@@ -56,7 +56,7 @@ export const searchIMDB = async (query: string, type: productionType): Promise<I
     url: 'https://imdb232.p.rapidapi.com/api/autocomplete',
     params: {q: query},
     headers: {
-      'x-rapidapi-key': import.meta.env.VITE_API_KEY,
+      'x-rapidapi-key': import.meta.env.VITE_API_KEY || process.env.RAPID_API_KEY,
       'x-rapidapi-host': 'imdb232.p.rapidapi.com'
     }
   };
@@ -86,7 +86,7 @@ export const getProductionDetails = async (result: IMDBSearchResult): Promise<IM
     method: 'GET',
       url: `https://imdb236.p.rapidapi.com/api/imdb/${result.id}`,
       headers: {
-        'x-rapidapi-key': import.meta.env.VITE_API_KEY,
+        'x-rapidapi-key': import.meta.env.VITE_API_KEY || process.env.RAPID_API_KEY,
         'x-rapidapi-host': 'imdb236.p.rapidapi.com'
       }
   };
@@ -114,7 +114,6 @@ export const getProductionDetails = async (result: IMDBSearchResult): Promise<IM
     plot: results.data.description || 'No description.',
     rating: results.data.averageRating || 0,
     poster: results.data.primaryImage || PosterPlaceHolder,
-    // akaTitle: akas
   };
   if (!productionDetails) {
     throw new Error('Production not found');
@@ -131,7 +130,7 @@ export const getAkas = async (result: IMDBSearchResult): Promise<AKATitle[]> => 
       limit: '30'
     },
     headers: {
-      'x-rapidapi-key': import.meta.env.VITE_API_KEY,
+      'x-rapidapi-key': import.meta.env.VITE_API_KEY || process.env.RAPID_API_KEY,
       'x-rapidapi-host': 'imdb232.p.rapidapi.com'
     }
   };
