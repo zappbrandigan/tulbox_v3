@@ -150,8 +150,9 @@ const IMDBSearch: React.FC = () => {
             {[
               { id: 'all', label: 'All Types', icon: Search },
               { id: 'movie', label: 'Movies', icon: Film },
-              { id: 'tv', label: 'TV Shows', icon: Tv },
-              { id: 'video_game', label: 'Games', icon: Gamepad2 },
+              { id: 'tvSeries', label: 'TV Shows', icon: Tv },
+              { id: 'tvMovie', label: 'TV Movies', icon: Tv },
+              { id: 'videoGame', label: 'Games', icon: Gamepad2 },
             ].map((type) => (
               <button
                 key={type.id}
