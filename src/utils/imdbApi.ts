@@ -17,6 +17,7 @@ const uniqueByTitle = (arr: {text: string}[]): {text: string}[] => {
 };
 
 const reorderName = (name: string): string => {
+  if (!name) return ''; // if director or cast name is missing 
   const parts = name.trim().split(/\s+/);
   if (parts.length < 2) return name; // can't reorder if there's only one name
 
