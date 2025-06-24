@@ -10,4 +10,5 @@ type ReportGenerator = (
 export const templateReportGenerators: Record<string, ReportGenerator> = {
   'works-report': CWRConverter.generateWorkReport.bind(CWRConverter),
   'isrc-report': CWRConverter.generateIsrcReport.bind(CWRConverter),
+  'aka-report': CWRConverter.generateAkaReport.bind(CWRConverter),
 };

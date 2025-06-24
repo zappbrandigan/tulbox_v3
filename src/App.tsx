@@ -2,7 +2,7 @@ import { useState } from 'react';
 import Layout from './components/ui/Layout';
 import PDFManager from './pages/PDFManager';
 import IMDBSearch from './pages/IMDBSearch';
-import CWRParser from './pages/CWRParser';
+import CWRConverter from './pages/CWRConverter';
 
 function App() {
   const [currentTool, setCurrentTool] = useState('pdf-manager');
@@ -14,8 +14,8 @@ function App() {
         return <PDFManager />;
       case 'imdb-search':
         return <IMDBSearch />;
-      case 'cwr-parser':
-        return <CWRParser />;
+      case 'cwr-converter':
+        return <CWRConverter />;
       default:
         return <PDFManager />;
     }

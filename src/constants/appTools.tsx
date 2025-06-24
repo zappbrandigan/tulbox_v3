@@ -21,8 +21,8 @@ export const TOOLS: Tool[] = [
     icon: <Search className="inline pr-2" />,
   },
   {
-    id: 'cwr-parser',
-    title: 'CWR Parser',
+    id: 'cwr-converter',
+    title: 'CWR Converter',
     description: 'Parse CWR .v21 files',
     icon: <AudioLines className="inline pr-2" />,
   },

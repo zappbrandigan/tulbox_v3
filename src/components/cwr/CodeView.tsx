@@ -27,7 +27,6 @@ export const CodeView: React.FC<CodeViewProps> = ({
 
   useEffect(() => {
     setIsProcessing(true);
-    console.log('viewer effect')
     
     setTimeout(() => {
       const result = CWRConverter.convertFile(fileContent, file); 

@@ -327,6 +327,28 @@ export class CWRConverter {
     return rowCollection;
   }
 
+    static generateAkaReport(transmission: ParsedCWRFile, template: CWRTemplate) {
+    const rowCollection: Map<string, string | number>[] =[];
+    const columns = template.fields.map(field => [field.key, ''] as [string, string]);
+
+    for (const group of transmission.groups) {
+      for (const transaction of group.transactions) {
+        const rows: Map<string, string | number>[] =[];
+        if (!transaction.alternativeTitles.length) { continue; } // skip if not REC records
+          for (const alternativeTitle of transaction.alternativeTitles) {
+            const row = new Map<string, string | number>(columns);
+            row.set('songCode', Number(transaction.header.data.submitterWorkNumber));
+            row.set('aka', alternativeTitle.data.alternativeTitle);
+            row.set('languageCode', alternativeTitle.data.languageCode ?? '');
+            row.set('workTitle', transaction.header.data.workTitle);
+            rows.push(row);
+          }
+        rowCollection.push(...rows);
+      }
+    }
+    return rowCollection;
+  }
+
   // record builder for custum parseFile method for code view
   private static buildRecord(type: CWRRecordType, line: string): Map<string, string> {
     const fieldDef = CWR_FIELD_MAP[type];

@@ -51,6 +51,17 @@ export const CWR_TEMPLATES: CWRTemplate[] = [
       { key: 'isrc', label: 'ISRCs', type: 'string', width: 13 },
     ]
   },
+  {
+    id: 'aka-report',
+    name: 'AKA Titles Report',
+    description: 'All AKAs (ALT record) present',
+    fields: [
+      { key: 'songCode', label: 'Song Code', type: 'string', width: 9 },
+      { key: 'aka', label: 'AKAs', type: 'string', width: 30 },
+      { key: 'languageCode', label: 'AKA Lang', type: 'string', width: 10 },
+      { key: 'workTitle', label: 'Work Title', type: 'string', width: 30 },
+    ]
+  },
 ];
 
 export const getTemplateById = (id: string): CWRTemplate | undefined => {
