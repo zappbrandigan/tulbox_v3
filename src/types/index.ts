@@ -220,3 +220,49 @@ export interface PageInfo {
   startCursor: string;
   endCursor: string;
 }
+
+// CWR Types
+// export interface CWRRecord {
+//   recordType: string;
+//   transactionSequence: string;
+//   recordSequence: string;
+//   [key: string]: string | number | undefined;
+// }
+
+export interface CWRWork {
+  workTitle: string;
+  workId?: string;
+  iswc?: string;
+  writers: CWRWriter[];
+  publishers: CWRPublisher[];
+  territories: string[];
+  duration?: string;
+  language?: string;
+  workType?: string;
+}
+
+export interface CWRWriter {
+  name: string;
+  ipi?: string;
+  role: string;
+  share?: number;
+  society?: string;
+}
+
+export interface CWRPublisher {
+  name: string;
+  ipi?: string;
+  share?: number;
+  society?: string;
+}
+
+export interface CWRParseResult {
+  fileName: string;
+  totalRecords: number;
+  records: Map<string, string>[];
+  totalWorks: number;
+  totalWriters: number;
+  totalPublishers: number;
+  errors: string[];
+  parseDate: Date;
+}

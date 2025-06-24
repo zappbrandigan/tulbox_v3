@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Plus, Search, Trash2, ToggleLeft, ToggleRight, AlertCircle } from 'lucide-react';
-import { SearchReplaceRule } from '../types';
+import { SearchReplaceRule } from '@/types';
 
 interface SearchReplaceProps {
   rules: SearchReplaceRule[];

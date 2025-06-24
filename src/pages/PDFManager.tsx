@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { Download, RefreshCw, Trash2 } from 'lucide-react';
-import DragDropZone from '../components/DragDropZone';
-import FileTable from '../components/FileTable';
-import SearchReplace from '../components/SearchReplace';
-import { FileItem, SearchReplaceRule } from '../types';
-import { generateFileId, checkForDuplicates, applySearchReplace, downloadRenamedFiles } from '../utils/fileHelpers';
+import DragDropZone from '@/components/DragDropZone';
+import FileTable from '@/components/FileTable';
+import SearchReplace from '@/components/SearchReplace';
+import { FileItem, SearchReplaceRule } from '@/types';
+import { generateFileId, checkForDuplicates, applySearchReplace, downloadRenamedFiles } from '@/utils/fileHelpers';
+import { ToolHeader } from '@/components/ui/ToolHeader';
 
 const PDFManager: React.FC = () => {
   const [files, setFiles] = useState<FileItem[]>([]);
@@ -78,21 +79,18 @@ const PDFManager: React.FC = () => {
 
   return (
     <div className="space-y-8">
-      {/* Header */}
       {files.length === 0 && 
-        (<div className="text-center">
-          <h1 className="text-3xl font-bold text-gray-900 mb-4">
-            PDF File Manager
-          </h1>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+        <ToolHeader 
+          primaryText='PDF File Manager'
+          secondaryText={`
             Upload PDF files, rename them individually or in batches using search & replace rules, 
-            then download your organized files.
-          </p>
-        </div>)
+            then download your organized files.`}
+        />
       }
 
-      {/* Upload Zone */}
-      {files.length === 0 && (<DragDropZone onFilesAdded={handleFilesAdded} />)}
+      {files.length === 0 && 
+        (<DragDropZone onFilesAdded={handleFilesAdded} />)
+      }
 
       {/* Stats & Actions */}
       {files.length > 0 && (
