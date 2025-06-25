@@ -128,7 +128,9 @@ export class CWRConverter {
       workTitle, 
       iswc,
       akas,
-    }: { songCode: string | number; workTitle: string; iswc: string, akas: string },
+      setupNote,
+      titleNote
+    }: { songCode: string | number; workTitle: string; iswc: string, akas: string, setupNote: string, titleNote: string },
     publisher: CWRPublisher,
     columns: [string, string][]
   ) {
@@ -151,6 +153,8 @@ export class CWRConverter {
     row.set('workTitle', workTitle);
     row.set('iswc', iswc);
     row.set('akas', akas);
+    row.set('setupNote', setupNote);
+    row.set('titleNote', titleNote);
     row.set('publisherSeqNum', publisher.data.publisherSequenceNumber);
     row.set('territoryCode', publisher.territories?.[0]?.data.tisCode ?? '');
     row.set('ogTerritoryFlag', publisher.territories?.[0]?.data.inclusionExclusionIndicator ?? '');
@@ -173,8 +177,10 @@ export class CWRConverter {
       songCode,
       workTitle,
       iswc,
-      akas
-    }: { songCode: string | number; workTitle: string; iswc: string, akas: string },
+      akas,
+      setupNote,
+      titleNote
+    }: { songCode: string | number; workTitle: string; iswc: string, akas: string, setupNote: string, titleNote: string },
     writer: CWRWriter,
     columns: [string, string][],
   ) {
@@ -202,6 +208,8 @@ export class CWRConverter {
       row.set('workTitle', workTitle);
       row.set('iswc', iswc);
       row.set('akas', akas);
+      row.set('setupNote', setupNote);
+      row.set('titleNote', titleNote);
       row.set('publisherSeqNum', '');
       row.set('territoryCode', writer.territories?.[0]?.data.tisCode ?? '');
       row.set('ogTerritoryFlag', writer.territories?.[0]?.data.inclusionExclusionIndicator ?? '');
@@ -226,6 +234,8 @@ export class CWRConverter {
       for (const transaction of group.transactions) {
         const rows: Map<string, string | number>[] =[];
         const songCode = Number(transaction.header.data.submitterWorkNumber);
+        const intendedPurpose = transaction.originators?.[0]?.data.intendedPurpose;
+        const setupNote = intendedPurpose === 'TEL' || intendedPurpose === 'FIL' ? 'FTV' : '';
 
         const repeatedData = {
           songCode: isNaN(songCode) ? transaction.header.data.submitterWorkNumber : songCode,
@@ -233,6 +243,8 @@ export class CWRConverter {
           workTitle: transaction.header.data.workTitle,
           iswc: transaction.header.data.iswc ?? '',
           akas: transaction.alternativeTitles.length ? 'See AKA Table' : '',
+          setupNote: setupNote,
+          titleNote: transaction.originators?.[0]?.data.productionTitle ?? ''
         };
 
         const publishers = transaction.publishers;
