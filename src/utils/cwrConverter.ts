@@ -129,8 +129,21 @@ export class CWRConverter {
       iswc,
       akas,
       setupNote,
-      titleNote
-    }: { songCode: string | number; workTitle: string; iswc: string, akas: string, setupNote: string, titleNote: string },
+      titleNote,
+      recordingTitle,
+      albumTitle,
+      catalogNum,
+    }: { 
+      songCode: string | number; 
+      workTitle: string; 
+      iswc: string, 
+      akas: string, 
+      setupNote: string, 
+      titleNote: string, 
+      recordingTitle: string, 
+      albumTitle: string, 
+      catalogNum: string 
+    },
     publisher: CWRPublisher,
     columns: [string, string][]
   ) {
@@ -146,9 +159,9 @@ export class CWRConverter {
     // const perfShare = (publisher.data.prOwnershipShare ?? 0);
     // const individualShare = perfShare / controllingWriterCount;
 
-    row.set('recordingTitle', 'No principal recording identified');
-    row.set('albumTitle', 'No album/single title identified');
-    row.set('catalogNum', 'No catalog number identified');
+    row.set('recordingTitle', recordingTitle);
+    row.set('albumTitle', albumTitle);
+    row.set('catalogNum', catalogNum);
     row.set('songCode', songCode);
     row.set('workTitle', workTitle);
     row.set('iswc', iswc);
@@ -173,14 +186,27 @@ export class CWRConverter {
   }
 
   static getWriterInfo(
-    {
-      songCode,
-      workTitle,
+    { 
+      songCode, 
+      workTitle, 
       iswc,
       akas,
       setupNote,
-      titleNote
-    }: { songCode: string | number; workTitle: string; iswc: string, akas: string, setupNote: string, titleNote: string },
+      titleNote,
+      recordingTitle,
+      albumTitle,
+      catalogNum,
+    }: { 
+      songCode: string | number; 
+      workTitle: string; 
+      iswc: string, 
+      akas: string, 
+      setupNote: string, 
+      titleNote: string, 
+      recordingTitle: string, 
+      albumTitle: string, 
+      catalogNum: string 
+    },
     writer: CWRWriter,
     columns: [string, string][],
   ) {
@@ -201,9 +227,9 @@ export class CWRConverter {
       
       row.set('contribution', individualContribution); // e.g., 16.67
 
-      row.set('recordingTitle', 'No principal recording identified');
-      row.set('albumTitle', 'No album/single title identified');
-      row.set('catalogNum', 'No catalog number identified');
+      row.set('recordingTitle', recordingTitle);
+      row.set('albumTitle', albumTitle);
+      row.set('catalogNum', catalogNum);
       row.set('songCode', songCode);
       row.set('workTitle', workTitle);
       row.set('iswc', iswc);
@@ -218,7 +244,7 @@ export class CWRConverter {
       row.set('ipNum', writer.data.writerIpNumber);
       row.set('publisherName', '');
       row.set('composerName', writerName);
-      row.set('ipiNameNum', Number(writer.data.writerIPINameNumber ?? ''));
+      row.set('ipiNameNum', Number(writer.data.writerIPINameNumber ?? '')); // will be change to writerIpiNameNumber in next version
       row.set('society', writer.data.prSocietyNumber ?? '');
       row.set('prOwnership', individualPerfShare);
       row.set('mrOwnership', writer.data.mrOwnershipShare ?? 0);
@@ -244,7 +270,10 @@ export class CWRConverter {
           iswc: transaction.header.data.iswc ?? '',
           akas: transaction.alternativeTitles.length ? 'See AKA Table' : '',
           setupNote: setupNote,
-          titleNote: transaction.originators?.[0]?.data.productionTitle ?? ''
+          titleNote: transaction.originators?.[0]?.data.productionTitle ?? '',
+          recordingTitle: transaction.recordings?.[0]?.data.recordingTitle ?? 'No principal recording identified', // need to add in cwr-parser
+          albumTitle: transaction.recordings?.[0]?.data.firstAlbumTitle ?? 'No album/single title identified',
+          catalogNum: transaction.recordings?.[0]?.data.firstReleaseCatalogNumber ?? 'No catalog number identified'
         };
 
         const publishers = transaction.publishers;
