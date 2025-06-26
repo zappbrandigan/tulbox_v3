@@ -20,6 +20,14 @@ const CWRParserPage: React.FC = () => {
   const [isProcessing, setIsProcessing] = useState(false);
 
   const handleFileUpload = async (file: File) => {
+    const maxSizeMB = 50; // limit in megabytes
+    const maxSizeBytes = maxSizeMB * 1024 * 1024;
+
+    if (file.size > maxSizeBytes) {
+      alert(`File too large. Max allowed size is ${maxSizeMB}MB.`);
+      return;
+    }
+    
     try {
       const content = await file.text();
       setFile(file.name);

@@ -20,6 +20,9 @@ import { AKATitle, IMDBProduction, IMDBSearchResult, productionType } from '@/ty
 import { searchIMDB, getProductionDetails, getAkas } from '@/utils/imdbApi';
 import { showToast } from '@/utils/toast';
 import { ToolHeader } from '@/components/ui/ToolHeader';
+import { ImdbSearchFilter } from '@/components/imdb/ImdbSearchFilter';
+import { ImdbSearchInput } from '@/components/imdb/ImdbSearchInput';
+import { ImdbSearchContainer } from '@/components/imdb/ImdbSearchContainer';
 
 const IMDBSearch: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -30,6 +33,7 @@ const IMDBSearch: React.FC = () => {
   const [isLoadingDetails, setIsLoadingDetails] = useState(false);
   const [isLoadingAkas, setIsLoadingAkas] = useState(false);
   const [searchType, setSearchType] = useState<productionType>('all');
+  const [error, setError] = useState(false);
 
   const handleSearch = async () => {
     if (!searchQuery.trim()) return;
@@ -43,6 +47,7 @@ const IMDBSearch: React.FC = () => {
       const results = await searchIMDB(searchQuery, searchType);
       setSearchResults(results);
     } catch (error) {
+      setError(true);
       console.error('Search failed:', error);
     } finally {
       setIsSearching(false);
@@ -141,64 +146,18 @@ const IMDBSearch: React.FC = () => {
       />
 
       {/* Search Section */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-        <div className="space-y-4">
-
-          {/* Search Type Filter */}
-          <div className="flex flex-wrap gap-2">
-            {[
-              { id: 'all', label: 'All Types', icon: Search },
-              { id: 'movie', label: 'Movies', icon: Film },
-              { id: 'tvSeries', label: 'TV Shows', icon: Tv },
-              { id: 'tvMovie', label: 'TV Movies', icon: Tv },
-              { id: 'videoGame', label: 'Games', icon: Gamepad2 },
-            ].map((type) => (
-              <button
-                key={type.id}
-                onClick={() => setSearchType(type.id as productionType)}
-                className={`inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                  searchType === type.id
-                    ? 'bg-blue-100 text-blue-700 border border-blue-200'
-                    : 'bg-gray-50 text-gray-700 border border-gray-200 hover:bg-gray-100'
-                }`}
-              >
-                <type.icon className="w-4 h-4 mr-2" />
-                {type.label}
-              </button>
-            ))}
-          </div>
-
-          {/* Search Input */}
-          <div className="flex space-x-4">
-            <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-              <input
-                type="text"
-                name="search"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-                placeholder="Search for movies, TV shows, games..."
-                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-            </div>
-            <button
-              onClick={handleSearch}
-              disabled={!searchQuery.trim() || isSearching}
-              className="px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors flex items-center"
-            >
-              {isSearching ? (
-                <Loader2 className="w-5 h-5 animate-spin" />
-              ) : (
-                <>
-                  <Search className="w-5 h-5 mr-2" />
-                  Search
-                </>
-              )}
-            </button>
-          </div>
-        </div>
-      </div>
+      <ImdbSearchContainer>
+          <ImdbSearchFilter 
+            searchType={searchType}
+            setSearchType={setSearchType}
+          />
+          <ImdbSearchInput 
+            searchQuery={searchQuery}
+            handleSearch={handleSearch}
+            isSearching={isSearching}
+            setSearchQuery={setSearchQuery}
+          />
+      </ImdbSearchContainer>
 
       {/* Search Results */}
       {!isLoadingDetails && !selectedProduction && filteredSearchResults.length > 0 && (
@@ -444,7 +403,7 @@ const IMDBSearch: React.FC = () => {
       )}
 
       {/* Empty State */}
-      {!isSearching && !isLoadingDetails && searchResults.length === 0 && !selectedProduction && searchQuery && (
+      {!isSearching && !isLoadingDetails && searchResults.length === 0 && !selectedProduction && searchQuery && error && (
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center">
           <Search className="w-12 h-12 mx-auto mb-4 text-gray-300" />
           <h3 className="text-lg font-medium text-gray-900 mb-2">No results found</h3>
