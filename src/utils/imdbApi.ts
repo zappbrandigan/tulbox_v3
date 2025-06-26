@@ -53,10 +53,10 @@ const seperateAticle = (akaTitle: string, languageCode: string) => {
 export const searchIMDB = async (query: string, type: productionType): Promise<IMDBSearchResult[]> => {
   const options = {
     method: 'GET',
-    url: `${import.meta.env.VITE_BASE_URL}/api/external/imdbMain/api/autocomplete`,
+    url: `${import.meta.env.VITE_REQUEST_URL}/api/external/imdbMain/api/autocomplete`,
     params: {q: query}
   };
-  console.log(import.meta.env.VITE_BASE_URL);
+  
   const results: ApiTitleSearchResponse = await axios.request(options);
 
   const responseData: IMDBSearchResult[] = results.data.d
@@ -80,7 +80,7 @@ export const searchIMDB = async (query: string, type: productionType): Promise<I
 export const getProductionDetails = async (result: IMDBSearchResult): Promise<IMDBProduction> => {
   const productionDetailOptions = {
     method: 'GET',
-    url: `${import.meta.env.VITE_BASE_URL}/api/external/imdbDetails/api/imdb/${result.id}`
+    url: `${import.meta.env.VITE_REQUEST_URL}/api/external/imdbDetails/api/imdb/${result.id}`
   };
 
   const results: ApiProductionDetails = await axios.request(productionDetailOptions);
@@ -116,7 +116,7 @@ export const getProductionDetails = async (result: IMDBSearchResult): Promise<IM
 export const getAkas = async (result: IMDBSearchResult): Promise<AKATitle[]> => {
   const productionAkaOptions = {
     method: 'GET',
-    url: `${import.meta.env.VITE_BASE_URL}/api/external/imdbMain/api/title/get-akas`,
+    url: `${import.meta.env.VITE_REQUEST_URL}/api/external/imdbMain/api/title/get-akas`,
     params: {
       tt: result.id,
       limit: '30'
@@ -133,7 +133,7 @@ export const getAkas = async (result: IMDBSearchResult): Promise<AKATitle[]> => 
   const uniqueAkaTitles = uniqueByTitle(akaTitles);
 
   const akaTitleLanguageDetails: LanguageDetectionResponse = await axios.post(
-    `${import.meta.env.VITE_BASE_URL}/api/external/langDetect/detect-language-batch`,
+    `${import.meta.env.VITE_REQUEST_URL}/api/external/langDetect/detect-language-batch`,
     {
       texts: uniqueAkaTitles
     }
