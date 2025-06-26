@@ -16,9 +16,10 @@ import {
   ExternalLink, 
   Loader2
 } from 'lucide-react';
-import { AKATitle, IMDBProduction, IMDBSearchResult, productionType } from '../types';
-import { searchIMDB, getProductionDetails, getAkas } from '../utils/imdbApi';
-import { showToast } from '../utils/toast';
+import { AKATitle, IMDBProduction, IMDBSearchResult, productionType } from '@/types';
+import { searchIMDB, getProductionDetails, getAkas } from '@/utils/imdbApi';
+import { showToast } from '@/utils/toast';
+import { ToolHeader } from '@/components/ui/ToolHeader';
 
 const IMDBSearch: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -131,15 +132,13 @@ const IMDBSearch: React.FC = () => {
 
   return (
     <div className="space-y-8">
-      {/* Header */}
-      <div className="text-center">
-        <h1 className="text-3xl font-bold text-gray-900 mb-4">
-          IMDb Production Search
-        </h1>
-        <p className="text-sm text-gray-600 max-w-2xl mx-auto">
-          Search for movies, TV shows, games and more. Get detailed production information including cast, crew, and international titles.
-        </p>
-      </div>
+      <ToolHeader 
+        primaryText='IMDb Production Search'
+        secondaryText={`
+          Search for movies, TV shows, games and more.
+          Get detailed production information including cast, crew, and international titles.
+        `}
+      />
 
       {/* Search Section */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">

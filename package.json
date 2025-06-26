@@ -1,7 +1,7 @@
 {
-  "name": "vite-react-typescript-starter",
+  "name": "TulBOX",
   "private": true,
-  "version": "0.0.0",
+  "version": "3.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -11,6 +11,8 @@
   },
   "dependencies": {
     "axios": "^1.9.0",
+    "cwr-parser": "^1.0.6",
+    "exceljs": "^4.4.0",
     "file-saver": "^2.0.5",
     "firebase": "^11.9.1",
     "jszip": "^3.10.1",

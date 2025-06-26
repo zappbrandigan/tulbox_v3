@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Edit3, Check, X, AlertCircle, CheckCircle, Copy, FileText } from 'lucide-react';
-import { FileItem } from '../types';
+import { FileItem } from '@/types';
 
 interface FileTableProps {
   files: FileItem[];
