@@ -56,7 +56,7 @@ export const searchIMDB = async (query: string, type: productionType): Promise<I
     url: `${import.meta.env.VITE_BASE_URL}/api/external/imdbMain/api/autocomplete`,
     params: {q: query}
   };
-
+  console.log(import.meta.env.VITE_BASE_URL);
   const results: ApiTitleSearchResponse = await axios.request(options);
 
   const responseData: IMDBSearchResult[] = results.data.d
