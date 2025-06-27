@@ -8,6 +8,7 @@ import { getTemplateById } from '@/utils/cwrTemplates';
 import { Table } from 'lucide-react';
 
 interface TableViewProps {
+  fileName: string;
   fileContent: string;
   selectedTemplate: string;
   isProcessing: boolean;
@@ -17,6 +18,7 @@ interface TableViewProps {
 }
 
 export const TableView: React.FC<TableViewProps> = ({ 
+  fileName,
   fileContent, 
   selectedTemplate, 
   isProcessing, 
@@ -30,7 +32,7 @@ export const TableView: React.FC<TableViewProps> = ({
     setIsProcessing(true);
     setTimeout(() => {
       const parser = new CWRParser();
-      const parsedData = parser.parseString(fileContent);
+      const parsedData = parser.parseString(fileContent, fileName);
       const template = getTemplateById(selectedTemplate);
       const generator = template && templateReportGenerators[template.id];
       const result = generator ? generator(parsedData, template) : [];
@@ -38,7 +40,7 @@ export const TableView: React.FC<TableViewProps> = ({
       setReportData(result);
       setIsProcessing(false);
     }, 500);
-  }, [fileContent, setIsProcessing, selectedTemplate, setReportData]);
+  }, [fileContent, setIsProcessing, selectedTemplate, setReportData, fileName]);
 
   return (
     <>

@@ -53,14 +53,10 @@ const seperateAticle = (akaTitle: string, languageCode: string) => {
 export const searchIMDB = async (query: string, type: productionType): Promise<IMDBSearchResult[]> => {
   const options = {
     method: 'GET',
-    url: 'https://imdb232.p.rapidapi.com/api/autocomplete',
-    params: {q: query},
-    headers: {
-      'x-rapidapi-key': import.meta.env.VITE_API_KEY,
-      'x-rapidapi-host': 'imdb232.p.rapidapi.com'
-    }
+    url: `https://tulbox-v3-proxy.onrender.com/api/external/imdbMain/api/autocomplete`,
+    params: {q: query}
   };
-
+  
   const results: ApiTitleSearchResponse = await axios.request(options);
 
   const responseData: IMDBSearchResult[] = results.data.d
@@ -84,11 +80,7 @@ export const searchIMDB = async (query: string, type: productionType): Promise<I
 export const getProductionDetails = async (result: IMDBSearchResult): Promise<IMDBProduction> => {
   const productionDetailOptions = {
     method: 'GET',
-      url: `https://imdb236.p.rapidapi.com/api/imdb/${result.id}`,
-      headers: {
-        'x-rapidapi-key': import.meta.env.VITE_API_KEY,
-        'x-rapidapi-host': 'imdb236.p.rapidapi.com'
-      }
+    url: `https://tulbox-v3-proxy.onrender.com/api/external/imdbDetails/api/imdb/${result.id}`
   };
 
   const results: ApiProductionDetails = await axios.request(productionDetailOptions);
@@ -124,14 +116,10 @@ export const getProductionDetails = async (result: IMDBSearchResult): Promise<IM
 export const getAkas = async (result: IMDBSearchResult): Promise<AKATitle[]> => {
   const productionAkaOptions = {
     method: 'GET',
-    url: 'https://imdb232.p.rapidapi.com/api/title/get-akas',
+    url: `https://tulbox-v3-proxy.onrender.com/api/external/imdbMain/api/title/get-akas`,
     params: {
       tt: result.id,
       limit: '30'
-    },
-    headers: {
-      'x-rapidapi-key': import.meta.env.VITE_API_KEY,
-      'x-rapidapi-host': 'imdb232.p.rapidapi.com'
     }
   };
 
@@ -145,7 +133,7 @@ export const getAkas = async (result: IMDBSearchResult): Promise<AKATitle[]> => 
   const uniqueAkaTitles = uniqueByTitle(akaTitles);
 
   const akaTitleLanguageDetails: LanguageDetectionResponse = await axios.post(
-    'https://lang-detect-memr.onrender.com/detect-language-batch',
+    `https://tulbox-v3-proxy.onrender.com/api/external/langDetect/detect-language-batch`,
     {
       texts: uniqueAkaTitles
     }

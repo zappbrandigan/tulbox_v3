@@ -256,6 +256,7 @@ export class CWRConverter {
   static generateWorkReport(transmission: ParsedCWRFile, template: CWRTemplate) {
     const rowCollection: Map<string, string | number>[] =[];
     const columns = template.fields.map(field => [field.key, ''] as [string, string]);
+    
     for (const group of transmission.groups) {
       for (const transaction of group.transactions) {
         const rows: Map<string, string | number>[] =[];
@@ -325,7 +326,7 @@ export class CWRConverter {
           // Only emit if we have enough share
           if (
             collectedPublisherShare >= writerShare ||
-            Math.abs(collectedPublisherShare - writerShare) < Number.EPSILON
+            Math.abs(collectedPublisherShare - writerShare) < 1e-6
           ) {
             // Push all collected publishers
             for (const pub of collectedPublishers) {
