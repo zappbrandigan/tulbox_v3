@@ -97,8 +97,8 @@ const CWRParserPage: React.FC = () => {
       {/* Data Display */}
       {selectedTemplate === 'raw-viewer' && fileContent && (
         <CodeView 
-          fileContent={fileContent} 
           file={file}
+          fileContent={fileContent} 
           isProcessing={isProcessing} 
           setIsProcessing={setIsProcessing}
           parseResult={parseResult}
@@ -108,6 +108,7 @@ const CWRParserPage: React.FC = () => {
 
       {selectedTemplate !== 'raw-viewer' && fileContent &&(
         <TableView 
+          fileName={file}
           fileContent={fileContent} 
           selectedTemplate={selectedTemplate} 
           isProcessing={isProcessing} 
