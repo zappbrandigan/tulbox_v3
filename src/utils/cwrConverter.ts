@@ -256,7 +256,7 @@ export class CWRConverter {
   static generateWorkReport(transmission: ParsedCWRFile, template: CWRTemplate) {
     const rowCollection: Map<string, string | number>[] =[];
     const columns = template.fields.map(field => [field.key, ''] as [string, string]);
-    console.log(transmission);
+    
     for (const group of transmission.groups) {
       for (const transaction of group.transactions) {
         const rows: Map<string, string | number>[] =[];
