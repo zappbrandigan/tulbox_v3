@@ -15,6 +15,13 @@ A modern web-based toolkit for PDF file management and IMDB production search, b
 - **View detailed production info**: cast, crew, plot, rating, production companies
 - **See international (AKA) titles** with transliteration
 
+### CWR Convertor
+- **Upload CWR .v21/.v22 files** via drag-and-drop or file picker
+- **Enhanced raw file viewer** makes it easier to read through a raw CWR file
+- **Convert** the content to predefined templates
+- **Export** to Excel, CSV, or JSON
+
+
 ## Tech Stack
 - [React](https://react.dev/) + [TypeScript](https://www.typescriptlang.org/)
 - [Vite](https://vitejs.dev/) for fast development
@@ -53,9 +60,6 @@ A modern web-based toolkit for PDF file management and IMDB production search, b
 ├── vite.config.ts       # Vite config
 └── ...
 ```
-
-## Notes
-- Only PDF files are supported in the file manager.
 
 ## License
 MIT
