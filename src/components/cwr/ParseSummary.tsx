@@ -17,6 +17,7 @@ export const ParseSummary: React.FC<SummaryProps> = ({ parseResult }) => {
 
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+      {/* Parse Summary Header */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center space-x-3">
           <CheckCircle className="w-6 h-6 text-emerald-500" />
