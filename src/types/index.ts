@@ -1,8 +1,23 @@
-export type productionType = 
-'all' | 'movie' | 'tvMovie' |'tvSeries' | 'tvEpisode' | 'short' |
-'videoGame' | 'podcast' | 'musicVideo' |'name' | 'video'
+export type productionType =
+  | 'all'
+  | 'movie'
+  | 'tvMovie'
+  | 'tvSeries'
+  | 'tvEpisode'
+  | 'short'
+  | 'videoGame'
+  | 'podcast'
+  | 'musicVideo'
+  | 'name'
+  | 'video';
 
-export type fileStatus = 'valid' | 'invalid' | 'duplicate' | 'dotified' | 'modified' | 'error';
+export type fileStatus =
+  | 'valid'
+  | 'invalid'
+  | 'duplicate'
+  | 'dotified'
+  | 'modified'
+  | 'error';
 
 export interface FileItem {
   id: string;
@@ -63,8 +78,8 @@ export interface IMDBSearchResult {
 }
 
 /*
-* type for API language detction
-*/
+ * type for API language detction
+ */
 export interface DetectedLanguage {
   confidence: number;
   detected_text: string;
@@ -77,18 +92,17 @@ export interface LanguageDetectionResponse {
   data: DetectedLanguage[];
 }
 
-
 /*
-* type for API title details response from imdb236
-*
-*/
+ * type for API title details response from imdb236
+ *
+ */
 
 export interface ApiTitleSearchResponse {
   data: {
     d: ApiTitleSearchItem[];
     q: string;
     v: number;
-  }
+  };
 }
 
 export interface ApiTitleSearchItem {
@@ -138,7 +152,7 @@ export interface ApiProductionDetails {
     directors: Person[];
     writers: Person[];
     cast: CastMember[];
-  }
+  };
 }
 
 export interface ProductionCompany {
@@ -158,9 +172,9 @@ export interface CastMember extends Person {
 }
 
 /*
-* Types for API AKA response data from imdb232
-*
-*/
+ * Types for API AKA response data from imdb232
+ *
+ */
 
 export interface ApiAkaResponse {
   data: {
@@ -195,13 +209,13 @@ export interface AkaNode {
 
 export interface DisplayableCountry {
   __typename: string;
-  id: string;   // e.g., "US"
+  id: string; // e.g., "US"
   text: string; // e.g., "United States"
 }
 
 export interface DisplayableLanguage {
   __typename: string;
-  id: string;   // e.g., "en"
+  id: string; // e.g., "en"
   text: string; // e.g., "English"
 }
 
@@ -221,48 +235,21 @@ export interface PageInfo {
   endCursor: string;
 }
 
-// CWR Types
-// export interface CWRRecord {
-//   recordType: string;
-//   transactionSequence: string;
-//   recordSequence: string;
-//   [key: string]: string | number | undefined;
-// }
+/**
+ * CWR Report Templates
+ */
 
-export interface CWRWork {
-  workTitle: string;
-  workId?: string;
-  iswc?: string;
-  writers: CWRWriter[];
-  publishers: CWRPublisher[];
-  territories: string[];
-  duration?: string;
-  language?: string;
-  workType?: string;
+export interface CWRTemplateField {
+  key: string;
+  label: string;
+  type: 'string' | 'number' | 'array' | 'nested';
+  width?: number;
+  style?: object;
 }
 
-export interface CWRWriter {
+export interface CWRTemplate {
+  id: string;
   name: string;
-  ipi?: string;
-  role: string;
-  share?: number;
-  society?: string;
-}
-
-export interface CWRPublisher {
-  name: string;
-  ipi?: string;
-  share?: number;
-  society?: string;
-}
-
-export interface CWRParseResult {
-  fileName: string;
-  totalRecords: number;
-  records: Map<string, string>[];
-  totalWorks: number;
-  totalWriters: number;
-  totalPublishers: number;
-  errors: string[];
-  parseDate: Date;
+  description: string;
+  fields: CWRTemplateField[];
 }
