@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Edit3, Check, X, AlertCircle, CheckCircle, Copy, FileText } from 'lucide-react';
+import { Edit3, Check, X, AlertCircle, CheckCircle, Copy } from 'lucide-react';
 import { FileItem } from '@/types';
 
 interface FileTableProps {
@@ -8,7 +8,11 @@ interface FileTableProps {
   onFileRemove: (id: string) => void;
 }
 
-const FileTable: React.FC<FileTableProps> = ({ files, onFileUpdate, onFileRemove }) => {
+const FileTable: React.FC<FileTableProps> = ({
+  files,
+  onFileUpdate,
+  onFileRemove,
+}) => {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editValue, setEditValue] = useState('');
 
@@ -85,8 +89,10 @@ const FileTable: React.FC<FileTableProps> = ({ files, onFileUpdate, onFileRemove
   if (files.length === 0) {
     return (
       <div className="text-center py-12 text-gray-500">
-        <FileText className="w-12 h-12 mx-auto mb-4 text-gray-300" />
-        <p>No files uploaded yet</p>
+        <p>
+          All data is processed locally in your browser. It is neither stored
+          nor transmitted, and is discarded when you refresh or exit the page.
+        </p>
       </div>
     );
   }
@@ -169,14 +175,21 @@ const FileTable: React.FC<FileTableProps> = ({ files, onFileUpdate, onFileRemove
                 <td className="px-6 py-4 text-sm">
                   <div className="flex items-center space-x-2">
                     {getStatusIcon(file.status)}
-                    <span className={`text-sm font-medium ${
-                      file.status === 'valid' ? 'text-emerald-700' :
-                      file.status === 'invalid' ? 'text-red-700' :
-                      file.status === 'dotified' ? 'text-blue-700' :
-                      file.status === 'modified' ? 'text-green-700' :
-                      file.status === 'error' ? 'text-red-700' :
-                      'text-amber-700'
-                    }`}>
+                    <span
+                      className={`text-sm font-medium ${
+                        file.status === 'valid'
+                          ? 'text-emerald-700'
+                          : file.status === 'invalid'
+                          ? 'text-red-700'
+                          : file.status === 'dotified'
+                          ? 'text-blue-700'
+                          : file.status === 'modified'
+                          ? 'text-green-700'
+                          : file.status === 'error'
+                          ? 'text-red-700'
+                          : 'text-amber-700'
+                      }`}
+                    >
                       {getStatusText(file.status)}
                     </span>
                   </div>

@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "axios": "^1.9.0",
-    "cwr-parser": "^1.0.6",
+    "cwr-parser": "^1.2.4",
     "exceljs": "^4.4.0",
     "file-saver": "^2.0.5",
     "firebase": "^11.9.1",

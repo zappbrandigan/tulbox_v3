@@ -1,4 +1,4 @@
-import { CWRConverter } from '@/utils/cwrConverter';
+import { CWRReporter } from '@/utils/cwrReporter';
 import { CWRTemplate } from '@/types/cwrTypes';
 import { ParsedCWRFile } from 'cwr-parser/types';
 
@@ -8,7 +8,7 @@ type ReportGenerator = (
 ) => Map<string, string | number>[];
 
 export const templateReportGenerators: Record<string, ReportGenerator> = {
-  'works-report': CWRConverter.generateWorkReport.bind(CWRConverter),
-  'isrc-report': CWRConverter.generateIsrcReport.bind(CWRConverter),
-  'aka-report': CWRConverter.generateAkaReport.bind(CWRConverter),
+  'works-report': CWRReporter.generateWorkReport.bind(CWRReporter),
+  'isrc-report': CWRReporter.generateIsrcReport.bind(CWRReporter),
+  'aka-report': CWRReporter.generateAkaReport.bind(CWRReporter),
 };

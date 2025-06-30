@@ -1,18 +1,19 @@
-import React from "react";
-import { CWRInitialParseResult } from "../../types/cwrTypes";
-import { AlertCircle, CheckCircle } from "lucide-react";
-import { LoadingOverlay } from "../ui/LoadingOverlay";
+import React from 'react';
+import { AlertCircle, CheckCircle } from 'lucide-react';
+import { LoadingOverlay } from '../ui/LoadingOverlay';
+import { CWRConverterRecord } from 'cwr-parser/types';
 
 interface SummaryProps {
-  parseResult: CWRInitialParseResult | null;
+  parseResult: CWRConverterRecord | null;
 }
 
 export const ParseSummary: React.FC<SummaryProps> = ({ parseResult }) => {
-  if (!parseResult) return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+  if (!parseResult)
+    return (
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
         <LoadingOverlay />
-    </div>
-  );
+      </div>
+    );
 
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
@@ -22,39 +23,47 @@ export const ParseSummary: React.FC<SummaryProps> = ({ parseResult }) => {
           <h3 className="text-lg font-semibold text-gray-900">Parse Results</h3>
         </div>
         <div className="text-sm text-gray-500">
-          Parsed on {parseResult.parseDate.toLocaleString()}
+          Parsed on {new Date().toDateString()}
         </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
         <div className="flex flex-col justify-center text-center p-4 bg-amber-50 rounded-lg">
           <div className="text-sm font-bold text-amber-600">
-            {parseResult.transmission.header.get('senderName')}
+            {parseResult.lines[0].data.get('senderName')}
           </div>
           <div className="text-sm text-amber-800">Sender</div>
         </div>
         <div className="text-center p-4 bg-blue-50 rounded-lg">
-          <div className="text-2xl font-bold text-blue-600">{parseResult.groupCount}</div>
-          <div className="text-sm text-blue-800">Total Groups</div>
+          <div className="text-2xl font-bold text-blue-600">
+            {parseResult.statistics?.recordCounts.NWR}
+          </div>
+          <div className="text-sm text-blue-800">New Works</div>
         </div>
         <div className="text-center p-4 bg-emerald-50 rounded-lg">
-          <div className="text-2xl font-bold text-emerald-600">{parseResult.transactionCount}</div>
-          <div className="text-sm text-emerald-800">Total Transactions</div>
+          <div className="text-2xl font-bold text-emerald-600">
+            {parseResult.statistics?.recordCounts.REV}
+          </div>
+          <div className="text-sm text-emerald-800">Revised Works</div>
         </div>
         <div className="text-center p-4 bg-purple-50 rounded-lg">
-          <div className="text-2xl font-bold text-purple-600">{parseResult.recordCount}</div>
+          <div className="text-2xl font-bold text-purple-600">
+            {parseResult.statistics?.totalRecords}
+          </div>
           <div className="text-sm text-purple-800">Total Records</div>
         </div>
       </div>
 
-      {parseResult.errors.length > 0 && (
+      {(parseResult.statistics?.errors?.length ?? 0) > 0 && (
         <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
           <div className="flex items-center space-x-2 mb-2">
             <AlertCircle className="w-5 h-5 text-red-500" />
-            <h4 className="font-medium text-red-900">Parse Errors ({parseResult.errors.length})</h4>
+            <h4 className="font-medium text-red-900">
+              Parse Errors ({parseResult.statistics?.errors?.length ?? 0})
+            </h4>
           </div>
           <div className="max-h-32 overflow-y-auto">
-            {parseResult.errors.map((error, index) => (
+            {parseResult.statistics?.errors.map((error, index) => (
               <div key={index} className="text-sm text-red-700 mb-1">
                 {error}
               </div>
