@@ -7,48 +7,57 @@ interface DragDropZoneProps {
   maxFiles?: number;
 }
 
-const DragDropZone: React.FC<DragDropZoneProps> = ({ 
-  onFilesAdded, 
+const DragDropZone: React.FC<DragDropZoneProps> = ({
+  onFilesAdded,
   accept = '.pdf',
-  maxFiles = 100 
+  maxFiles = 100,
 }) => {
   const [isDragOver, setIsDragOver] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const validateFiles = useCallback((files: FileList): File[] => {
-    const validFiles: File[] = [];
-    
-    for (let i = 0; i < files.length; i++) {
-      const file = files[i];
-      
-      if (file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf')) {
-        validFiles.push(file);
-      }
-    }
-    
-    if (validFiles.length === 0) {
-      setError('Please select only PDF files');
-      return [];
-    }
-    
-    if (validFiles.length > maxFiles) {
-      setError(`Maximum ${maxFiles} files allowed`);
-      return [];
-    }
-    
-    setError(null);
-    return validFiles;
-  }, [maxFiles]);
+  const validateFiles = useCallback(
+    (files: FileList): File[] => {
+      const validFiles: File[] = [];
 
-  const handleDrop = useCallback((e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    setIsDragOver(false);
-    
-    const files = validateFiles(e.dataTransfer.files);
-    if (files.length > 0) {
-      onFilesAdded(files);
-    }
-  }, [onFilesAdded, validateFiles]);
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+
+        if (
+          file.type === 'application/pdf' ||
+          file.name.toLowerCase().endsWith('.pdf')
+        ) {
+          validFiles.push(file);
+        }
+      }
+
+      if (validFiles.length === 0) {
+        setError('Please select only PDF files');
+        return [];
+      }
+
+      if (validFiles.length > maxFiles) {
+        setError(`Maximum ${maxFiles} files allowed`);
+        return [];
+      }
+
+      setError(null);
+      return validFiles;
+    },
+    [maxFiles]
+  );
+
+  const handleDrop = useCallback(
+    (e: React.DragEvent<HTMLDivElement>) => {
+      e.preventDefault();
+      setIsDragOver(false);
+
+      const files = validateFiles(e.dataTransfer.files);
+      if (files.length > 0) {
+        onFilesAdded(files);
+      }
+    },
+    [onFilesAdded, validateFiles]
+  );
 
   const handleDragOver = useCallback((e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
@@ -79,36 +88,41 @@ const DragDropZone: React.FC<DragDropZoneProps> = ({
         onDragLeave={handleDragLeave}
         className={`
           relative border-2 border-dashed rounded-xl p-8 text-center transition-all duration-300
-          ${isDragOver 
-            ? 'border-blue-400 bg-blue-50 scale-105' 
-            : 'border-gray-300 hover:border-gray-400'
+          ${
+            isDragOver
+              ? 'border-blue-400 bg-blue-50 scale-105'
+              : 'border-gray-300 hover:border-gray-400'
           }
           cursor-pointer group
         `}
       >
         <input
           type="file"
+          title=""
           accept={accept}
           multiple
           onChange={handleFileSelect}
           className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
         />
-        
+
         <div className="flex flex-col items-center space-y-4">
-          <div className={`
+          <div
+            className={`
             w-16 h-16 rounded-full flex items-center justify-center transition-all duration-300
-            ${isDragOver 
-              ? 'bg-blue-100 text-blue-600 scale-110' 
-              : 'bg-gray-100 text-gray-500 group-hover:bg-gray-200'
+            ${
+              isDragOver
+                ? 'bg-blue-100 text-blue-600 scale-110'
+                : 'bg-gray-100 text-gray-500 group-hover:bg-gray-200'
             }
-          `}>
+          `}
+          >
             {isDragOver ? (
               <FileText className="w-8 h-8" />
             ) : (
               <Upload className="w-8 h-8" />
             )}
           </div>
-          
+
           <div>
             <h3 className="text-lg font-semibold text-gray-900 mb-2">
               {isDragOver ? 'Drop your PDF files here' : 'Upload PDF Files'}
@@ -122,7 +136,7 @@ const DragDropZone: React.FC<DragDropZoneProps> = ({
           </div>
         </div>
       </div>
-      
+
       {error && (
         <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg flex items-center space-x-2">
           <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0" />

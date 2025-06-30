@@ -1,8 +1,7 @@
-import { useState } from "react";
-import { TooltipPortal } from "./TooltipPortal";
-import { CWRRecordType } from "../../types/cwrTypes";
-import { CWR_FIELD_MAP } from "../../utils/cwrRecordDefinitions";
-import { CWRRecordDefinition } from "../../types/cwrTypes";
+import { useState } from 'react';
+import { TooltipPortal } from './TooltipPortal';
+import { recordFields } from 'cwr-parser';
+import { FieldDefinition, RecordTypeKey } from 'cwr-parser/types';
 
 export const RecordLine = ({ line }: { line: Map<string, string> }) => {
   const [tooltip, setTooltip] = useState<{
@@ -11,8 +10,8 @@ export const RecordLine = ({ line }: { line: Map<string, string> }) => {
     position: { x: number; y: number };
   } | null>(null);
 
-  const recordType = line.get('recordType')! as CWRRecordType;
-  const recordDefinition: CWRRecordDefinition = CWR_FIELD_MAP[recordType];
+  const recordType = line.get('recordType') as RecordTypeKey;
+  const recordDefinition = recordFields[recordType];
 
   const handleMouseEnter = (
     e: React.MouseEvent<HTMLSpanElement>,
@@ -24,9 +23,9 @@ export const RecordLine = ({ line }: { line: Map<string, string> }) => {
       title: header,
       description: desc,
       position: {
-        x: (rect.right - rect.width),
+        x: rect.right - rect.width,
         y: rect.top,
-      }
+      },
     });
   };
 
@@ -37,30 +36,41 @@ export const RecordLine = ({ line }: { line: Map<string, string> }) => {
   return (
     <div>
       {[...line.entries()].map(([key, value]) => {
-        const recordDescription = recordDefinition['desc'];
-        const fieldDefinition = recordDefinition['fields'][key];
-        const size = fieldDefinition?.size ?? value.length;
-        const isPercentage = key.includes('Share');
+        const fieldDefinition: FieldDefinition =
+          recordDefinition.find((f) => f.name === key) ??
+          ({
+            title: 'Error',
+            description: 'Missing info',
+            type: 'string',
+            length: value.length,
+            required: false,
+          } as FieldDefinition);
+        const size = fieldDefinition?.length ?? value.length;
+        const isPercentage = fieldDefinition.type === 'percentage';
 
         return (
           <span
             key={key}
             onMouseEnter={(e) =>
-              fieldDefinition?.desc 
-              ? handleMouseEnter(e, fieldDefinition.header, fieldDefinition.desc)
-              : handleMouseEnter(e, 'Record Indicator', recordDescription)
+              handleMouseEnter(
+                e,
+                fieldDefinition.title,
+                fieldDefinition.description
+              )
             }
             onMouseLeave={handleMouseLeave}
             className="text-sm bg-gray-300 text-gray-800 px-1.5 py-0.5 mx-1 rounded whitespace-pre hover:bg-blue-100"
           >
-            {isPercentage 
-              ? (
-                  <>
-                    <span className="tracking-widest">{value.slice(0, -2)}</span>
-                    <span className="text-[.8em] relative -top-1">{value.slice(-2)}</span>
-                  </>
-                )
-              : value.padEnd(size)}
+            {isPercentage ? (
+              <>
+                <span className="tracking-widest">{value.slice(0, -2)}</span>
+                <span className="text-[.8em] relative -top-1">
+                  {value.slice(-2)}
+                </span>
+              </>
+            ) : (
+              value.padEnd(size)
+            )}
           </span>
         );
       })}
