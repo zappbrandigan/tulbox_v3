@@ -304,6 +304,22 @@ export class CWRReporter {
   }
 
   static generateAkaReport(transmission: ParsedCWRFile, template: CWRTemplate) {
+    function isRowDuplicate(
+      row: Map<string, string | number>,
+      existingRows: Map<string, string | number>[]
+    ): boolean {
+      const songCode = row.get('songCode');
+      const aka = row.get('aka');
+      const lang = row.get('languageCode');
+
+      return existingRows.some(
+        (r) =>
+          r.get('songCode') === songCode &&
+          r.get('aka') === aka &&
+          r.get('languageCode') === lang
+      );
+    }
+
     const rowCollection: Map<string, string | number>[] = [];
     const columns = template.fields.map(
       (field) => [field.key, ''] as [string, string]
@@ -311,10 +327,10 @@ export class CWRReporter {
 
     for (const group of transmission.groups) {
       for (const transaction of group.transactions) {
+        if (!transaction.alternativeTitles.length) continue;
+
         const rows: Map<string, string | number>[] = [];
-        if (!transaction.alternativeTitles.length) {
-          continue;
-        } // skip if not REC records
+
         for (const alternativeTitle of transaction.alternativeTitles) {
           const row = new Map<string, string | number>(columns);
           row.set(
@@ -324,7 +340,10 @@ export class CWRReporter {
           row.set('aka', alternativeTitle.data.alternativeTitle);
           row.set('languageCode', alternativeTitle.data.languageCode ?? '');
           row.set('workTitle', transaction.header.data.workTitle);
-          rows.push(row);
+          // Only add the row if it's not a duplicate
+          if (!isRowDuplicate(row, rows)) {
+            rows.push(row);
+          }
         }
         rowCollection.push(...rows);
       }
