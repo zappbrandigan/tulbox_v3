@@ -15,6 +15,7 @@ import {
   Star,
   ExternalLink,
   Loader2,
+  Languages,
 } from 'lucide-react';
 import {
   AKATitle,
@@ -249,8 +250,12 @@ const IMDBSearch: React.FC = () => {
                     <span>{selectedProduction.releaseYear}</span>
                   </div>
                   <div className="flex items-center space-x-1">
-                    <Globe className="w-4 h-4" />
+                    <Languages className="w-4 h-4" />
                     <span>{selectedProduction.language}</span>
+                  </div>
+                  <div className="flex items-center space-x-1">
+                    <Globe className="w-4 h-4" />
+                    <span>{selectedProduction.originCountry}</span>
                   </div>
                   {selectedProduction.rating && (
                     <div className="flex items-center space-x-1">

@@ -52,6 +52,7 @@ export interface IMDBProduction {
   imdbCode: string;
   type: productionType;
   language: string;
+  originCountry: string;
   productionCompanies: string[];
   releaseYear: number;
   actors: string[];
