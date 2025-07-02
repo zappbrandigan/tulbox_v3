@@ -368,9 +368,10 @@ export class CWRReporter {
           const row = new Map<string, string | number>(
             columnKeys.map((key) => [key, ''])
           );
-          const contribution = String(
-            writer.data.prOwnershipShare * 2
-          ).padStart(5, '0');
+          const contribution = (writer.data.prOwnershipShare * 2)
+            .toFixed(2) // ensures 2 decimal places
+            .padStart(6, '0'); // pads total length to 6 (e.g. "005.00")
+
           row.set('iswc', iswc);
           row.set('workTitle', workTitle);
           row.set('songTypeCode', songTypeCode);
@@ -389,13 +390,16 @@ export class CWRReporter {
           const row = new Map<string, string | number>(
             columnKeys.map((key) => [key, ''])
           );
+          const contribution = (publisher.data.prOwnershipShare * 2)
+            .toFixed(2) // ensures 2 decimal places
+            .padStart(6, '0'); // pads total length to 6 (e.g. "005.00")
           row.set('iswc', iswc);
           row.set('workTitle', workTitle);
           row.set('songTypeCode', songTypeCode);
           row.set('lastName', publisher.data.publisherName ?? '');
           row.set('firstName', '');
           row.set('capacity', publisher.data.publisherType ?? '');
-          row.set('contribution', publisher.data.prOwnershipShare ?? '');
+          row.set('contribution', contribution);
           row.set('controlled', publisher.recordType === 'SPU' ? 'Y' : 'N');
 
           // This was previously duplicated — pick the correct field
