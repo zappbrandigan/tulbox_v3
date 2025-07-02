@@ -24,11 +24,13 @@ const CWRParserPage: React.FC = () => {
   const [isProcessing, setIsProcessing] = useState(false);
 
   const handleFileUpload = async (file: File) => {
-    const maxSizeMB = 50; // limit in megabytes
+    const maxSizeMB = 1; // limit in megabytes
     const maxSizeBytes = maxSizeMB * 1024 * 1024;
 
     if (file.size > maxSizeBytes) {
-      alert(`File too large. Max allowed size is ${maxSizeMB}MB.`);
+      alert(
+        `This tool is currently in beta: maximum allowed file size is ${maxSizeMB}MB.`
+      );
       return;
     }
 
@@ -83,6 +85,7 @@ const CWRParserPage: React.FC = () => {
             Upload and parse CWR (Common Works Registration) .v21 or .v22 files. 
             Extract work registrations, writer information, publisher data, and export to CSV or Excel formats.
             `}
+            isBeta={true}
           />
           <DragDropZone onFilesAdded={handleFileUpload} />
         </>

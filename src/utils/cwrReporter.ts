@@ -350,4 +350,65 @@ export class CWRReporter {
     }
     return rowCollection;
   }
+
+  static generateCatImport(transmission: ParsedCWRFile, template: CWRTemplate) {
+    const rowCollection: Map<string, string | number>[] = [];
+
+    // Collect all expected column keys from the template
+    const columnKeys = template.fields.map((field) => field.key);
+
+    for (const group of transmission.groups) {
+      for (const transaction of group.transactions) {
+        const iswc = transaction.header.data.iswc ?? '';
+        const workTitle = transaction.header.data.workTitle ?? '';
+        const songTypeCode = 'OG';
+
+        // Writer rows
+        for (const writer of transaction.writers) {
+          const row = new Map<string, string | number>(
+            columnKeys.map((key) => [key, ''])
+          );
+          const contribution = String(
+            writer.data.prOwnershipShare * 2
+          ).padStart(5, '0');
+          row.set('iswc', iswc);
+          row.set('workTitle', workTitle);
+          row.set('songTypeCode', songTypeCode);
+          row.set('lastName', writer.data.writerLastName ?? '');
+          row.set('firstName', writer.data.writerFirstName ?? '');
+          row.set('capacity', writer.data.writerDesignationCode ?? '');
+          row.set('contribution', contribution);
+          row.set('controlled', writer.recordType === 'SWR' ? 'Y' : 'N');
+          row.set('affiliation', writer.data.prAffiliationSocietyNumber ?? '');
+          row.set('ipiNameNumber', writer.data.ipiNameNumber ?? '');
+          rowCollection.push(row);
+        }
+
+        // Publisher rows
+        for (const publisher of transaction.publishers) {
+          const row = new Map<string, string | number>(
+            columnKeys.map((key) => [key, ''])
+          );
+          row.set('iswc', iswc);
+          row.set('workTitle', workTitle);
+          row.set('songTypeCode', songTypeCode);
+          row.set('lastName', publisher.data.publisherName ?? '');
+          row.set('firstName', '');
+          row.set('capacity', publisher.data.publisherType ?? '');
+          row.set('contribution', publisher.data.prOwnershipShare ?? '');
+          row.set('controlled', publisher.recordType === 'SPU' ? 'Y' : 'N');
+
+          // This was previously duplicated — pick the correct field
+          row.set(
+            'affiliation',
+            publisher.data.prAffiliationSocietyNumber ?? ''
+          );
+          row.set('ipiNameNumber', publisher.data.ipiNameNumber ?? '');
+          rowCollection.push(row);
+        }
+      }
+    }
+
+    return rowCollection;
+  }
 }
