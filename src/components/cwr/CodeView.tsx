@@ -111,7 +111,8 @@ export const CodeView: React.FC<CodeViewProps> = ({
               <div className="flex items-center justify-between text-xs text-gray-600">
                 <span>
                   {parseResult?.statistics?.totalRecords} records •{' '}
-                  {parseResult?.statistics?.errors.length} errors
+                  {parseResult?.statistics?.errors.length} errors •{' '}
+                  {parseResult?.statistics?.warnings.length} warnings
                 </span>
                 <span>CWR v{Number(parseResult.version)} format</span>
               </div>
