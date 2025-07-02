@@ -281,7 +281,7 @@ const IMDBSearch: React.FC = () => {
               <div
                 onClick={() => {
                   navigator.clipboard.writeText(
-                    `${selectedProduction.imdbCode}`
+                    `${selectedProduction.imdbCode.substring(1)}`
                   );
                   showToast();
                 }}
