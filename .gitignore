@@ -3,6 +3,7 @@ node_modules
 *.local
 .DS_Store
 src/firebase.js
+src/firebase.ts
 .firebaserc
 firebase.json
 .firebase/
