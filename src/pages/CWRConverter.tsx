@@ -24,7 +24,7 @@ const CWRParserPage: React.FC = () => {
   const [isProcessing, setIsProcessing] = useState(false);
 
   const handleFileUpload = async (file: File) => {
-    const maxSizeMB = 1; // limit in megabytes
+    const maxSizeMB = 200; // limit in megabytes
     const maxSizeBytes = maxSizeMB * 1024 * 1024;
 
     if (file.size > maxSizeBytes) {
@@ -107,6 +107,7 @@ const CWRParserPage: React.FC = () => {
         <CodeView
           file={file}
           fileContent={fileContent}
+          selectedTemplate={selectedTemplate}
           isProcessing={isProcessing}
           setIsProcessing={setIsProcessing}
           parseResult={parseResult}

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Search,
   Podcast,
@@ -29,6 +29,8 @@ import { ToolHeader } from '@/components/ui/ToolHeader';
 import { ImdbSearchFilter } from '@/components/imdb/ImdbSearchFilter';
 import { ImdbSearchInput } from '@/components/imdb/ImdbSearchInput';
 import { ImdbSearchContainer } from '@/components/imdb/ImdbSearchContainer';
+import { analytics } from '@/firebase';
+import { logEvent } from 'firebase/analytics';
 
 const IMDBSearch: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -134,6 +136,13 @@ const IMDBSearch: React.FC = () => {
         return 'bg-gray-100 text-gray-800';
     }
   };
+
+  useEffect(() => {
+    logEvent(analytics, 'screen_view', {
+      firebase_screen: 'IMDbSearch',
+      firebase_screen_class: 'IMDbSearch',
+    });
+  }, []);
 
   const filteredSearchResults =
     searchType === 'all'

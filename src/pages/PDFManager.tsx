@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import DragDropZone from '@/components/pdf/DragDropZone';
 import FileTable from '@/components/pdf/FileTable';
 import SearchReplace from '@/components/pdf/SearchReplace';
@@ -11,6 +11,8 @@ import {
   downloadRenamedFiles,
 } from '@/utils/fileHelpers';
 import { ToolHeader } from '@/components/ui/ToolHeader';
+import { analytics } from '@/firebase';
+import { logEvent } from 'firebase/analytics';
 
 const PDFManager: React.FC = () => {
   const [files, setFiles] = useState<FileItem[]>([]);
@@ -20,6 +22,8 @@ const PDFManager: React.FC = () => {
   const [isDownloading, setIsDownloading] = useState(false);
 
   const handleFilesAdded = (newFiles: File[]) => {
+    logEvent(analytics, 'pdf_files_added', { count: newFiles.length });
+
     const fileItems: FileItem[] = newFiles.map((file) => ({
       id: generateFileId(),
       originalName: file.name,
@@ -56,6 +60,10 @@ const PDFManager: React.FC = () => {
   };
 
   const handleApplySearchReplace = () => {
+    logEvent(analytics, 'pdf_search_replace_applied', {
+      rulesCount: searchReplaceRules.length,
+    });
+
     setFiles((prevFiles) => {
       const updatedFiles = applySearchReplace(prevFiles, searchReplaceRules);
       return checkForDuplicates(updatedFiles);
@@ -68,10 +76,18 @@ const PDFManager: React.FC = () => {
     );
     if (downloadableFiles.length === 0) return;
 
+    logEvent(analytics, 'pdf_download_started', {
+      count: downloadableFiles.length,
+    });
+
     setIsDownloading(true);
     try {
       await downloadRenamedFiles(downloadableFiles);
+      logEvent(analytics, 'pdf_download_success', {
+        count: downloadableFiles.length,
+      });
     } catch (error) {
+      logEvent(analytics, 'pdf_download_error', { error: error });
       console.error('Error downloading files:', error);
     } finally {
       setIsDownloading(false);
@@ -79,9 +95,20 @@ const PDFManager: React.FC = () => {
   };
 
   const handleClearAll = () => {
+    logEvent(analytics, 'pdf_clear_all', {
+      fileCount: files.length,
+      rulesCount: searchReplaceRules.length,
+    });
     setFiles([]);
     setSearchReplaceRules([]);
   };
+
+  useEffect(() => {
+    logEvent(analytics, 'screen_view', {
+      firebase_screen: 'PDFManager',
+      firebase_screen_class: 'PDFManager',
+    });
+  }, []);
 
   return (
     <div className="space-y-8">
