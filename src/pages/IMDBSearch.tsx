@@ -45,6 +45,7 @@ const IMDBSearch: React.FC = () => {
   const [error, setError] = useState(false);
 
   const handleSearch = async () => {
+    logEvent(analytics, 'imdb_prod_search', { query: searchQuery });
     if (!searchQuery.trim()) return;
 
     setIsSearching(true);
@@ -77,6 +78,7 @@ const IMDBSearch: React.FC = () => {
   };
 
   const handleSelectProduction = async (result: IMDBSearchResult) => {
+    logEvent(analytics, 'imdb_prod_selection', { production: result.title });
     setIsLoadingDetails(true);
     setSelectedProduction(null);
 
