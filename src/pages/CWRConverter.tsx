@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FileText } from 'lucide-react';
 import { getTemplateById } from '@/utils/cwrTemplates';
 import { exportToCSV, exportToXLSX, exportToJSON } from '@/utils/exportHelpers';
@@ -9,6 +9,8 @@ import { TableView } from '@/components/cwr/TableView';
 import { ToolHeader } from '@/components/ui/ToolHeader';
 import { TemplateBox } from '@/components/cwr/TemplateBox';
 import { CWRConverterRecord } from 'cwr-parser/types';
+import { analytics } from '@/firebase';
+import { logEvent } from 'firebase/analytics';
 
 const CWRParserPage: React.FC = () => {
   const [file, setFile] = useState<string>('');
@@ -24,6 +26,7 @@ const CWRParserPage: React.FC = () => {
   const [isProcessing, setIsProcessing] = useState(false);
 
   const handleFileUpload = async (file: File) => {
+    logEvent(analytics, 'cwr_file_added', { size: file.size });
     const maxSizeMB = 200; // limit in megabytes
     const maxSizeBytes = maxSizeMB * 1024 * 1024;
 
@@ -47,6 +50,8 @@ const CWRParserPage: React.FC = () => {
   };
 
   const handleExport = (format: 'csv' | 'xlsx' | 'json') => {
+    logEvent(analytics, 'cwr_file_exported', { format: format });
+
     if (!parseResult) return;
 
     const template = getTemplateById(selectedTemplate);
@@ -74,6 +79,13 @@ const CWRParserPage: React.FC = () => {
     setReportData([]);
     setSelectedTemplate('raw-viewer');
   };
+
+  useEffect(() => {
+    logEvent(analytics, 'screen_view', {
+      firebase_screen: 'CWRConverter',
+      firebase_screen_class: 'CWRConverter',
+    });
+  }, []);
 
   return (
     <div className="space-y-8">
