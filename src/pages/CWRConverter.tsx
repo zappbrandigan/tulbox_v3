@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { FileText } from 'lucide-react';
 import { getTemplateById } from '@/utils/cwrTemplates';
-import { exportToCSV, exportToXLSX, exportToJSON } from '@/utils/exportHelpers';
+import { exportFile } from '@/utils/exportHelpers';
 import { CodeView } from '@/components/cwr/CodeView';
 import { ParseSummary } from '@/components/cwr/ParseSummary';
 import { DragDropZone } from '@/components/cwr/DragDropZone';
@@ -24,6 +24,7 @@ const CWRParserPage: React.FC = () => {
     []
   );
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
 
   const handleFileUpload = async (file: File) => {
     logEvent(analytics, 'cwr_file_added', { size: file.size });
@@ -49,7 +50,7 @@ const CWRParserPage: React.FC = () => {
     }
   };
 
-  const handleExport = (format: 'csv' | 'xlsx' | 'json') => {
+  const handleExport = (format: 'csv' | 'json') => {
     logEvent(analytics, 'cwr_file_exported', { format: format });
 
     if (!parseResult) return;
@@ -63,13 +64,15 @@ const CWRParserPage: React.FC = () => {
       '_'
     )}`;
 
-    if (format === 'csv') {
-      exportToCSV(reportData, template, exportFileName);
-    } else if (format === 'json') {
-      exportToJSON(reportData, exportFileName);
-    } else {
-      exportToXLSX(reportData, template, exportFileName);
-    }
+    exportFile(reportData, template, exportFileName, format, setIsDownloading);
+    // if (format === 'csv') {
+    //   exportToCSV(reportData, template, exportFileName);
+    // } else if (format === 'json') {
+    //   exportToJSON(reportData, exportFileName);
+    // }
+    // } else {
+    //   exportToXLSX(reportData, template, exportFileName);
+    // }
   };
 
   const handleFileRemove = () => {
@@ -109,6 +112,8 @@ const CWRParserPage: React.FC = () => {
         <TemplateBox
           selectedTemplate={selectedTemplate}
           setSelectedTemplate={setSelectedTemplate}
+          isProcessing={isProcessing}
+          isDownloading={isDownloading}
           handleFileRemove={handleFileRemove}
           handleExport={handleExport}
         />

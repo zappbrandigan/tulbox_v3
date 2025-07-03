@@ -5,13 +5,17 @@ import React, { useRef } from 'react';
 interface TemplateBoxProps {
   selectedTemplate: string;
   setSelectedTemplate: React.Dispatch<React.SetStateAction<string>>;
+  isProcessing: boolean;
+  isDownloading: boolean;
   handleFileRemove: () => void;
-  handleExport: (format: 'csv' | 'json' | 'xlsx') => void;
+  handleExport: (format: 'csv' | 'json') => void;
 }
 
 export const TemplateBox: React.FC<TemplateBoxProps> = ({
   selectedTemplate,
   setSelectedTemplate,
+  isProcessing,
+  isDownloading,
   handleFileRemove,
   handleExport,
 }) => {
@@ -50,8 +54,9 @@ export const TemplateBox: React.FC<TemplateBoxProps> = ({
 
         <div className="flex items-center space-x-3">
           <button
+            disabled={isProcessing || isDownloading}
             onClick={() => handleFileRemove()}
-            className="inline-flex items-center px-4 py-2 bg-gray-600 text-white font-medium rounded-lg hover:bg-emerald-700 transition-colors"
+            className="inline-flex items-center px-4 py-2 bg-gray-600 text-white font-medium rounded-lg hover:bg-gray-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
           >
             <Trash className="w-4 h-4 mr-2" />
             Clear
@@ -60,26 +65,28 @@ export const TemplateBox: React.FC<TemplateBoxProps> = ({
           {selectedTemplate !== 'raw-viewer' && (
             <>
               <button
+                disabled={isProcessing || isDownloading}
                 onClick={() => handleExport('json')}
-                className="inline-flex items-center px-4 py-2 bg-orange-600 text-white font-medium rounded-lg hover:bg-emerald-700 transition-colors"
+                className="inline-flex items-center px-4 py-2 bg-orange-600 text-white font-medium rounded-lg hover:bg-orange-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
               >
                 <Download className="w-4 h-4 mr-2" />
                 Export JSON
               </button>
               <button
+                disabled={isProcessing || isDownloading}
                 onClick={() => handleExport('csv')}
-                className="inline-flex items-center px-4 py-2 bg-emerald-600 text-white font-medium rounded-lg hover:bg-emerald-700 transition-colors"
+                className="inline-flex items-center px-4 py-2 bg-emerald-600 text-white font-medium rounded-lg hover:bg-emerald-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
               >
                 <Download className="w-4 h-4 mr-2" />
                 Export CSV
               </button>
-              <button
+              {/* <button
                 onClick={() => handleExport('xlsx')}
                 className="inline-flex items-center px-4 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"
               >
                 <Download className="w-4 h-4 mr-2" />
                 Export Excel
-              </button>
+              </button> */}
             </>
           )}
         </div>
