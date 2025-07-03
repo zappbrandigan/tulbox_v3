@@ -28,7 +28,7 @@ const CWRParserPage: React.FC = () => {
 
   const handleFileUpload = async (file: File) => {
     logEvent(analytics, 'cwr_file_added', { size: file.size });
-    const maxSizeMB = 200; // limit in megabytes
+    const maxSizeMB = 150; // limit in megabytes
     const maxSizeBytes = maxSizeMB * 1024 * 1024;
 
     if (file.size > maxSizeBytes) {
@@ -65,14 +65,6 @@ const CWRParserPage: React.FC = () => {
     )}`;
 
     exportFile(reportData, template, exportFileName, format, setIsDownloading);
-    // if (format === 'csv') {
-    //   exportToCSV(reportData, template, exportFileName);
-    // } else if (format === 'json') {
-    //   exportToJSON(reportData, exportFileName);
-    // }
-    // } else {
-    //   exportToXLSX(reportData, template, exportFileName);
-    // }
   };
 
   const handleFileRemove = () => {
@@ -97,8 +89,8 @@ const CWRParserPage: React.FC = () => {
           <ToolHeader
             primaryText="CWR File Converter"
             secondaryText={`
-            Upload and parse CWR (Common Works Registration) .v21 or .v22 files. 
-            Extract work registrations, writer information, publisher data, and export to CSV or Excel formats.
+            Upload and parse Common Works Registration (.v21 or .v22) files.
+            Inspect them with an enhanced raw viewer and export reports to CSV.
             `}
             isBeta={true}
           />

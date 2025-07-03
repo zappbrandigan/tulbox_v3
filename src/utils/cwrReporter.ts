@@ -5,7 +5,7 @@ import {
   CWRWriter,
   ParsedCWRFile,
 } from 'cwr-parser/types';
-import { CWRTemplate } from '@/types/cwrTypes';
+import { CWRTemplate, CWRTemplateField } from '@/types';
 
 export class CWRReporter {
   static getPublisherInfo(
@@ -161,7 +161,7 @@ export class CWRReporter {
   ) {
     const rowCollection: Map<string, string | number>[] = [];
     const columns = template.fields.map(
-      (field) => [field.key, ''] as [string, string]
+      (field: CWRTemplateField) => [field.key, ''] as [string, string]
     );
 
     for (const group of transmission.groups) {
@@ -279,7 +279,7 @@ export class CWRReporter {
   ) {
     const rowCollection: Map<string, string | number>[] = [];
     const columns = template.fields.map(
-      (field) => [field.key, ''] as [string, string]
+      (field: CWRTemplateField) => [field.key, ''] as [string, string]
     );
 
     for (const group of transmission.groups) {
@@ -289,11 +289,9 @@ export class CWRReporter {
           continue;
         } // skip if not REC records
         for (const recording of transaction.recordings) {
+          if (!recording.data.isrc) continue; // skip if REC has no ISRC
           const row = new Map<string, string | number>(columns);
-          row.set(
-            'songCode',
-            Number(transaction.header.data.submitterWorkNumber)
-          );
+          row.set('songCode', transaction.header.data.submitterWorkNumber);
           row.set('isrc', recording.data.isrc ?? '');
           rows.push(row);
         }
@@ -322,7 +320,7 @@ export class CWRReporter {
 
     const rowCollection: Map<string, string | number>[] = [];
     const columns = template.fields.map(
-      (field) => [field.key, ''] as [string, string]
+      (field: CWRTemplateField) => [field.key, ''] as [string, string]
     );
 
     for (const group of transmission.groups) {
@@ -333,10 +331,7 @@ export class CWRReporter {
 
         for (const alternativeTitle of transaction.alternativeTitles) {
           const row = new Map<string, string | number>(columns);
-          row.set(
-            'songCode',
-            Number(transaction.header.data.submitterWorkNumber)
-          );
+          row.set('songCode', transaction.header.data.submitterWorkNumber);
           row.set('aka', alternativeTitle.data.alternativeTitle);
           row.set('languageCode', alternativeTitle.data.languageCode ?? '');
           row.set('workTitle', transaction.header.data.workTitle);
@@ -355,7 +350,9 @@ export class CWRReporter {
     const rowCollection: Map<string, string | number>[] = [];
 
     // Collect all expected column keys from the template
-    const columnKeys = template.fields.map((field) => field.key);
+    const columnKeys = template.fields.map(
+      (field: CWRTemplateField) => field.key
+    );
 
     for (const group of transmission.groups) {
       for (const transaction of group.transactions) {
@@ -366,7 +363,7 @@ export class CWRReporter {
         // Writer rows
         for (const writer of transaction.writers) {
           const row = new Map<string, string | number>(
-            columnKeys.map((key) => [key, ''])
+            columnKeys.map((key: string) => [key, ''])
           );
           const contribution = (writer.data.prOwnershipShare * 2)
             .toFixed(2) // ensures 2 decimal places

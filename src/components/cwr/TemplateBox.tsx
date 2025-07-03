@@ -1,5 +1,5 @@
 import { CWR_TEMPLATES, getTemplateById } from '@/utils/cwrTemplates';
-import { Download, Settings, Trash } from 'lucide-react';
+import { Download, Settings, Trash, Loader2 } from 'lucide-react';
 import React, { useRef } from 'react';
 
 interface TemplateBoxProps {
@@ -64,29 +64,40 @@ export const TemplateBox: React.FC<TemplateBoxProps> = ({
 
           {selectedTemplate !== 'raw-viewer' && (
             <>
-              <button
+              {/* <button
                 disabled={isProcessing || isDownloading}
                 onClick={() => handleExport('json')}
                 className="inline-flex items-center px-4 py-2 bg-orange-600 text-white font-medium rounded-lg hover:bg-orange-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
               >
-                <Download className="w-4 h-4 mr-2" />
-                Export JSON
-              </button>
+                {isDownloading ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Downloading...
+                  </>
+                ) : (
+                  <>
+                    <Download className="w-4 h-4 mr-2" />
+                    Export JSON
+                  </>
+                )}
+              </button> */}
               <button
                 disabled={isProcessing || isDownloading}
                 onClick={() => handleExport('csv')}
                 className="inline-flex items-center px-4 py-2 bg-emerald-600 text-white font-medium rounded-lg hover:bg-emerald-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
               >
-                <Download className="w-4 h-4 mr-2" />
-                Export CSV
+                {isDownloading ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Exporting...
+                  </>
+                ) : (
+                  <>
+                    <Download className="w-4 h-4 mr-2" />
+                    Export CSV
+                  </>
+                )}
               </button>
-              {/* <button
-                onClick={() => handleExport('xlsx')}
-                className="inline-flex items-center px-4 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"
-              >
-                <Download className="w-4 h-4 mr-2" />
-                Export Excel
-              </button> */}
             </>
           )}
         </div>

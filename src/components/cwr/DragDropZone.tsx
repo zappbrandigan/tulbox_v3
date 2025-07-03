@@ -109,7 +109,7 @@ export const DragDropZone: React.FC<DragDropZoneProps> = ({
               Drag and drop your CWR file here, or click to browse
             </p>
             <p className="text-sm text-gray-500">
-              Maximum {maxFiles} file • .v21/.v22 format only
+              Maximum {maxFiles} file • 150MB Limit • .v21/.v22 format only
             </p>
           </div>
         </div>
