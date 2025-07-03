@@ -1,11 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { generateReactKey } from '@/utils/generateReactKeys';
-import { CWRTemplate, CWRTemplateField } from '@/types/cwrTypes';
+import { CWRTemplate, CWRTemplateField } from '@/types';
 import { LoadingOverlay } from '../ui/LoadingOverlay';
-import { CWRParser } from 'cwr-parser';
-import { templateReportGenerators } from '@/constants/templateRegistry';
-import { getTemplateById } from '@/utils/cwrTemplates';
 import { Table } from 'lucide-react';
+import ReportWorker from '@/workers/reportWorker?worker';
+import { analytics } from '@/firebase';
+import { logEvent } from 'firebase/analytics';
+
+const ROW_HEIGHT = 36;
+const PAGE_SIZE = 50;
 
 interface TableViewProps {
   fileName: string;
@@ -29,22 +32,49 @@ export const TableView: React.FC<TableViewProps> = ({
   setReportData,
 }) => {
   const [template, setTemplate] = useState<CWRTemplate | undefined>(undefined);
+  const [startIndex, setStartIndex] = useState(0);
+  const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    logEvent(analytics, 'cwr_report_viewed', { report: selectedTemplate });
+    const MIN_DURATION = 500; // ms
+    const start = Date.now();
     setIsProcessing(true);
-    setTimeout(() => {
-      const parser = new CWRParser({
-        convertCodes: true,
-      });
-      const parsedData = parser.parseString(fileContent, fileName);
-      const template = getTemplateById(selectedTemplate);
-      const generator = template && templateReportGenerators[template.id];
-      const result = generator ? generator(parsedData, template) : [];
+
+    const worker = new ReportWorker();
+    worker.postMessage({ fileContent, fileName, selectedTemplate });
+
+    worker.onmessage = (e) => {
+      const { template, reportData, error } = e.data;
+      const elapsed = Date.now() - start;
+      const remaining = Math.max(0, MIN_DURATION - elapsed);
+
+      if (error) {
+        console.error('Worker Error:', error);
+        setIsProcessing(false);
+        worker.terminate();
+        return;
+      }
+
       setTemplate(template);
-      setReportData(result);
-      setIsProcessing(false);
-    }, 500);
-  }, [fileContent, setIsProcessing, selectedTemplate, setReportData, fileName]);
+      setReportData(reportData);
+
+      setTimeout(() => {
+        setIsProcessing(false);
+        worker.terminate();
+      }, remaining);
+    };
+
+    return () => worker.terminate();
+  }, [fileContent, fileName, selectedTemplate, setIsProcessing, setReportData]);
+
+  const handleScroll = () => {
+    const scrollTop = scrollRef.current?.scrollTop || 0;
+    const newIndex = Math.floor(scrollTop / ROW_HEIGHT);
+    setStartIndex(newIndex);
+  };
+
+  const visibleData = reportData.slice(startIndex, startIndex + PAGE_SIZE);
 
   return (
     <>
@@ -52,6 +82,7 @@ export const TableView: React.FC<TableViewProps> = ({
         <Table className="w-5 h-5 text-gray-600" />
         <h3 className="text-lg font-semibold text-gray-900">Data Preview</h3>
       </div>
+
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
         {isProcessing ? (
           <LoadingOverlay message={'Rendering Template...'} />
@@ -62,7 +93,11 @@ export const TableView: React.FC<TableViewProps> = ({
           </div>
         ) : (
           <>
-            <div className="overflow-auto min-h-[650px] h-[82vh]">
+            <div
+              className="overflow-auto min-h-[650px] h-[82vh]"
+              ref={scrollRef}
+              onScroll={handleScroll}
+            >
               <table className="w-full">
                 <thead className="sticky top-0 bg-gray-50 border-b border-gray-200">
                   <tr>
@@ -77,10 +112,19 @@ export const TableView: React.FC<TableViewProps> = ({
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
-                  {reportData.map((record, index) => (
+                  {/* Top Spacer */}
+                  {startIndex > 0 && (
+                    <tr style={{ height: `${startIndex * ROW_HEIGHT}px` }}>
+                      <td colSpan={template.fields.length}></td>
+                    </tr>
+                  )}
+
+                  {/* Visible Rows */}
+                  {visibleData.map((record, index) => (
                     <tr
-                      key={index}
-                      className="hover:bg-gray-50 transition-colors overflow-hidden"
+                      key={startIndex + index}
+                      className="hover:bg-gray-50 transition-colors"
+                      style={{ height: `${ROW_HEIGHT}px` }}
                     >
                       {Array.from(record.entries()).map(([key, value]) => (
                         <td
@@ -92,8 +136,38 @@ export const TableView: React.FC<TableViewProps> = ({
                       ))}
                     </tr>
                   ))}
+
+                  {/* Bottom Spacer */}
+                  {startIndex + PAGE_SIZE < reportData.length && (
+                    <tr
+                      style={{
+                        height: `${
+                          (reportData.length - startIndex - PAGE_SIZE) *
+                          ROW_HEIGHT
+                        }px`,
+                      }}
+                    >
+                      <td colSpan={template.fields.length}></td>
+                    </tr>
+                  )}
                 </tbody>
               </table>
+            </div>
+            <div className="bg-gray-50 border-t border-gray-200 px-4 py-2">
+              <div className="flex items-center justify-between text-xs text-gray-600">
+                <span>
+                  <span className="text-emerald-500">{reportData.length}</span>
+                  {` records • `}
+                  <span className="text-red-500">{0}</span>
+                  {` errors • `}
+                  <span className="text-amber-500">{0}</span>
+                  {` warnings`}
+                </span>
+                <span>
+                  <span>{template.name}</span>{' '}
+                  <span className="text-blue-500">v{template?.version}</span>
+                </span>
+              </div>
             </div>
           </>
         )}

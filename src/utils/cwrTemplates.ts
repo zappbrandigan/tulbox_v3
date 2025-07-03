@@ -1,8 +1,9 @@
-import { CWRTemplate } from '../types/cwrTypes';
+import { CWRTemplate } from '@/types';
 
 export const CWR_TEMPLATES: CWRTemplate[] = [
   {
     id: 'raw-viewer',
+    version: '1.7.5',
     name: 'Raw File Viewer',
     description:
       'View the original CWR .v21/.v22 file content, hover cells for additional info.',
@@ -11,6 +12,7 @@ export const CWR_TEMPLATES: CWRTemplate[] = [
   {
     id: 'works-report',
     name: 'Works Report',
+    version: '0.1.1',
     description: 'Detailed works information with roles and shares',
     fields: [
       { key: 'songCode', label: 'Song Code', type: 'string', width: 9 },
@@ -79,6 +81,7 @@ export const CWR_TEMPLATES: CWRTemplate[] = [
   },
   {
     id: 'isrc-report',
+    version: '1.0.0',
     name: 'ISRC Report',
     description: 'All ISRC records present',
     fields: [
@@ -89,6 +92,7 @@ export const CWR_TEMPLATES: CWRTemplate[] = [
   },
   {
     id: 'aka-report',
+    version: '1.0.2',
     name: 'AKA Titles Report',
     description: 'All AKAs (ALT record) present',
     fields: [
@@ -100,6 +104,7 @@ export const CWR_TEMPLATES: CWRTemplate[] = [
   },
   {
     id: 'cat-import',
+    version: '0.0.1',
     name: 'Cat Import',
     description: 'CWR data formated for Cat Import.',
     fields: [

@@ -250,6 +250,7 @@ export interface CWRTemplateField {
 
 export interface CWRTemplate {
   id: string;
+  version: string;
   name: string;
   description: string;
   fields: CWRTemplateField[];
