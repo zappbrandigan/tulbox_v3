@@ -1,5 +1,6 @@
 import React from 'react';
 import { Header } from '@/components/header/Header';
+import { Footer } from '@/components/footer/Footer';
 import { ToolContainer } from './ToolContainer';
 
 interface LayoutProps {
@@ -16,13 +17,14 @@ const Layout: React.FC<LayoutProps> = ({
   onToolChange,
 }) => {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
+    <div className="flex flex-col min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
       <Header
         appName={appName}
         currentTool={currentTool}
         onToolChange={onToolChange}
       />
       <ToolContainer>{children}</ToolContainer>
+      <Footer />
     </div>
   );
 };

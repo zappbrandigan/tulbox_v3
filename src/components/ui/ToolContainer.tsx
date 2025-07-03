@@ -6,7 +6,7 @@ interface ToolContainerProps {
 
 export const ToolContainer: React.FC<ToolContainerProps> = ({ children }) => {
   return (
-    <main className="container mx-auto px-4 sm:px-4 lg:px-4 py-8">
+    <main className="container flex-1 mx-auto px-4 sm:px-2 lg:px-4 py-8">
       {children}
       <div
         id="clipboard-toast"
