@@ -2,8 +2,7 @@ node_modules
 .env
 *.local
 .DS_Store
-src/firebase.js
-src/firebase.ts
+firebase.ts
 .firebaserc
 firebase.json
 .firebase/
