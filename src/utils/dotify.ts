@@ -1,9 +1,9 @@
 import { FileItem } from '../types';
 
 const titleCase = (title: string): string => {
-  const titleWords = title.toLocaleLowerCase().split(' ');
+  const titleWords = title.toLowerCase().split(' ');
   const newTitle = titleWords.map(
-    (word: string) => word.charAt(0).toLocaleUpperCase() + word.slice(1)
+    (word: string) => word.charAt(0).toUpperCase() + word.slice(1)
   );
   return newTitle.join(' ');
 };
