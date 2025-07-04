@@ -24,7 +24,7 @@ const Layout: React.FC<LayoutProps> = ({
         onToolChange={onToolChange}
       />
       <ToolContainer>{children}</ToolContainer>
-      <Footer />
+      <Footer appName={appName} />
     </div>
   );
 };
