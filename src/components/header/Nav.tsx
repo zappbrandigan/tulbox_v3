@@ -39,7 +39,7 @@ export const Nav: React.FC<NavProps> = ({ currentTool, onToolChange }) => {
             ))}
             <MenuItem>
               <a
-                href="https://docs.tulbox.app"
+                href="https://docs.tulbox.app/tulbox/intro"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
@@ -70,7 +70,7 @@ export const Nav: React.FC<NavProps> = ({ currentTool, onToolChange }) => {
           </button>
         ))}
         <a
-          href="https://docs.tulbox.app"
+          href="https://docs.tulbox.app/tulbox/intro"
           target="_blank"
           rel="noopender noreferrer"
         >
