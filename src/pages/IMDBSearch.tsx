@@ -15,7 +15,7 @@ import {
   IMDBSearchResult,
   productionType,
 } from '@/types';
-import { searchIMDB, getProductionDetails, getAkas } from '@/utils';
+import { searchIMDB, getProductionDetails, getAkas, trackEvent } from '@/utils';
 import {
   SearchContainer,
   SearchInput,
@@ -24,8 +24,6 @@ import {
   ProductionDetails,
 } from '@/components/imdb';
 import { ToolHeader, LoadingOverlay } from '@/components/ui';
-import { analytics } from '@/firebase';
-import { logEvent } from 'firebase/analytics';
 
 const IMDBSearch: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -40,7 +38,7 @@ const IMDBSearch: React.FC = () => {
   const [error, setError] = useState(false);
 
   const handleSearch = async () => {
-    logEvent(analytics, 'imdb_prod_search', { query: searchQuery });
+    trackEvent('imdb_prod_search', { query: searchQuery });
     if (!searchQuery.trim()) return;
 
     setIsSearching(true);
@@ -52,6 +50,7 @@ const IMDBSearch: React.FC = () => {
       const results = await searchIMDB(searchQuery, searchType);
       setSearchResults(results);
     } catch (error) {
+      trackEvent('imdb_prod_search_error', { query: searchQuery });
       setError(true);
       console.error('Search failed:', error);
     } finally {
@@ -60,12 +59,14 @@ const IMDBSearch: React.FC = () => {
   };
 
   const handleGetAkas = async (result: IMDBSearchResult) => {
+    trackEvent('imdb_prod_akas', { production: result.id });
     setIsLoadingAkas(true);
     try {
       const akas = await getAkas(result);
       setAkaTitles(akas);
       setIsLoadingAkas(false);
     } catch (error) {
+      trackEvent('imdb_prod_akas_error', { query: result.id });
       console.error('Failed to load AKAs:', error);
     } finally {
       setIsLoadingAkas(false);
@@ -73,7 +74,7 @@ const IMDBSearch: React.FC = () => {
   };
 
   const handleSelectProduction = async (result: IMDBSearchResult) => {
-    logEvent(analytics, 'imdb_prod_selection', { production: result.title });
+    trackEvent('imdb_prod_selection', { production: result.id });
     setIsLoadingDetails(true);
     setSelectedProduction(null);
 
@@ -81,6 +82,7 @@ const IMDBSearch: React.FC = () => {
       const details = await getProductionDetails(result);
       setSelectedProduction(details);
     } catch (error) {
+      trackEvent('imdb_prod_selection_error', { production: result.id });
       console.error('Failed to load production details:', error);
     } finally {
       setIsLoadingDetails(false);
@@ -110,7 +112,7 @@ const IMDBSearch: React.FC = () => {
   };
 
   useEffect(() => {
-    logEvent(analytics, 'screen_view', {
+    trackEvent('screen_view', {
       firebase_screen: 'IMDbSearch',
       firebase_screen_class: 'IMDbSearch',
     });

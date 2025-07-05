@@ -1,4 +1,3 @@
-import ExcelJS from 'exceljs';
 import { CWRTemplate } from '@/types';
 import ExportWorker from '@/workers/exportWorker?worker';
 
@@ -38,7 +37,7 @@ const exportFile = (
 };
 
 const downloadFile = (
-  content: string | ExcelJS.Buffer,
+  content: string,
   fileName: string,
   mimeType: string
 ): void => {

@@ -2,6 +2,7 @@ import React from 'react';
 import { ExternalLink, MenuIcon } from 'lucide-react';
 import { TOOLS } from '@/constants/appTools';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
+import { trackEvent } from '@/utils';
 
 interface NavProps {
   currentTool: string;
@@ -9,6 +10,26 @@ interface NavProps {
 }
 
 const Nav: React.FC<NavProps> = ({ currentTool, onToolChange }) => {
+  function DocsLink() {
+    const handleClick = () => {
+      trackEvent('docs_link_click', {
+        destination: 'https://docs.tulbox.app/tulbox/intro',
+        label: 'Documentation',
+      });
+    };
+
+    return (
+      <a
+        href="https://docs.tulbox.app/tulbox/intro"
+        target="_blank"
+        rel="noopener noreferrer"
+        onClick={handleClick}
+        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+      >
+        Docs <ExternalLink className="inline pl-2" />
+      </a>
+    );
+  }
   return (
     <div className="flex items-center justify-between">
       {/* Mobile Nav (Dropdown) */}
@@ -38,14 +59,7 @@ const Nav: React.FC<NavProps> = ({ currentTool, onToolChange }) => {
               </MenuItem>
             ))}
             <MenuItem>
-              <a
-                href="https://docs.tulbox.app/tulbox/intro"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-              >
-                Docs <ExternalLink className="inline pl-2" />
-              </a>
+              <DocsLink />
             </MenuItem>
           </MenuItems>
         </Menu>
@@ -69,15 +83,7 @@ const Nav: React.FC<NavProps> = ({ currentTool, onToolChange }) => {
             <span className="hidden lg:inline">{tool.icon}</span> {tool.title}
           </button>
         ))}
-        <a
-          href="https://docs.tulbox.app/tulbox/intro"
-          target="_blank"
-          rel="noopender noreferrer"
-        >
-          <button className="flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 text-gray-600 hover:text-gray-900 hover:bg-gray-100">
-            Docs <ExternalLink className="inline pl-2" />
-          </button>
-        </a>
+        <DocsLink />
       </nav>
     </div>
   );

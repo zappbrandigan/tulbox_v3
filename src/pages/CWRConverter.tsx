@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { FileText } from 'lucide-react';
-import { exportFile, getTemplateById } from '@/utils';
+import { exportFile, getTemplateById, trackEvent } from '@/utils';
 import {
   DragDropZone,
   ParseSummary,
@@ -10,8 +10,6 @@ import {
 } from '@/components/cwr';
 import { ToolHeader } from '@/components/ui';
 import { CWRConverterRecord } from 'cwr-parser/types';
-import { analytics } from '@/firebase';
-import { logEvent } from 'firebase/analytics';
 
 const CWRParserPage: React.FC = () => {
   const [file, setFile] = useState<string>('');
@@ -28,7 +26,9 @@ const CWRParserPage: React.FC = () => {
   const [isDownloading, setIsDownloading] = useState(false);
 
   const handleFileUpload = async (file: File) => {
-    logEvent(analytics, 'cwr_file_added', { size: file.size });
+    trackEvent('cwr_file_added', {
+      size: `${(file.size / 1024 / 1024).toFixed(2)} Mb`,
+    });
     const maxSizeMB = 150; // limit in megabytes
     const maxSizeBytes = maxSizeMB * 1024 * 1024;
 
@@ -52,7 +52,7 @@ const CWRParserPage: React.FC = () => {
   };
 
   const handleExport = (format: 'csv' | 'json') => {
-    logEvent(analytics, 'cwr_file_exported', { format: format });
+    trackEvent('cwr_file_exported', { format: format });
 
     if (!parseResult) return;
 
@@ -77,7 +77,7 @@ const CWRParserPage: React.FC = () => {
   };
 
   useEffect(() => {
-    logEvent(analytics, 'screen_view', {
+    trackEvent('screen_view', {
       firebase_screen: 'CWRConverter',
       firebase_screen_class: 'CWRConverter',
     });

@@ -1,8 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Layout } from './components/ui';
-import PDFManager from './pages/PDFManager';
-import IMDBSearch from './pages/IMDBSearch';
-import CWRConverter from './pages/CWRConverter';
+import { PDFManager, IMDBSearch, CWRConverter } from './pages';
 
 function App() {
   const [currentTool, setCurrentTool] = useState('pdf-manager');

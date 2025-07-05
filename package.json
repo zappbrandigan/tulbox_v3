@@ -13,7 +13,6 @@
     "@headlessui/react": "^2.2.4",
     "axios": "^1.9.0",
     "cwr-parser": "^1.2.7",
-    "exceljs": "^4.4.0",
     "file-saver": "^2.0.5",
     "firebase": "^11.9.1",
     "jszip": "^3.10.1",
@@ -37,6 +36,7 @@
     "tailwindcss": "^3.4.17",
     "typescript": "^5.5.3",
     "typescript-eslint": "^8.3.0",
-    "vite": "^6.3.5"
+    "vite": "^6.3.5",
+    "vitest": "^3.2.4"
   }
 }

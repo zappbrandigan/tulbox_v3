@@ -11,10 +11,9 @@ import {
   checkForDuplicates,
   applySearchReplace,
   downloadRenamedFiles,
+  trackEvent,
 } from '@/utils';
 import { ToolHeader } from '@/components/ui';
-import { analytics } from '@/firebase';
-import { logEvent } from 'firebase/analytics';
 
 const PDFManager: React.FC = () => {
   const [files, setFiles] = useState<FileItem[]>([]);
@@ -24,7 +23,7 @@ const PDFManager: React.FC = () => {
   const [isDownloading, setIsDownloading] = useState(false);
 
   const handleFilesAdded = (newFiles: File[]) => {
-    logEvent(analytics, 'pdf_files_added', { count: newFiles.length });
+    trackEvent('pdf_files_added', { count: newFiles.length });
 
     const fileItems: FileItem[] = newFiles.map((file) => ({
       id: generateFileId(),
@@ -62,8 +61,9 @@ const PDFManager: React.FC = () => {
   };
 
   const handleApplySearchReplace = () => {
-    logEvent(analytics, 'pdf_search_replace_applied', {
+    trackEvent('pdf_search_replace_applied', {
       rulesCount: searchReplaceRules.length,
+      rule: searchReplaceRules,
     });
 
     setFiles((prevFiles) => {
@@ -78,18 +78,18 @@ const PDFManager: React.FC = () => {
     );
     if (downloadableFiles.length === 0) return;
 
-    logEvent(analytics, 'pdf_download_started', {
+    trackEvent('pdf_download_started', {
       count: downloadableFiles.length,
     });
 
     setIsDownloading(true);
     try {
       await downloadRenamedFiles(downloadableFiles);
-      logEvent(analytics, 'pdf_download_success', {
+      trackEvent('pdf_download_success', {
         count: downloadableFiles.length,
       });
     } catch (error) {
-      logEvent(analytics, 'pdf_download_error', { error: error });
+      trackEvent('pdf_download_error', { error: error });
       console.error('Error downloading files:', error);
     } finally {
       setIsDownloading(false);
@@ -97,7 +97,7 @@ const PDFManager: React.FC = () => {
   };
 
   const handleClearAll = () => {
-    logEvent(analytics, 'pdf_clear_all', {
+    trackEvent('pdf_clear_all', {
       fileCount: files.length,
       rulesCount: searchReplaceRules.length,
     });
@@ -106,7 +106,7 @@ const PDFManager: React.FC = () => {
   };
 
   useEffect(() => {
-    logEvent(analytics, 'screen_view', {
+    trackEvent('screen_view', {
       firebase_screen: 'PDFManager',
       firebase_screen_class: 'PDFManager',
     });

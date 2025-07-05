@@ -1,7 +1,7 @@
-import { FileItem, fileStatus, SearchReplaceRule } from '../types';
+import { FileItem, fileStatus, SearchReplaceRule } from '@/types';
 import JSZip from 'jszip';
 import { saveAs } from 'file-saver';
-import dotifyTitle from './dotify';
+import dotifyTitle from '@/utils/pdf/dotify';
 
 const generateFileId = (): string => {
   return Date.now().toString(36) + Math.random().toString(36).substring(2);

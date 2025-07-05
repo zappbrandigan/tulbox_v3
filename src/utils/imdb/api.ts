@@ -9,10 +9,10 @@ import {
   DetectedLanguage,
   LanguageDetectionResponse,
   AKATitle,
-} from '../types';
+} from '@/types';
 import { transliterate } from 'transliteration';
-import PosterPlaceHolder from '../static/imdb.jpg';
-import languageArticles from './articles';
+import PosterPlaceHolder from '@/static/imdb.jpg';
+import languageArticles from '@/utils/imdb/articles';
 import axios from 'axios';
 
 const uniqueByTitle = (arr: { text: string }[]): { text: string }[] => {
