@@ -1,15 +1,15 @@
-import { productionType } from "@/types";
-import { Film, Gamepad2, Search, Tv } from "lucide-react";
-import React from "react"
+import { productionType } from '@/types';
+import { Film, Gamepad2, Search, Tv } from 'lucide-react';
+import React from 'react';
 
-interface ImdbSearchFilterProps {
-  searchType: productionType,
-  setSearchType: React.Dispatch<React.SetStateAction<productionType>>
+interface SearchFilterProps {
+  searchType: productionType;
+  setSearchType: React.Dispatch<React.SetStateAction<productionType>>;
 }
 
-export const ImdbSearchFilter: React.FC<ImdbSearchFilterProps> = ({
+const SearchFilter: React.FC<SearchFilterProps> = ({
   searchType,
-  setSearchType
+  setSearchType,
 }) => {
   return (
     <div className="flex flex-wrap gap-2 pb-2">
@@ -36,3 +36,5 @@ export const ImdbSearchFilter: React.FC<ImdbSearchFilterProps> = ({
     </div>
   );
 };
+
+export default SearchFilter;

@@ -4,7 +4,7 @@ interface ToolContainerProps {
   children: React.ReactNode;
 }
 
-export const ToolContainer: React.FC<ToolContainerProps> = ({ children }) => {
+const ToolContainer: React.FC<ToolContainerProps> = ({ children }) => {
   return (
     <main className="container flex-1 mx-auto px-4 sm:px-2 lg:px-4 py-8">
       {children}
@@ -22,3 +22,5 @@ export const ToolContainer: React.FC<ToolContainerProps> = ({ children }) => {
     </main>
   );
 };
+
+export default ToolContainer;

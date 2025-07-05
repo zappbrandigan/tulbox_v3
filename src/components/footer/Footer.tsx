@@ -4,7 +4,7 @@ interface FooterProps {
   appName: string;
 }
 
-export const Footer: React.FC<FooterProps> = ({ appName }) => {
+const Footer: React.FC<FooterProps> = ({ appName }) => {
   const version = __APP_VERSION__;
   const updated = new Date(__APP_UPDATED__).toLocaleDateString('en-US', {
     month: 'short',
@@ -116,3 +116,5 @@ Thanks!
     </footer>
   );
 };
+
+export default Footer;

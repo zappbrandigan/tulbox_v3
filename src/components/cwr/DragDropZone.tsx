@@ -7,7 +7,7 @@ interface DragDropZoneProps {
   maxFiles?: number;
 }
 
-export const DragDropZone: React.FC<DragDropZoneProps> = ({
+const DragDropZone: React.FC<DragDropZoneProps> = ({
   onFilesAdded,
   accept = '.v21',
   maxFiles = 1,
@@ -124,3 +124,5 @@ export const DragDropZone: React.FC<DragDropZoneProps> = ({
     </div>
   );
 };
+
+export default DragDropZone;

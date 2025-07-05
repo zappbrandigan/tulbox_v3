@@ -12,7 +12,7 @@ import {
 } from '../types';
 import { transliterate } from 'transliteration';
 import PosterPlaceHolder from '../static/imdb.jpg';
-import { languageArticles } from './articles';
+import languageArticles from './articles';
 import axios from 'axios';
 
 const uniqueByTitle = (arr: { text: string }[]): { text: string }[] => {
@@ -59,13 +59,15 @@ const seperateAticle = (akaTitle: string, languageCode: string) => {
   return { article: '', title: akaTitle };
 };
 
-export const searchIMDB = async (
+const searchIMDB = async (
   query: string,
   type: productionType
 ): Promise<IMDBSearchResult[]> => {
   const options = {
     method: 'GET',
-    url: `https://tulbox-v3-proxy.onrender.com/api/external/imdbMain/api/autocomplete`,
+    url: `${
+      import.meta.env.VITE_REQUEST_URL
+    }/api/external/imdbMain/api/autocomplete`,
     params: { q: query },
   };
 
@@ -89,12 +91,14 @@ export const searchIMDB = async (
   return responseData;
 };
 
-export const getProductionDetails = async (
+const getProductionDetails = async (
   result: IMDBSearchResult
 ): Promise<IMDBProduction> => {
   const productionDetailOptions = {
     method: 'GET',
-    url: `https://tulbox-v3-proxy.onrender.com/api/external/imdbDetails/api/imdb/${result.id}`,
+    url: `${
+      import.meta.env.VITE_REQUEST_URL
+    }/api/external/imdbDetails/api/imdb/${result.id}`,
   };
 
   const results: ApiProductionDetails = await axios.request(
@@ -130,12 +134,12 @@ export const getProductionDetails = async (
   return productionDetails;
 };
 
-export const getAkas = async (
-  result: IMDBSearchResult
-): Promise<AKATitle[]> => {
+const getAkas = async (result: IMDBSearchResult): Promise<AKATitle[]> => {
   const productionAkaOptions = {
     method: 'GET',
-    url: `https://tulbox-v3-proxy.onrender.com/api/external/imdbMain/api/title/get-akas`,
+    url: `${
+      import.meta.env.VITE_REQUEST_URL
+    }/api/external/imdbMain/api/title/get-akas`,
     params: {
       tt: result.id,
       limit: '30',
@@ -153,7 +157,9 @@ export const getAkas = async (
   const uniqueAkaTitles = uniqueByTitle(akaTitles);
 
   const akaTitleLanguageDetails: LanguageDetectionResponse = await axios.post(
-    `https://tulbox-v3-proxy.onrender.com/api/external/langDetect/detect-language-batch`,
+    `${
+      import.meta.env.VITE_REQUEST_URL
+    }/api/external/langDetect/detect-language-batch`,
     {
       texts: uniqueAkaTitles,
     }
@@ -182,3 +188,5 @@ export const getAkas = async (
 
   return akas;
 };
+
+export { getAkas, getProductionDetails, searchIMDB };

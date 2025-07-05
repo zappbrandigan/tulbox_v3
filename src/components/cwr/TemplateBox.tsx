@@ -1,4 +1,4 @@
-import { CWR_TEMPLATES, getTemplateById } from '@/utils/cwrTemplates';
+import { CWR_TEMPLATES, getTemplateById } from '@/utils';
 import { Download, Settings, Trash, Loader2 } from 'lucide-react';
 import React, { useRef } from 'react';
 
@@ -11,7 +11,7 @@ interface TemplateBoxProps {
   handleExport: (format: 'csv' | 'json') => void;
 }
 
-export const TemplateBox: React.FC<TemplateBoxProps> = ({
+const TemplateBox: React.FC<TemplateBoxProps> = ({
   selectedTemplate,
   setSelectedTemplate,
   isProcessing,
@@ -115,3 +115,5 @@ export const TemplateBox: React.FC<TemplateBoxProps> = ({
     </div>
   );
 };
+
+export default TemplateBox;

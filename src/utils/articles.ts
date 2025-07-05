@@ -1,4 +1,4 @@
-export const languageArticles: Record<string, string[]> = {
+const languageArticles: Record<string, string[]> = {
   en: ['a', 'an', 'the'],
   es: ['el', 'la', 'los', 'las', 'un', 'una', 'unos', 'unas'],
   fr: ['le', 'la', 'les', 'un', 'une', 'des'],
@@ -26,3 +26,5 @@ export const languageArticles: Record<string, string[]> = {
   et: ['see', 'need', 'uks'],
   co: ['u', 'a', 'i', 'e', 'un', 'una', 'di', 'delle'],
 };
+
+export default languageArticles;

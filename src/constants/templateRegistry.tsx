@@ -1,5 +1,5 @@
-import { CWRReporter } from '@/utils/cwrReporter';
-import { CWRTemplate } from '@/types/cwrTypes';
+import { CWRReporter } from '@/utils';
+import { CWRTemplate } from '@/types';
 import { ParsedCWRFile } from 'cwr-parser/types';
 
 type ReportGenerator = (

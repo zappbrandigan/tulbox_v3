@@ -1,14 +1,19 @@
-import { Loader2, Search } from "lucide-react";
-import React from "react"
+import { Loader2, Search } from 'lucide-react';
+import React from 'react';
 
-interface ImdbSearchInputProps {
+interface SearchInputProps {
   searchQuery: string;
   handleSearch: () => Promise<void>;
   isSearching: boolean;
   setSearchQuery: React.Dispatch<React.SetStateAction<string>>;
 }
 
-export const ImdbSearchInput: React.FC<ImdbSearchInputProps> = ({ searchQuery, handleSearch, isSearching, setSearchQuery}) => {
+const SearchInput: React.FC<SearchInputProps> = ({
+  searchQuery,
+  handleSearch,
+  isSearching,
+  setSearchQuery,
+}) => {
   return (
     <div className="flex space-x-4">
       <div className="flex-1 relative">
@@ -40,3 +45,5 @@ export const ImdbSearchInput: React.FC<ImdbSearchInputProps> = ({ searchQuery, h
     </div>
   );
 };
+
+export default SearchInput;

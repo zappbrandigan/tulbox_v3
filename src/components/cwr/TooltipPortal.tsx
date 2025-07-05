@@ -1,12 +1,12 @@
-import { useEffect, useState, useRef, useLayoutEffect } from "react";
-import { createPortal } from "react-dom";
+import { useEffect, useState, useRef, useLayoutEffect } from 'react';
+import { createPortal } from 'react-dom';
 
 type Props = {
   children: React.ReactNode;
   position: { x: number; y: number };
 };
 
-export const TooltipPortal = ({ children, position }: Props) => {
+const TooltipPortal = ({ children, position }: Props) => {
   const [mounted, setMounted] = useState(false);
   const [tooltipHeight, setTooltipHeight] = useState(0);
   const tooltipRef = useRef<HTMLDivElement>(null);
@@ -32,7 +32,7 @@ export const TooltipPortal = ({ children, position }: Props) => {
       style={{
         top: position.y - tooltipHeight - 8,
         left: position.x,
-        position: "fixed",
+        position: 'fixed',
       }}
     >
       {children}
@@ -40,3 +40,5 @@ export const TooltipPortal = ({ children, position }: Props) => {
     document.body
   );
 };
+
+export default TooltipPortal;

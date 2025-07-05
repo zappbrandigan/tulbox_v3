@@ -1,4 +1,4 @@
-import { FileItem } from '../types';
+import { FileItem } from '@/types';
 
 const titleCase = (title: string): string => {
   const titleWords = title.toLowerCase().split(' ');

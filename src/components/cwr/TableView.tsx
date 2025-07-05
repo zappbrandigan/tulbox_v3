@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { generateReactKey } from '@/utils/generateReactKeys';
+import { generateReactKey } from '@/utils';
 import { CWRTemplate, CWRTemplateField } from '@/types';
-import { LoadingOverlay } from '../ui/LoadingOverlay';
+import { LoadingOverlay } from '@/components/ui';
 import { Table } from 'lucide-react';
 import ReportWorker from '@/workers/reportWorker?worker';
 import { analytics } from '@/firebase';
@@ -22,7 +22,7 @@ interface TableViewProps {
   >;
 }
 
-export const TableView: React.FC<TableViewProps> = ({
+const TableView: React.FC<TableViewProps> = ({
   fileName,
   fileContent,
   selectedTemplate,
@@ -175,3 +175,5 @@ export const TableView: React.FC<TableViewProps> = ({
     </>
   );
 };
+
+export default TableView;

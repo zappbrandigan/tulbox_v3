@@ -1,13 +1,13 @@
 import React from 'react';
 import { AlertCircle, CheckCircle } from 'lucide-react';
-import { LoadingOverlay } from '../ui/LoadingOverlay';
+import { LoadingOverlay } from '@/components/ui';
 import { CWRConverterRecord } from 'cwr-parser/types';
 
 interface SummaryProps {
   parseResult: CWRConverterRecord | null;
 }
 
-export const ParseSummary: React.FC<SummaryProps> = ({ parseResult }) => {
+const ParseSummary: React.FC<SummaryProps> = ({ parseResult }) => {
   if (!parseResult)
     return (
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
@@ -86,3 +86,5 @@ export const ParseSummary: React.FC<SummaryProps> = ({ parseResult }) => {
     </div>
   );
 };
+
+export default ParseSummary;

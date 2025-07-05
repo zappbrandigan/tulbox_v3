@@ -8,7 +8,7 @@ interface NavProps {
   onToolChange: (tool: string) => void;
 }
 
-export const Nav: React.FC<NavProps> = ({ currentTool, onToolChange }) => {
+const Nav: React.FC<NavProps> = ({ currentTool, onToolChange }) => {
   return (
     <div className="flex items-center justify-between">
       {/* Mobile Nav (Dropdown) */}
@@ -82,3 +82,5 @@ export const Nav: React.FC<NavProps> = ({ currentTool, onToolChange }) => {
     </div>
   );
 };
+
+export default Nav;

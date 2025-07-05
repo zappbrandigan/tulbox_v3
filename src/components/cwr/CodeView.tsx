@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { RecordLine } from '../cwr/RecordLine';
-import { LoadingOverlay } from '../ui/LoadingOverlay';
+import RecordLine from './RecordLine';
+import { LoadingOverlay } from '@/components/ui';
 import { Code } from 'lucide-react';
 import { CWRConverterRecord, CWRParsedRecord } from 'cwr-parser/types';
-import { getTemplateById } from '@/utils/cwrTemplates';
+import { getTemplateById } from '@/utils';
 import ParserWorker from '@/workers/parserWorker?worker';
 
 const ROW_HEIGHT = 24;
@@ -21,7 +21,7 @@ interface CodeViewProps {
   >;
 }
 
-export const CodeView: React.FC<CodeViewProps> = ({
+const CodeView: React.FC<CodeViewProps> = ({
   fileContent,
   file,
   selectedTemplate,
@@ -200,3 +200,5 @@ export const CodeView: React.FC<CodeViewProps> = ({
     </>
   );
 };
+
+export default CodeView;

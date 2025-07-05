@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import { TooltipPortal } from './TooltipPortal';
+import TooltipPortal from './TooltipPortal';
 import { recordFields } from 'cwr-parser';
 import { FieldDefinition, RecordTypeKey } from 'cwr-parser/types';
 
-export const RecordLine = ({ line }: { line: Map<string, string> }) => {
+const RecordLine = ({ line }: { line: Map<string, string> }) => {
   const [tooltip, setTooltip] = useState<{
     title: string;
     description: string;
@@ -83,3 +83,5 @@ export const RecordLine = ({ line }: { line: Map<string, string> }) => {
     </div>
   );
 };
+
+export default RecordLine;

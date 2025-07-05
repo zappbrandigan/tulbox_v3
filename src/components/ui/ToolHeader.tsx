@@ -7,7 +7,7 @@ interface ToolHeaderProps {
   isBeta?: boolean;
 }
 
-export const ToolHeader: React.FC<ToolHeaderProps> = ({
+const ToolHeader: React.FC<ToolHeaderProps> = ({
   primaryText,
   secondaryText,
   isBeta = false,
@@ -30,3 +30,5 @@ export const ToolHeader: React.FC<ToolHeaderProps> = ({
     </div>
   );
 };
+
+export default ToolHeader;

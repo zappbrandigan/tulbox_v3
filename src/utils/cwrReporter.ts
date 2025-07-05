@@ -7,7 +7,7 @@ import {
 } from 'cwr-parser/types';
 import { CWRTemplate, CWRTemplateField } from '@/types';
 
-export class CWRReporter {
+class CWRReporter {
   static getPublisherInfo(
     {
       songCode,
@@ -413,3 +413,5 @@ export class CWRReporter {
     return rowCollection;
   }
 }
+
+export default CWRReporter;

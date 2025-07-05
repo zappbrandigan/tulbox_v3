@@ -5,7 +5,7 @@ interface BrandProps {
   appName: string;
 }
 
-export const Brand: React.FC<BrandProps> = ({ appName }) => {
+const Brand: React.FC<BrandProps> = ({ appName }) => {
   return (
     <div className="flex items-center space-x-3">
       <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg flex items-center justify-center">
@@ -17,3 +17,5 @@ export const Brand: React.FC<BrandProps> = ({ appName }) => {
     </div>
   );
 };
+
+export default Brand;

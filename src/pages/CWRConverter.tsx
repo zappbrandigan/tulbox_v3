@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { FileText } from 'lucide-react';
-import { getTemplateById } from '@/utils/cwrTemplates';
-import { exportFile } from '@/utils/exportHelpers';
-import { CodeView } from '@/components/cwr/CodeView';
-import { ParseSummary } from '@/components/cwr/ParseSummary';
-import { DragDropZone } from '@/components/cwr/DragDropZone';
-import { TableView } from '@/components/cwr/TableView';
-import { ToolHeader } from '@/components/ui/ToolHeader';
-import { TemplateBox } from '@/components/cwr/TemplateBox';
+import { exportFile, getTemplateById } from '@/utils';
+import {
+  DragDropZone,
+  ParseSummary,
+  TemplateBox,
+  CodeView,
+  TableView,
+} from '@/components/cwr';
+import { ToolHeader } from '@/components/ui';
 import { CWRConverterRecord } from 'cwr-parser/types';
 import { analytics } from '@/firebase';
 import { logEvent } from 'firebase/analytics';

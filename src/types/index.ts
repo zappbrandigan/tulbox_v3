@@ -3,6 +3,7 @@ export type productionType =
   | 'movie'
   | 'tvMovie'
   | 'tvSeries'
+  | 'tvSpecial'
   | 'tvEpisode'
   | 'short'
   | 'videoGame'
@@ -77,6 +78,105 @@ export interface IMDBSearchResult {
   type: string;
   poster?: string;
 }
+
+// For future use
+// export interface IMDbSearchResponse {
+//   data: {
+//     data: {
+//       mainSearch: {
+//         edges: {
+//           node: {
+//             entity: TitleEntity;
+//           };
+//         }[];
+//       };
+//     };
+//   };
+// }
+
+// interface TitleEntity {
+//   __typename: 'Title';
+//   id: string;
+//   titleText: TitleText;
+//   originalTitleText: TitleText;
+//   releaseYear: YearRange;
+//   releaseDate: ReleaseDate;
+//   titleType: TitleType;
+//   primaryImage: Image;
+//   episodes: null;
+//   series: null;
+//   principalCredits: PrincipalCredit[];
+// }
+
+// interface TitleText {
+//   text: string;
+//   isOriginalTitle: boolean;
+// }
+
+// interface YearRange {
+//   __typename: 'YearRange';
+//   year: number;
+//   endYear: number | null;
+// }
+
+// interface ReleaseDate {
+//   __typename: 'ReleaseDate';
+//   month: number;
+//   day: number;
+//   year: number;
+//   country: {
+//     id: string;
+//   };
+//   restriction: string | null;
+//   attributes: string[]; // Replace with specific type if known
+//   displayableProperty: {
+//     qualifiersInMarkdownList: string | null;
+//   };
+// }
+
+// interface TitleType {
+//   __typename: 'TitleType';
+//   id: string;
+//   text: string;
+//   categories: TitleCategory[];
+//   canHaveEpisodes: boolean;
+//   isEpisode: boolean;
+//   isSeries: boolean;
+//   displayableProperty: {
+//     value: {
+//       plainText: string;
+//     };
+//   };
+// }
+
+// interface TitleCategory {
+//   id: string;
+//   text: string;
+//   value: string;
+// }
+
+// interface Image {
+//   __typename: 'Image';
+//   id: string;
+//   url: string;
+//   height: number;
+//   width: number;
+// }
+
+// interface PrincipalCredit {
+//   credits: {
+//     name: NameEntity;
+//   }[];
+// }
+
+// interface NameEntity {
+//   __typename: 'Name';
+//   id: string;
+//   nameText: {
+//     text: string;
+//   };
+//   primaryImage: Image;
+// }
 
 /*
  * type for API language detction

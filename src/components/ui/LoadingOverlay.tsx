@@ -4,13 +4,15 @@ interface LoadingOverlayProps {
   message?: string;
 }
 
-export const LoadingOverlay: React.FC<LoadingOverlayProps> = ({
+const LoadingOverlay: React.FC<LoadingOverlayProps> = ({
   message = 'Loading...',
 }) => {
   return (
     <div className="flex flex-col items-center justify-center w-full h-full py-12 text-gray-600">
-      <Loader2 className="h-8 w-8 animate-spin mb-2" />
+      <Loader2 className="h-8 w-8 animate-spin mb-2 text-blue-600" />
       <p className="text-sm font-medium">{message}</p>
     </div>
   );
 };
+
+export default LoadingOverlay;

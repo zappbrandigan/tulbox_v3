@@ -1,25 +1,25 @@
 import { FileItem, fileStatus, SearchReplaceRule } from '../types';
 import JSZip from 'jszip';
 import { saveAs } from 'file-saver';
-import dotifyTitle from './dotify'
+import dotifyTitle from './dotify';
 
-export const generateFileId = (): string => {
+const generateFileId = (): string => {
   return Date.now().toString(36) + Math.random().toString(36).substring(2);
 };
 
-export const validateFileName = (name: string): boolean => {
+const validateFileName = (name: string): boolean => {
   // Check for invalid characters in file names
   const invalidChars = /[<>:"/\\|?*]/;
   return !invalidChars.test(name) && name.trim().length > 0;
 };
 
-export const checkForDuplicates = (files: FileItem[]): FileItem[] => {
+const checkForDuplicates = (files: FileItem[]): FileItem[] => {
   const nameCounts = files.reduce((map, file) => {
     map.set(file.currentName, (map.get(file.currentName) || 0) + 1);
     return map;
   }, new Map<string, number>());
 
-  return files.map(file => {
+  return files.map((file) => {
     if (!validateFileName(file.currentName)) {
       return { ...file, status: 'invalid' };
     }
@@ -33,20 +33,20 @@ export const checkForDuplicates = (files: FileItem[]): FileItem[] => {
   });
 };
 
-export const applyCueSheetConvention = (filename: string): [string, fileStatus] => {
-  const cleanTitle =  dotifyTitle(filename);
+const applyCueSheetConvention = (filename: string): [string, fileStatus] => {
+  const cleanTitle = dotifyTitle(filename);
   return cleanTitle;
 };
 
-export const applySearchReplace = (
-  files: FileItem[], 
+const applySearchReplace = (
+  files: FileItem[],
   rules: SearchReplaceRule[]
 ): FileItem[] => {
-  return files.map(file => {
+  return files.map((file) => {
     let newName = file.currentName;
     let status = file.status;
-    
-    rules.forEach(rule => {
+
+    rules.forEach((rule) => {
       if (!rule.isEnabled) return;
 
       // Handle cue sheet template
@@ -56,17 +56,22 @@ export const applySearchReplace = (
         if (newName !== file.currentName && results[1] !== 'dotified') {
           status = 'modified';
         } else {
-          status = Array.isArray(results) ? results[1] as FileItem['status'] : file.status;
+          status = Array.isArray(results)
+            ? (results[1] as FileItem['status'])
+            : file.status;
         }
         return;
       }
-      
+
       try {
         if (rule.isRegex) {
           const regex = new RegExp(rule.searchPattern, 'g');
           newName = newName.replace(regex, rule.replaceWith);
         } else {
-          newName = newName.replace(new RegExp(escapeRegExp(rule.searchPattern), 'g'), rule.replaceWith);
+          newName = newName.replace(
+            new RegExp(escapeRegExp(rule.searchPattern), 'g'),
+            rule.replaceWith
+          );
         }
       } catch {
         console.warn('Invalid regex pattern:', rule.searchPattern);
@@ -77,16 +82,16 @@ export const applySearchReplace = (
       ...file,
       currentName: newName,
       characterCount: newName.length,
-      status: status
+      status: status,
     };
   });
 };
 
-export const escapeRegExp = (string: string): string => {
+const escapeRegExp = (string: string): string => {
   return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 };
 
-export const downloadRenamedFiles = async (files: FileItem[]): Promise<void> => {
+const downloadRenamedFiles = async (files: FileItem[]): Promise<void> => {
   const zip = new JSZip();
 
   for (const fileItem of files) {
@@ -100,17 +105,17 @@ export const downloadRenamedFiles = async (files: FileItem[]): Promise<void> => 
       zip.file(ensurePdfExtension(fileItem.currentName), blob);
 
       // Small delay between processing files to avoid browser blocking
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 100));
     } catch (error) {
       console.error('Error downloading file:', fileItem.currentName, error);
     }
   }
 
   try {
-    const content = await zip.generateAsync({ type: "blob" });
-    saveAs(content, "dotified.zip");
+    const content = await zip.generateAsync({ type: 'blob' });
+    saveAs(content, 'dotified.zip');
   } catch {
-    console.log("Error. Please reload and try again.");
+    console.log('Error. Please reload and try again.');
   }
 };
 
@@ -119,4 +124,15 @@ const ensurePdfExtension = (filename: string): string => {
     return `${filename}.pdf`;
   }
   return filename;
+};
+
+export {
+  ensurePdfExtension,
+  downloadRenamedFiles,
+  escapeRegExp,
+  applyCueSheetConvention,
+  applySearchReplace,
+  checkForDuplicates,
+  validateFileName,
+  generateFileId,
 };

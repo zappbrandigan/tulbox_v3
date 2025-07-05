@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import Layout from './components/ui/Layout';
+import { Layout } from './components/ui';
 import PDFManager from './pages/PDFManager';
 import IMDBSearch from './pages/IMDBSearch';
 import CWRConverter from './pages/CWRConverter';

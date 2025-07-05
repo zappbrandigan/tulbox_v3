@@ -2,7 +2,7 @@ import ExcelJS from 'exceljs';
 import { CWRTemplate } from '@/types';
 import ExportWorker from '@/workers/exportWorker?worker';
 
-export const exportFile = (
+const exportFile = (
   data: Map<string, string | number>[],
   template: CWRTemplate,
   fileName: string,
@@ -52,3 +52,5 @@ const downloadFile = (
   document.body.removeChild(link);
   URL.revokeObjectURL(url);
 };
+
+export default exportFile;

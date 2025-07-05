@@ -1,6 +1,6 @@
 import { CWRTemplate } from '@/types';
 
-export const CWR_TEMPLATES: CWRTemplate[] = [
+const CWR_TEMPLATES: CWRTemplate[] = [
   {
     id: 'raw-viewer',
     version: '1.7.5',
@@ -146,7 +146,7 @@ export const CWR_TEMPLATES: CWRTemplate[] = [
   },
 ];
 
-export const getTemplateById = (id: string): CWRTemplate | undefined => {
+const getTemplateById = (id: string): CWRTemplate | undefined => {
   return CWR_TEMPLATES.find((template) => template.id === id);
 };
 
@@ -171,3 +171,5 @@ export const getRecordTypeColor = (recordType: string): string => {
 
   return colors[recordType] || 'bg-gray-100 text-gray-800 border-gray-200';
 };
+
+export { CWR_TEMPLATES, getTemplateById };

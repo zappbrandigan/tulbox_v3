@@ -1,16 +1,18 @@
 import React, { useEffect, useState } from 'react';
-import DragDropZone from '@/components/pdf/DragDropZone';
-import FileTable from '@/components/pdf/FileTable';
-import SearchReplace from '@/components/pdf/SearchReplace';
-import Summary from '@/components/pdf/Summary';
+import {
+  DragDropZone,
+  Summary,
+  SearchReplace,
+  FileTable,
+} from '@/components/pdf';
 import { FileItem, SearchReplaceRule } from '@/types';
 import {
   generateFileId,
   checkForDuplicates,
   applySearchReplace,
   downloadRenamedFiles,
-} from '@/utils/fileHelpers';
-import { ToolHeader } from '@/components/ui/ToolHeader';
+} from '@/utils';
+import { ToolHeader } from '@/components/ui';
 import { analytics } from '@/firebase';
 import { logEvent } from 'firebase/analytics';
 
