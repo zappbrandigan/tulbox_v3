@@ -1,3 +1,4 @@
+import { trackEvent } from '@/utils';
 import React from 'react';
 
 interface FooterProps {
@@ -88,6 +89,46 @@ ${note}
 Thanks!
 `.trim();
 
+  const BugLink = () => {
+    const handleClick = () => {
+      trackEvent('bugs_link_click', {
+        label: 'Bugs Link Clicked',
+      });
+    };
+
+    return (
+      <a
+        href={`mailto:brandon@tulbox.app?subject=Bug/Feedback:%20v${version}-${commit}&body=${encodeURIComponent(
+          emailTemplate
+        )}`}
+        onClick={handleClick}
+        className="text-blue-500 hover:underline"
+      >
+        Feedback/Bug Report
+      </a>
+    );
+  };
+
+  const RequestLink = () => {
+    const handleClick = () => {
+      trackEvent('request_link_click', {
+        label: 'Request Link Clicked',
+      });
+    };
+
+    return (
+      <a
+        href={`mailto:brandon@tulbox.app?subject=Request:%20v${version}-${commit}&body=${encodeURIComponent(
+          requestTemplate
+        )}`}
+        onClick={handleClick}
+        className="text-blue-500 hover:underline"
+      >
+        Requests
+      </a>
+    );
+  };
+
   return (
     <footer className="w-full py-3 text-xs text-gray-500 flex flex-col items-center space-y-1">
       <div className="text-gray-400">
@@ -95,23 +136,9 @@ Thanks!
       </div>
       <div className="text-gray-400">Last Updated {updated}</div>
       <span>
-        <a
-          href={`mailto:brandon@tulbox.app?subject=Bug/Feedback:%20v${version}-${commit}&body=${encodeURIComponent(
-            emailTemplate
-          )}`}
-          className="text-blue-500 hover:underline"
-        >
-          Feedback/Bug Report
-        </a>
+        <BugLink />
         {` • `}
-        <a
-          href={`mailto:brandon@tulbox.app?subject=Request:%20v${version}-${commit}&body=${encodeURIComponent(
-            requestTemplate
-          )}`}
-          className="text-blue-500 hover:underline"
-        >
-          Requests
-        </a>
+        <RequestLink />
       </span>
     </footer>
   );
