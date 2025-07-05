@@ -1,5 +1,4 @@
-import { analytics } from '@/firebase';
-import { logEvent } from 'firebase/analytics';
+import { getAnalytics, logEvent } from 'firebase/analytics';
 
 const isDev = import.meta.env.MODE === 'development';
 
@@ -9,7 +8,7 @@ const isDev = import.meta.env.MODE === 'development';
 function trackEvent(
   eventName: string,
   params?: Record<string, string | number | unknown>,
-  instance = analytics
+  instance = getAnalytics()
 ) {
   if (isDev) {
     console.log(`[GA EVENT]: ${eventName}`, params ?? {});

@@ -1,6 +1,6 @@
 import { CWRParser } from 'cwr-parser';
 import { templateReportGenerators } from '@/constants/templateRegistry';
-import { getTemplateById } from '@/utils/cwrTemplates';
+import { getTemplateById } from '@/utils/cwr/templates';
 
 self.onmessage = (e) => {
   const { fileContent, fileName, selectedTemplate } = e.data;
