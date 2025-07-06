@@ -97,6 +97,7 @@ const IMDBSearch: React.FC = () => {
     tvSeries: <Tv className="w-5 h-5" />,
     tvMovie: <Tv className="w-5 h-5" />,
     tvSpecial: <Tv className="w-5 h-5" />,
+    tvMiniSeries: <Tv className="w-5 h-5" />,
     tvEpisode: <Clapperboard className="w-5 h-5" />,
     videoGame: <Gamepad2 className="w-5 h-5" />,
     video: <Video className="w-5 h-5" />,

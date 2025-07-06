@@ -1,6 +1,6 @@
 import React from 'react';
 import { IMDBSearchResult, productionType } from '@/types';
-import PosterImage from './PosterImage';
+import PosterImage from '../PosterImage';
 
 interface SearchResultProps {
   searchType: string;
@@ -21,6 +21,7 @@ const SearchResult: React.FC<SearchResultProps> = ({
       tvSeries: 'bg-fuchsia-100 text-fuchsia-800',
       tvMovie: 'bg-orange-100 text-orange-800',
       tvSpecial: 'bg-amber-100 text-amber-800',
+      tvMiniSeries: 'bg-emerald-100 text-emerald-800',
       video: 'bg-red-100 text-red-800',
       musicVideo: 'bg-pink-100 text-pink-800',
       podcast: 'bg-green-100 text-green-900',
@@ -47,41 +48,59 @@ const SearchResult: React.FC<SearchResultProps> = ({
           {filteredSearchResults.map((result) => (
             <div
               key={result.id}
-              title={result.title}
               onClick={() => handleSelectProduction(result)}
-              className="p-4 border border-gray-200 rounded-lg hover:border-blue-300 hover:shadow-md transition-all cursor-pointer group"
+              className="flex p-4 rounded-xl border border-gray-200 hover:shadow-sm hover:border-blue-400 transition-all bg-white space-x-4 cursor-pointer"
             >
-              <div className="flex items-start space-x-3">
+              {/* Poster */}
+              <div className="flex-shrink-0">
                 {result.poster ? (
                   <PosterImage
                     src={result.poster}
                     alt={result.title ?? 'Unknown'}
                   />
                 ) : (
-                  <div className="w-16 h-24 bg-gray-200 rounded-md flex items-center justify-center flex-shrink-0">
+                  <div className="w-16 h-24 bg-gray-200 rounded-md flex items-center justify-center">
                     {getTypeIcon(result.type as productionType)}
                   </div>
                 )}
-                <div className="flex-1 min-w-0">
-                  <h4 className="font-medium text-gray-900 group-hover:text-blue-600 transition-colors line-clamp-2">
-                    {result.title}
-                  </h4>
-                  <div className="flex items-center space-x-2 mt-1">
-                    <span
-                      className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getTypeColor(
-                        result.type
-                      )}`}
-                    >
-                      {getTypeIcon(result.type as productionType)}
-                      <span className="ml-1">{result.type}</span>
+              </div>
+
+              {/* Info section */}
+              <div className="flex flex-col justify-between flex-1 min-w-0">
+                {/* Title */}
+                <h4 className="text-base font-semibold text-gray-900 group-hover:text-blue-600 transition-colors truncate">
+                  {result.title}
+                </h4>
+
+                {/* Metadata row */}
+                <div className="flex flex-wrap items-center gap-x-2 text-sm text-gray-600">
+                  <span
+                    className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium ${getTypeColor(
+                      result.type
+                    )}`}
+                  >
+                    {getTypeIcon(result.type as productionType)}
+                    <span className="ml-1">{result.type}</span>
+                  </span>
+                  {result.year && (
+                    <span className="text-sm rounded-md px-2 py-0.5 bg-gray-100">
+                      <span className="font-medium text-gray-800">Year:</span>{' '}
+                      {result.year}
                     </span>
-                    {result.year && (
-                      <span className="text-sm text-gray-500">
-                        {result.year}
-                      </span>
-                    )}
-                  </div>
+                  )}
+                  <span className="font-mediumrounded-md px-2 py-0.5 bg-gray-100 xs:inline md:hidden 2xl:inline">
+                    <span className="font-medium text-gray-800">ID: </span>
+                    {result.id}
+                  </span>
                 </div>
+
+                {/* Stars */}
+                {result.stars && (
+                  <p className="text-sm text-gray-500 mt-1 line-clamp-2">
+                    <span className="font-medium text-gray-700">Stars:</span>{' '}
+                    {result.stars}
+                  </p>
+                )}
               </div>
             </div>
           ))}

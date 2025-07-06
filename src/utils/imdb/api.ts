@@ -80,6 +80,7 @@ const searchIMDB = async (
       year: result.y || 'Unknown',
       type: result.qid || result.q,
       poster: result.i?.imageUrl || PosterPlaceHolder,
+      stars: result.s,
     }))
     .filter((result) => !result.id.includes('nm')); // Remove people from title search results
 
@@ -92,13 +93,13 @@ const searchIMDB = async (
 };
 
 const getProductionDetails = async (
-  result: IMDBSearchResult
+  production: IMDBSearchResult
 ): Promise<IMDBProduction> => {
   const productionDetailOptions = {
     method: 'GET',
     url: `${
       import.meta.env.VITE_REQUEST_URL
-    }/api/external/imdbDetails/api/imdb/${result.id}`,
+    }/api/external/imdbDetails/api/imdb/${production.id}`,
   };
 
   const results: ApiProductionDetails = await axios.request(
@@ -108,7 +109,7 @@ const getProductionDetails = async (
   const productionDetails: IMDBProduction = {
     id: results.data.id,
     title: results.data.originalTitle,
-    imdbCode: results.data.id,
+    imdbCode: results.data.id ?? production.id,
     type: results.data.type,
     language: results.data.spokenLanguages[0]?.toUpperCase(),
     originCountry: results.data.countriesOfOrigin[0] ?? '',
@@ -118,7 +119,7 @@ const getProductionDetails = async (
             .slice(0, Math.min(6, results.data.productionCompanies.length))
             .map((item) => item.name)
         : ['None Found'],
-    releaseYear: results.data.startYear || 0,
+    releaseYear: results.data.startYear || production.year || 0,
     actors:
       results.data.cast
         .slice(0, Math.min(4, results.data.cast.length))
@@ -126,7 +127,7 @@ const getProductionDetails = async (
     director: reorderName(results.data.directors[0]?.fullName) || 'None Found',
     plot: results.data.description || 'No description.',
     rating: results.data.averageRating || 0,
-    poster: results.data.primaryImage || PosterPlaceHolder,
+    poster: results.data.primaryImage || production.poster || PosterPlaceHolder,
   };
   if (!productionDetails) {
     throw new Error('Production not found');

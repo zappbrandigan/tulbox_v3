@@ -5,6 +5,7 @@ export type productionType =
   | 'tvSeries'
   | 'tvSpecial'
   | 'tvEpisode'
+  | 'tvMiniSeries'
   | 'short'
   | 'videoGame'
   | 'podcast'
@@ -55,7 +56,7 @@ export interface IMDBProduction {
   language: string;
   originCountry: string;
   productionCompanies: string[];
-  releaseYear: number;
+  releaseYear: string | number;
   actors: string[];
   director: string | null;
   plot?: string;
@@ -77,6 +78,7 @@ export interface IMDBSearchResult {
   year: string | number;
   type: string;
   poster?: string;
+  stars: string;
 }
 
 // For future use

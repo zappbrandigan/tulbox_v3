@@ -10,11 +10,11 @@ export default {
         },
       },
       animation: {
-        shimmer: 'shimmer 1.5s infinite linear',
+        shimmer: 'shimmer 2s infinite linear',
       },
       backgroundImage: {
         shimmer:
-          'linear-gradient(to right, #f3f4f6 0%, #e5e7eb 20%, #f3f4f6 40%)',
+          'linear-gradient(90deg, #f4f4f5 0%, #e4e4e7 50%, #f4f4f5 100%)',
       },
     },
   },
