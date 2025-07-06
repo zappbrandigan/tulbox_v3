@@ -1,5 +1,6 @@
 import React from 'react';
 import { IMDBSearchResult, productionType } from '@/types';
+import PosterImage from './PosterImage';
 
 interface SearchResultProps {
   searchType: string;
@@ -52,10 +53,9 @@ const SearchResult: React.FC<SearchResultProps> = ({
             >
               <div className="flex items-start space-x-3">
                 {result.poster ? (
-                  <img
+                  <PosterImage
                     src={result.poster}
                     alt={result.title ?? 'Unknown'}
-                    className="w-16 h-24 object-cover rounded-md flex-shrink-0"
                   />
                 ) : (
                   <div className="w-16 h-24 bg-gray-200 rounded-md flex items-center justify-center flex-shrink-0">

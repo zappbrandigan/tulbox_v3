@@ -1,0 +1,37 @@
+import React from 'react';
+import { ExternalLink } from 'lucide-react';
+import { showToast } from '@/utils';
+
+interface IMDBCodeProps {
+  imdbCode: string;
+}
+
+const IMDBCode: React.FC<IMDBCodeProps> = ({ imdbCode }) => {
+  return (
+    <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+      <div
+        onClick={() => {
+          navigator.clipboard.writeText(`${imdbCode.substring(1)}`);
+          showToast();
+        }}
+        className="flex items-center space-x-2"
+      >
+        <span className="font-medium text-gray-900">IMDB Code:</span>
+        <code className="px-2 py-1 bg-gray-200 rounded text-sm font-mono hover:cursor-pointer">
+          {imdbCode}
+        </code>
+      </div>
+      <a
+        href={`https://www.imdb.com/title/${imdbCode}/`}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="flex items-center gap-2 text-blue-600 hover:text-blue-700 transition-colors"
+      >
+        View on IMDB
+        <ExternalLink className="inline w-5 h-5 text-gray-600" />
+      </a>
+    </div>
+  );
+};
+
+export default IMDBCode;
