@@ -28,6 +28,10 @@ export default defineConfig({
       output: {
         manualChunks: {
           vendor: ['react', 'react-dom'],
+          lucide: ['lucide-react'],
+          firebase: ['firebase/app', 'firebase/analytics'],
+          jszip: ['jszip'],
+          transliteration: ['transliteration'],
         },
       },
     },
