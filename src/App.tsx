@@ -1,18 +1,14 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Layout } from './components/ui';
 import { PDFManager, IMDBSearch, CWRConverter } from './pages';
 
 function App() {
-  const [currentTool, setCurrentTool] = useState('pdf-manager');
+  const [currentTool, setCurrentTool] = useState(() => {
+    return localStorage.getItem('defaultTool') ?? 'pdf-manager';
+  });
+
   const appName = 'TūlBOX';
 
-  // On mount: load saved tool from localStorage
-  useEffect(() => {
-    const savedTool = localStorage.getItem('defaultTool');
-    if (savedTool) setCurrentTool(savedTool);
-  }, []);
-
-  // When tool changes: update localStorage
   const handleToolChange = (tool: string) => {
     setCurrentTool(tool);
     localStorage.setItem('defaultTool', tool);

@@ -1,4 +1,5 @@
-import { getAnalytics, logEvent } from 'firebase/analytics';
+import { analytics } from '../../firebase.js';
+import { logEvent } from 'firebase/analytics';
 
 const isDev = import.meta.env.MODE === 'development';
 
@@ -7,8 +8,7 @@ const isDev = import.meta.env.MODE === 'development';
  */
 function trackEvent(
   eventName: string,
-  params?: Record<string, string | number | unknown>,
-  instance = getAnalytics()
+  params?: Record<string, string | number | unknown>
 ) {
   if (isDev) {
     console.log(`[GA EVENT]: ${eventName}`, params ?? {});
@@ -16,7 +16,12 @@ function trackEvent(
   }
 
   try {
-    logEvent(instance, eventName, params);
+    if (!analytics) {
+      console.warn('Analytics not yet initialized. Event skipped:', eventName);
+      return;
+    }
+
+    logEvent(analytics, eventName, params);
   } catch (err) {
     console.warn('Error logging event:', err);
   }

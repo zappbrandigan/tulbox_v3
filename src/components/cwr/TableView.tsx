@@ -1,11 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { generateReactKey } from '@/utils';
+import { trackEvent } from '@/utils';
 import { CWRTemplate, CWRTemplateField } from '@/types';
 import { LoadingOverlay } from '@/components/ui';
 import { Table } from 'lucide-react';
 import ReportWorker from '@/workers/reportWorker?worker';
-import { analytics } from '@/firebase';
-import { logEvent } from 'firebase/analytics';
 
 const ROW_HEIGHT = 36;
 const PAGE_SIZE = 50;
@@ -36,7 +34,7 @@ const TableView: React.FC<TableViewProps> = ({
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    logEvent(analytics, 'cwr_report_viewed', { report: selectedTemplate });
+    trackEvent('cwr_report_viewed', { report: selectedTemplate });
     const MIN_DURATION = 500; // ms
     const start = Date.now();
     setIsProcessing(true);
@@ -98,13 +96,14 @@ const TableView: React.FC<TableViewProps> = ({
               ref={scrollRef}
               onScroll={handleScroll}
             >
-              <table className="w-full">
+              <table className="min-w-full table-fixed">
                 <thead className="sticky top-0 bg-gray-50 border-b border-gray-200">
                   <tr>
                     {template.fields.map((field: CWRTemplateField) => (
                       <th
                         key={field.label}
-                        className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wide"
+                        style={{ minWidth: field.width, maxWidth: field.width }}
+                        className={`px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wide`}
                       >
                         {field.label}
                       </th>
@@ -112,32 +111,33 @@ const TableView: React.FC<TableViewProps> = ({
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
-                  {/* Top Spacer */}
                   {startIndex > 0 && (
                     <tr style={{ height: `${startIndex * ROW_HEIGHT}px` }}>
                       <td colSpan={template.fields.length}></td>
                     </tr>
                   )}
 
-                  {/* Visible Rows */}
                   {visibleData.map((record, index) => (
                     <tr
                       key={startIndex + index}
                       className="hover:bg-gray-50 transition-colors"
                       style={{ height: `${ROW_HEIGHT}px` }}
                     >
-                      {Array.from(record.entries()).map(([key, value]) => (
+                      {template.fields.map((field) => (
                         <td
-                          key={generateReactKey(key)}
-                          className="px-6 py-2 text-sm text-gray-900 max-w-xs truncate"
+                          key={field.label}
+                          style={{
+                            minWidth: field.width,
+                            maxWidth: field.width,
+                          }}
+                          className="px-6 py-2 text-sm text-gray-900 min-w-xs max-w-xs truncate"
                         >
-                          {value}
+                          {record.get(field.key)}
                         </td>
                       ))}
                     </tr>
                   ))}
 
-                  {/* Bottom Spacer */}
                   {startIndex + PAGE_SIZE < reportData.length && (
                     <tr
                       style={{
@@ -153,6 +153,7 @@ const TableView: React.FC<TableViewProps> = ({
                 </tbody>
               </table>
             </div>
+
             <div className="bg-gray-50 border-t border-gray-200 px-4 py-2">
               <div className="flex items-center justify-between text-xs text-gray-600">
                 <span>
