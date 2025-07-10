@@ -12,7 +12,7 @@ const CWR_TEMPLATES: CWRTemplate[] = [
   {
     id: 'works-report',
     name: 'Works Report',
-    version: '0.1.1',
+    version: '1.0.0',
     description: 'Detailed works information with roles and shares',
     fields: [
       { key: 'songCode', label: 'Song Code', type: 'string', width: 200 },
