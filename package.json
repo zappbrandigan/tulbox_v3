@@ -12,7 +12,8 @@
   "dependencies": {
     "@headlessui/react": "^2.2.4",
     "axios": "^1.9.0",
-    "cwr-parser": "^1.2.7",
+    "cwr-parser": "^2.0.1",
+    "decimal.js-light": "^2.5.1",
     "file-saver": "^2.0.5",
     "firebase": "^11.9.1",
     "jszip": "^3.10.1",
@@ -26,7 +27,7 @@
     "@types/file-saver": "^2.0.7",
     "@types/react": "^18.3.5",
     "@types/react-dom": "^18.3.0",
-    "@vitejs/plugin-react": "^4.3.1",
+    "@vitejs/plugin-react": "^4.6.0",
     "autoprefixer": "^10.4.21",
     "eslint": "^9.9.1",
     "eslint-plugin-react-hooks": "^5.1.0-rc.0",

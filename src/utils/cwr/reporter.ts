@@ -1,11 +1,12 @@
 import {
-  CWROtherPublisher,
-  CWROtherWriter,
-  CWRPublisher,
-  CWRWriter,
-  ParsedCWRFile,
+  ParsedOPU,
+  ParsedOWR,
+  ParsedSPU,
+  ParsedSWR,
+  ParsedTransmission,
 } from 'cwr-parser/types';
 import { CWRTemplate, CWRTemplateField } from '@/types';
+import Decimal from 'decimal.js-light';
 
 class CWRReporter {
   static getPublisherInfo(
@@ -30,20 +31,30 @@ class CWRReporter {
       albumTitle: string;
       catalogNum: string;
     },
-    publisher: CWRPublisher | CWROtherPublisher,
+    publisher: ParsedSPU | ParsedOPU,
     columns: [string, string][]
   ) {
     const row = new Map<string, string | number>(columns);
     const publisherName =
-      publisher.data.publisherUnknownIndicator === 'Y'
+      publisher.fields.publisherUnknownIndicator === 'Y'
         ? 'UNKNOWN PUBLISHER'
-        : publisher.data.publisherName ?? 'UNKNOWN PUBLISHER';
-    const publisherControlFlag = publisher.recordType === 'SPU' ? 'Y' : 'N';
-
-    // const controllingWriterCount = publisher.writers?.length || 1;
-    // const perfShare = (publisher.data.prOwnershipShare ?? 0);
-    // const individualShare = perfShare / controllingWriterCount;
-    row.set('recordingTitle', recordingTitle);
+        : publisher.fields.publisherName ?? 'UNKNOWN PUBLISHER';
+    let publisherControlFlag: 'Y' | 'N' = 'N';
+    let prCollectionShare: number = 0;
+    let mrCollectionShare: number = 0;
+    if (publisher.fields.recordType === 'SPU') {
+      publisherControlFlag = 'Y';
+      prCollectionShare = Number(
+        (publisher as ParsedSPU).spts?.[0].fields.prCollectionShare ??
+          publisher.fields.prOwnershipShare ??
+          0
+      );
+      mrCollectionShare = Number(
+        (publisher as ParsedSPU).spts?.[0].fields.mrCollectionShare ??
+          publisher.fields.mrOwnershipShare ??
+          0
+      );
+    } else row.set('recordingTitle', recordingTitle);
     row.set('albumTitle', albumTitle);
     row.set('catalogNum', catalogNum);
     row.set('songCode', songCode);
@@ -52,28 +63,24 @@ class CWRReporter {
     row.set('akas', akas);
     row.set('setupNote', setupNote);
     row.set('titleNote', titleNote);
-    row.set('publisherSeqNum', publisher.data.publisherSequenceNumber);
-    row.set('territoryCode', publisher.territories?.[0]?.data.tisCode ?? '');
-    row.set(
-      'ogTerritoryFlag',
-      publisher.territories?.[0]?.data.inclusionExclusionIndicator ?? ''
-    );
+    row.set('publisherSeqNum', publisher.fields.publisherSequenceNumber);
     row.set('controlled', publisherControlFlag);
-    row.set('capacity', publisher.data.publisherType ?? '');
-    row.set('ipNum', publisher.data.interestedPartyNumber ?? '');
+    row.set('capacity', publisher.fields.publisherType ?? '');
+    row.set('ipNum', publisher.fields.interestedPartyNumber ?? '');
     row.set('publisherName', publisherName);
-    row.set('ipiNameNum', Number(publisher.data.ipiNameNumber ?? ''));
-    row.set('society', publisher.data.prAffiliationSocietyNumber ?? '');
-    row.set('prOwnership', publisher.data.prOwnershipShare ?? 0);
-    row.set('mrOwnership', publisher.data.mrOwnershipShare ?? 0);
-    row.set(
-      'prCollection',
-      publisher.territories?.[0]?.data.prCollectionShare ?? 0
-    );
-    row.set(
-      'mrCollection',
-      publisher.territories?.[0]?.data.mrCollectionShare ?? 0
-    );
+    row.set('ipiNameNum', Number(publisher.fields.ipiNameNumber ?? ''));
+    row.set('society', publisher.fields.prAffiliationSocietyNumber ?? '');
+    row.set('prOwnership', (publisher.fields.prOwnershipShare ?? 0).toFixed(2));
+    row.set('mrOwnership', (publisher.fields.mrOwnershipShare ?? 0).toFixed(2));
+    if ('spts' in publisher) {
+      row.set('territoryCode', publisher.spts?.[0]?.fields.tisCode ?? '');
+      row.set(
+        'ogTerritoryFlag',
+        publisher.spts?.[0]?.fields.inclusionExclusionIndicator ?? ''
+      );
+      row.set('prCollection', prCollectionShare.toFixed(2));
+      row.set('mrCollection', mrCollectionShare.toFixed(2));
+    }
 
     return row;
   }
@@ -100,25 +107,24 @@ class CWRReporter {
       albumTitle: string;
       catalogNum: string;
     },
-    writer: CWRWriter | CWROtherWriter,
+    writer: ParsedSWR | ParsedOWR,
     columns: [string, string][]
   ) {
     const row = new Map<string, string | number>(columns);
-    const writerName = !writer.data.writerLastName
+    const writerName = !writer.fields.writerLastName
       ? 'UNKNOWN WRITER'
-      : !writer.data.writerFirstName
-      ? writer.data.writerLastName
-      : `${writer.data.writerLastName}, ${writer.data.writerFirstName}`;
-    const writerControlFlag = writer.recordType === 'SWR' ? 'Y' : 'N';
+      : !writer.fields.writerFirstName
+      ? writer.fields.writerLastName
+      : `${writer.fields.writerLastName}, ${writer.fields.writerFirstName}`;
+    const writerControlFlag = writer.fields.recordType === 'SWR' ? 'Y' : 'N';
+    const adjustedContribution = writer.fields.prOwnershipShare * 2;
+    // const adjustedContribution =
+    //   writerControlFlag === 'Y'
+    //     ? writer.fields.prOwnershipShare ?? 0
+    //     : writer.fields.prOwnershipShare * 2;
+    // const adjustedPrShare = writer.fields.prOwnershipShare;
 
-    const controllingPublisherCount = writer.publishers?.length || 1;
-    const totalContribution = (writer.data.prOwnershipShare ?? 0) * 2;
-    const individualContribution =
-      totalContribution / controllingPublisherCount;
-    const individualPerfShare =
-      (writer.data.prOwnershipShare ?? 0) / controllingPublisherCount;
-
-    row.set('contribution', individualContribution); // e.g., 16.67
+    row.set('contribution', adjustedContribution.toFixed(2)); // e.g., 16.67
 
     row.set('recordingTitle', recordingTitle);
     row.set('albumTitle', albumTitle);
@@ -130,33 +136,334 @@ class CWRReporter {
     row.set('setupNote', setupNote);
     row.set('titleNote', titleNote);
     row.set('publisherSeqNum', '');
-    row.set('territoryCode', writer.territories?.[0]?.data.tisCode ?? '');
-    row.set(
-      'ogTerritoryFlag',
-      writer.territories?.[0]?.data.inclusionExclusionIndicator ?? ''
-    );
+
     row.set('controlled', writerControlFlag);
-    row.set('capacity', writer.data.writerDesignationCode);
-    row.set('ipNum', writer.data.interestedPartyNumber);
+    row.set('capacity', writer.fields.writerDesignationCode);
+    row.set('ipNum', writer.fields.interestedPartyNumber);
     row.set('publisherName', '');
     row.set('composerName', writerName);
-    row.set('ipiNameNum', Number(writer.data.ipiNameNumber ?? '')); // will be change to writerIpiNameNumber in next version
-    row.set('society', writer.data.prAffiliationSocietyNumber ?? '');
-    row.set('prOwnership', individualPerfShare);
-    row.set('mrOwnership', writer.data.mrOwnershipShare ?? 0);
-    row.set(
-      'prCollection',
-      writer.territories?.[0]?.data.prCollectionShare ?? 0
-    );
-    row.set(
-      'mrCollection',
-      writer.territories?.[0]?.data.mrCollectionShare ?? 0
-    );
+    row.set('ipiNameNum', Number(writer.fields.ipiNameNumber ?? ''));
+    row.set('society', writer.fields.prAffiliationSocietyNumber ?? '');
+    row.set('prOwnership', writer.fields.prOwnershipShare.toFixed(2));
+    row.set('mrOwnership', writer.fields.mrOwnershipShare ?? 0);
+    if ('swts' in writer) {
+      row.set('territoryCode', writer.swts?.[0]?.fields.tisCode ?? '');
+      row.set(
+        'ogTerritoryFlag',
+        writer.swts?.[0]?.fields.inclusionExclusionIndicator ?? ''
+      );
+      row.set('prCollection', writer.swts?.[0]?.fields.prCollectionShare ?? 0);
+      row.set('mrCollection', writer.swts?.[0]?.fields.mrCollectionShare ?? 0);
+    }
     return row;
   }
 
+  static calculateTotalShareForPublisher(
+    totalSharePerPublisher: Map<
+      string,
+      {
+        prOwnershipShare: Decimal;
+        mrOwnershipShare: Decimal;
+        srOwnershipShare: Decimal;
+      }
+    >,
+    spu: ParsedSPU
+  ) {
+    const ipn = spu.fields.interestedPartyNumber;
+    const prOwnershipShare = new Decimal(spu.fields.prOwnershipShare ?? 0);
+    const mrOwnershipShare = new Decimal(spu.fields.mrOwnershipShare ?? 0);
+    const srOwnershipShare = new Decimal(spu.fields.srOwnershipShare ?? 0);
+
+    const prevShares = totalSharePerPublisher.get(ipn) ?? {
+      prOwnershipShare: 0,
+      mrOwnershipShare: 0,
+      srOwnershipShare: 0,
+    };
+    totalSharePerPublisher.set(ipn, {
+      prOwnershipShare: new Decimal(prevShares.prOwnershipShare).plus(
+        prOwnershipShare
+      ),
+      mrOwnershipShare: new Decimal(prevShares.mrOwnershipShare).plus(
+        mrOwnershipShare
+      ),
+      srOwnershipShare: new Decimal(prevShares.srOwnershipShare).plus(
+        srOwnershipShare
+      ),
+    });
+  }
+
+  static collapseDuplicatePublishers(
+    groupedBySeq: Record<number, ParsedSPU[]>,
+    ipnToSeqMap: Map<string, number[]>
+  ) {
+    const seqsBySingleIPN = new Map();
+
+    for (const [seqStr, spusForSeq] of Object.entries(groupedBySeq)) {
+      const seq = Number(seqStr);
+      if (spusForSeq.length === 1) {
+        const ipn = spusForSeq[0].fields.interestedPartyNumber;
+        if (ipn) {
+          const list = seqsBySingleIPN.get(ipn) ?? [];
+          list.push(seq);
+          seqsBySingleIPN.set(ipn, list);
+        }
+      }
+    }
+
+    // Step 2: Collapse duplicate IPNs across single-entry sequences
+    for (const [ipn, seqList] of seqsBySingleIPN.entries()) {
+      if (seqList.length <= 1) continue;
+
+      // Sum up all shares
+      let totalPR = 0;
+      let totalMR = 0;
+      let totalSR = 0;
+      let combinedSPU = { ...groupedBySeq[seqList[0]][0] }; // clone the first
+
+      for (const seq of seqList) {
+        const spu = groupedBySeq[seq][0];
+        totalPR += Number(spu.fields.prOwnershipShare ?? 0);
+        totalMR += Number(spu.fields.mrOwnershipShare ?? 0);
+        totalSR += Number(spu.fields.srOwnershipShare ?? 0);
+      }
+
+      // Update the combined SPU's shares
+      combinedSPU = {
+        ...combinedSPU,
+        fields: {
+          ...combinedSPU.fields,
+          prOwnershipShare: totalPR,
+          mrOwnershipShare: totalMR,
+          srOwnershipShare: totalSR,
+        },
+      };
+
+      // Replace the first sequence with the collapsed SPU
+      const firstSeq = seqList[0];
+      groupedBySeq[firstSeq] = [combinedSPU];
+
+      // Remove all other sequences
+      for (const seq of seqList.slice(1)) {
+        delete groupedBySeq[seq];
+      }
+
+      // Update ipnToSeqMap[ipn] to keep only [firstSeq]
+      ipnToSeqMap.set(ipn, [firstSeq]);
+    }
+  }
+
+  static groupSPUsWithSWRs(spus: ParsedSPU[], swrs: ParsedSWR[]) {
+    const groupedBySeq: Record<number, ParsedSPU[]> = {};
+    const ipnToSeqMap = new Map<string, number[]>();
+    const totalSharePerPublisher = new Map<
+      string,
+      {
+        prOwnershipShare: Decimal;
+        mrOwnershipShare: Decimal;
+        srOwnershipShare: Decimal;
+      }
+    >();
+
+    for (const spu of spus) {
+      const seq = spu.fields.publisherSequenceNumber;
+      const ipn = spu.fields.interestedPartyNumber;
+
+      if (!groupedBySeq[seq]) groupedBySeq[seq] = [];
+      groupedBySeq[seq].push(spu);
+
+      const list = ipnToSeqMap.get(ipn) ?? [];
+      list.push(seq);
+      ipnToSeqMap.set(ipn, list);
+
+      this.calculateTotalShareForPublisher(totalSharePerPublisher, spu);
+    }
+
+    this.collapseDuplicatePublishers(groupedBySeq, ipnToSeqMap);
+
+    const groupedWithSwrs: Record<
+      number,
+      { spus: ParsedSPU[]; swrs: ParsedSWR[]; totalSharePerSeq: Decimal }
+    > = {};
+
+    for (const [seqStr, spusForSeq] of Object.entries(groupedBySeq)) {
+      const seq = Number(seqStr);
+      groupedWithSwrs[seq] = {
+        spus: spusForSeq,
+        swrs: [],
+        totalSharePerSeq: spusForSeq.reduce(
+          (total, spu) =>
+            total.plus(new Decimal(spu.fields.prOwnershipShare ?? 0)),
+          new Decimal(0)
+        ),
+      };
+    }
+
+    // Step 1: Group all SWRs into their sequences based on their associated PWRs
+    for (const swr of swrs) {
+      for (const pwr of swr.pwrs ?? []) {
+        const pubIpn = pwr.fields.publisherInterestedPartyNumber;
+        const seqs = ipnToSeqMap.get(pubIpn) ?? [];
+
+        for (const seq of seqs) {
+          const group = groupedWithSwrs[seq];
+          if (!group) continue;
+
+          // Confirm the publisher exists in the sequence with a non-zero share
+          const matchingSPU = group.spus.find(
+            (spu) =>
+              spu.fields.interestedPartyNumber === pubIpn &&
+              new Decimal(spu.fields.prOwnershipShare ?? 0).gt(0)
+          );
+
+          if (!matchingSPU) continue; // Skip if no valid publisher in this sequence
+
+          if (
+            !group.swrs.some(
+              (existing) =>
+                existing.fields.interestedPartyNumber ===
+                swr.fields.interestedPartyNumber
+            )
+          ) {
+            group.swrs.push({ ...swr });
+          }
+        }
+      }
+    }
+
+    // Step 2: Recalculate per-sequence writer PR ownership using the new formula
+    for (const [, group] of Object.entries(groupedWithSwrs)) {
+      const spus = group.spus;
+      const swrs = group.swrs;
+
+      const totalPublisherShare = spus.reduce((sum, spu) => {
+        const share = new Decimal(spu.fields.prOwnershipShare ?? 0);
+        return share.isZero() ? sum : sum.plus(share);
+      }, new Decimal(0));
+
+      // const doubledPublisherShare = totalPublisherShare.mul(1);
+
+      const totalWriterPrInSeq = swrs.reduce((sum, swr) => {
+        return sum.plus(new Decimal(swr.fields.prOwnershipShare ?? 0));
+      }, new Decimal(0));
+
+      group.swrs = swrs.map((swr) => {
+        const writerPr = new Decimal(swr.fields.prOwnershipShare ?? 0);
+
+        const weightedShare = totalWriterPrInSeq.isZero()
+          ? new Decimal(0)
+          : totalPublisherShare
+              .mul(writerPr)
+              .div(totalWriterPrInSeq)
+              .toDecimalPlaces(4);
+
+        return {
+          ...swr,
+          fields: {
+            ...swr.fields,
+            prOwnershipShare: weightedShare.toNumber(),
+          },
+        };
+      });
+    }
+
+    return { groupedWithSwrs, totalSharePerPublisher };
+  }
+
+  static groupOPUsWithOWRs(
+    opus: ParsedOPU[],
+    owrs: ParsedOWR[]
+  ): {
+    sequenceNumber: number;
+    opus: ParsedOPU[];
+    owrs: ParsedOWR[];
+  }[] {
+    const result: {
+      sequenceNumber: number;
+      opus: ParsedOPU[];
+      owrs: ParsedOWR[];
+    }[] = [];
+
+    const remainingOPUs = [...opus];
+    const remainingOWRs = [...owrs];
+    const MARGIN = 0.06;
+
+    while (remainingOPUs.length > 0 && remainingOWRs.length > 0) {
+      const nextOPU = remainingOPUs[0];
+      const nextOWR = remainingOWRs[0];
+      const opuShare = Number(nextOPU.fields.prOwnershipShare ?? 0);
+      const owrShare = Number(nextOWR.fields.prOwnershipShare ?? 0);
+
+      // === CASE 1: Direct 1-to-1 match ===
+      if (Math.abs(opuShare - owrShare) < MARGIN) {
+        result.push({
+          sequenceNumber: nextOPU.fields.publisherSequenceNumber,
+          opus: [remainingOPUs.shift()!],
+          owrs: [remainingOWRs.shift()!],
+        });
+        continue;
+      }
+
+      // === CASE 2: Combine OPUs to match one OWR ===
+      const opuGroup: ParsedOPU[] = [];
+      let opuSum = 0;
+      let matched = false;
+
+      for (let i = 0; i < remainingOPUs.length; i++) {
+        opuGroup.push(remainingOPUs[i]);
+        opuSum += Number(remainingOPUs[i].fields.prOwnershipShare ?? 0);
+
+        if (Math.abs(opuSum - owrShare) < MARGIN) {
+          result.push({
+            sequenceNumber: opuGroup[0].fields.publisherSequenceNumber,
+            opus: remainingOPUs.splice(0, opuGroup.length),
+            owrs: [remainingOWRs.shift()!],
+          });
+          matched = true;
+          break;
+        }
+      }
+
+      if (matched) continue;
+
+      // === CASE 3: Combine OWRs to match one OPU ===
+      const owrGroup: ParsedOWR[] = [];
+      let owrSum = 0;
+
+      for (let j = 0; j < remainingOWRs.length; j++) {
+        owrGroup.push(remainingOWRs[j]);
+        owrSum += Number(remainingOWRs[j].fields.prOwnershipShare ?? 0);
+
+        if (Math.abs(owrSum - opuShare) < MARGIN) {
+          result.push({
+            sequenceNumber: nextOPU.fields.publisherSequenceNumber,
+            opus: [remainingOPUs.shift()!],
+            owrs: remainingOWRs.splice(0, owrGroup.length),
+          });
+          matched = true;
+          break;
+        }
+      }
+
+      if (matched) continue;
+
+      // === Fallback: Force one-to-one pairing with warning ===
+      console.warn(`No accurate match found. Forcing fallback pairing.`, {
+        opu: nextOPU.fields.publisherName,
+        owrs: remainingOWRs.map((o) => o.fields.writerLastName),
+      });
+
+      result.push({
+        sequenceNumber: nextOPU.fields.publisherSequenceNumber,
+        opus: [remainingOPUs.shift()!],
+        owrs: [remainingOWRs.shift()!], // may not match exactly
+      });
+    }
+
+    return result;
+  }
+
   static generateWorkReport(
-    transmission: ParsedCWRFile,
+    transmission: ParsedTransmission,
     template: CWRTemplate
   ) {
     const rowCollection: Map<string, string | number>[] = [];
@@ -164,106 +471,69 @@ class CWRReporter {
       (field: CWRTemplateField) => [field.key, ''] as [string, string]
     );
 
-    for (const group of transmission.groups) {
-      for (const transaction of group.transactions) {
+    for (const group of transmission.groups ?? []) {
+      for (const transaction of group.transactions ?? []) {
         const rows: Map<string, string | number>[] = [];
-        const songCode = Number(transaction.header.data.submitterWorkNumber);
-        const setupNote = transaction.originators?.[0]?.data.intendedPurpose;
+        if (!transaction.work) continue;
+        const currentWork = transaction.work;
+        const songCode = currentWork.header.fields.submitterWorkNumber;
+        const setupNote = currentWork.orns?.[0].fields.intendedPurpose ?? '';
 
         const repeatedData = {
-          songCode: isNaN(songCode)
-            ? transaction.header.data.submitterWorkNumber
-            : songCode,
-          languageCode: transaction.header.data.languageCode ?? '',
-          workTitle: transaction.header.data.workTitle,
-          iswc: transaction.header.data.iswc ?? '',
-          akas: transaction.alternativeTitles.length ? 'See AKA Table' : '',
+          songCode,
+          languageCode: currentWork.header.fields.languageCode ?? '',
+          workTitle: currentWork.header.fields.workTitle,
+          iswc: currentWork.header.fields.iswc ?? '',
+          akas: currentWork.alts?.length ? 'See AKA Table' : '',
           setupNote: setupNote,
-          titleNote: transaction.originators?.[0]?.data.productionTitle ?? '',
+          titleNote: currentWork.orns?.[0]?.fields.productionTitle ?? '',
           recordingTitle:
-            transaction.recordings?.[0]?.data.recordingTitle ??
-            'No principal recording identified', // need to add in cwr-parser
+            currentWork.recs?.[0].fields.recordingTitle ??
+            'No principal recording identified',
           albumTitle:
-            transaction.recordings?.[0]?.data.firstAlbumTitle ??
+            currentWork.recs?.[0].fields.firstAlbumTitle ??
             'No album/single title identified',
           catalogNum:
-            transaction.recordings?.[0]?.data.firstReleaseCatalogNumber ??
+            currentWork.recs?.[0].fields.firstReleaseCatalogNumber ??
             'No catalog number identified',
         };
 
-        const publishers = transaction.publishers;
-        for (let index = 0; index < transaction.publishers.length; index++) {
-          rows.push(
-            this.getPublisherInfo(repeatedData, publishers[index], columns)
-          );
+        const { groupedWithSwrs } = this.groupSPUsWithSWRs(
+          currentWork.spus ?? [],
+          currentWork.swrs ?? []
+        );
+        const uncontrolledGroup = this.groupOPUsWithOWRs(
+          currentWork.opus ?? [],
+          currentWork.owrs ?? []
+        );
 
-          const next = index + 1 < publishers.length ? index + 1 : 0;
-          if (
-            !next ||
-            Number(publishers[index].data.publisherSequenceNumber) <
-              publishers[next].data.publisherSequenceNumber
-          ) {
-            for (const writer of transaction.writers) {
-              const currentPublisher = writer.publishers?.find(
-                (p) =>
-                  p.data.publisherInterestedPartyNumber ===
-                  publishers[index].data.interestedPartyNumber
-              );
-              if (currentPublisher) {
-                rows.push(this.getWriterInfo(repeatedData, writer, columns));
-              }
-            }
+        const controlledSplits = Object.entries(groupedWithSwrs).map(
+          ([key, value]) => ({
+            sequenceNumber: Number(key),
+            ...value,
+          })
+        );
+
+        const uncontrolledSplits = Object.entries(uncontrolledGroup).map(
+          ([, value]) => ({
+            ...value,
+          })
+        );
+
+        for (const split of controlledSplits) {
+          for (const pub of split.spus) {
+            rows.push(this.getPublisherInfo(repeatedData, pub, columns));
+          }
+          for (const wrt of split.swrs) {
+            rows.push(this.getWriterInfo(repeatedData, wrt, columns));
           }
         }
-
-        const writers = [...transaction.otherWriters];
-        const otherPublishers = [...transaction.otherPublishers];
-
-        let writerIndex = 0;
-        let publisherIndex = 0;
-
-        // const usedPublishers = new Set<string>();
-
-        while (
-          writerIndex < writers.length &&
-          publisherIndex < otherPublishers.length
-        ) {
-          const writer = writers[writerIndex];
-          const writerShare = (writer.data.prOwnershipShare ?? 0) * 2;
-
-          let collectedPublisherShare = 0;
-          const collectedPublishers: typeof otherPublishers = [];
-
-          // Collect publishers until their total share matches or exceeds writer's share
-          while (
-            publisherIndex < otherPublishers.length &&
-            collectedPublisherShare < writerShare
-          ) {
-            const publisher = otherPublishers[publisherIndex];
-            const pubShare = (publisher.data.prOwnershipShare ?? 0) * 2;
-
-            collectedPublisherShare += pubShare;
-            collectedPublishers.push(publisher);
-            publisherIndex++;
+        for (const split of uncontrolledSplits) {
+          for (const pub of split.opus) {
+            rows.push(this.getPublisherInfo(repeatedData, pub, columns));
           }
-
-          // Only emit if we have enough share
-          if (
-            collectedPublisherShare >= writerShare ||
-            Math.abs(collectedPublisherShare - writerShare) < 1e-6
-          ) {
-            // Push all collected publishers
-            for (const pub of collectedPublishers) {
-              rows.push(this.getPublisherInfo(repeatedData, pub, columns));
-            }
-
-            // Push the writer
-            rows.push(this.getWriterInfo(repeatedData, writer, columns));
-
-            writerIndex++;
-          } else {
-            // Not enough publisher share to match writer — break to avoid infinite loop
-            break;
+          for (const wrt of split.owrs) {
+            rows.push(this.getWriterInfo(repeatedData, wrt, columns));
           }
         }
 
@@ -274,7 +544,7 @@ class CWRReporter {
   }
 
   static generateIsrcReport(
-    transmission: ParsedCWRFile,
+    transmission: ParsedTransmission,
     template: CWRTemplate
   ) {
     const rowCollection: Map<string, string | number>[] = [];
@@ -283,16 +553,19 @@ class CWRReporter {
     );
 
     for (const group of transmission.groups) {
-      for (const transaction of group.transactions) {
+      for (const transaction of group.transactions ?? []) {
         const rows: Map<string, string | number>[] = [];
-        if (!transaction.recordings.length) {
+        if (!transaction.work?.recs?.length) {
           continue;
         } // skip if not REC records
-        for (const recording of transaction.recordings) {
-          if (!recording.data.isrc) continue; // skip if REC has no ISRC
+        for (const recording of transaction.work?.recs ?? []) {
+          if (!recording.fields.isrc) continue; // skip if REC has no ISRC
           const row = new Map<string, string | number>(columns);
-          row.set('songCode', transaction.header.data.submitterWorkNumber);
-          row.set('isrc', recording.data.isrc ?? '');
+          row.set(
+            'songCode',
+            transaction.work.header.fields.submitterWorkNumber
+          );
+          row.set('isrc', recording.fields.isrc ?? '');
           rows.push(row);
         }
         rowCollection.push(...rows);
@@ -301,7 +574,10 @@ class CWRReporter {
     return rowCollection;
   }
 
-  static generateAkaReport(transmission: ParsedCWRFile, template: CWRTemplate) {
+  static generateAkaReport(
+    transmission: ParsedTransmission,
+    template: CWRTemplate
+  ) {
     function isRowDuplicate(
       row: Map<string, string | number>,
       existingRows: Map<string, string | number>[]
@@ -324,17 +600,20 @@ class CWRReporter {
     );
 
     for (const group of transmission.groups) {
-      for (const transaction of group.transactions) {
-        if (!transaction.alternativeTitles.length) continue;
+      for (const transaction of group.transactions ?? []) {
+        if (!transaction.work?.alts?.length) continue;
 
         const rows: Map<string, string | number>[] = [];
 
-        for (const alternativeTitle of transaction.alternativeTitles) {
+        for (const alternativeTitle of transaction.work.alts) {
           const row = new Map<string, string | number>(columns);
-          row.set('songCode', transaction.header.data.submitterWorkNumber);
-          row.set('aka', alternativeTitle.data.alternativeTitle);
-          row.set('languageCode', alternativeTitle.data.languageCode ?? '');
-          row.set('workTitle', transaction.header.data.workTitle);
+          row.set(
+            'songCode',
+            transaction.work.header.fields.submitterWorkNumber
+          );
+          row.set('aka', alternativeTitle.fields.alternativeTitle);
+          row.set('languageCode', alternativeTitle.fields.languageCode ?? '');
+          row.set('workTitle', transaction.work.header.fields.workTitle);
           // Only add the row if it's not a duplicate
           if (!isRowDuplicate(row, rows)) {
             rows.push(row);
@@ -346,7 +625,10 @@ class CWRReporter {
     return rowCollection;
   }
 
-  static generateCatImport(transmission: ParsedCWRFile, template: CWRTemplate) {
+  static generateCatImport(
+    transmission: ParsedTransmission,
+    template: CWRTemplate
+  ) {
     const rowCollection: Map<string, string | number>[] = [];
 
     // Collect all expected column keys from the template
@@ -355,56 +637,62 @@ class CWRReporter {
     );
 
     for (const group of transmission.groups) {
-      for (const transaction of group.transactions) {
-        const iswc = transaction.header.data.iswc ?? '';
-        const workTitle = transaction.header.data.workTitle ?? '';
+      for (const transaction of group.transactions ?? []) {
+        const iswc = transaction.work?.header.fields.iswc ?? '';
+        const workTitle = transaction.work?.header.fields.workTitle ?? '';
         const songTypeCode = 'OG';
 
         // Writer rows
-        for (const writer of transaction.writers) {
+        for (const writer of transaction.work?.swrs ?? []) {
           const row = new Map<string, string | number>(
             columnKeys.map((key: string) => [key, ''])
           );
-          const contribution = (writer.data.prOwnershipShare * 2)
+          const contribution = (writer.fields.prOwnershipShare * 2)
             .toFixed(2) // ensures 2 decimal places
             .padStart(6, '0'); // pads total length to 6 (e.g. "005.00")
 
           row.set('iswc', iswc);
           row.set('workTitle', workTitle);
           row.set('songTypeCode', songTypeCode);
-          row.set('lastName', writer.data.writerLastName ?? '');
-          row.set('firstName', writer.data.writerFirstName ?? '');
-          row.set('capacity', writer.data.writerDesignationCode ?? '');
+          row.set('lastName', writer.fields.writerLastName ?? '');
+          row.set('firstName', writer.fields.writerFirstName ?? '');
+          row.set('capacity', writer.fields.writerDesignationCode ?? '');
           row.set('contribution', contribution);
-          row.set('controlled', writer.recordType === 'SWR' ? 'Y' : 'N');
-          row.set('affiliation', writer.data.prAffiliationSocietyNumber ?? '');
-          row.set('ipiNameNumber', writer.data.ipiNameNumber ?? '');
+          row.set('controlled', writer.fields.recordType === 'SWR' ? 'Y' : 'N');
+          row.set(
+            'affiliation',
+            writer.fields.prAffiliationSocietyNumber ?? ''
+          );
+          row.set('ipiNameNumber', writer.fields.ipiNameNumber ?? '');
           rowCollection.push(row);
         }
 
         // Publisher rows
-        for (const publisher of transaction.publishers) {
+        for (const publisher of transaction.work?.spus ?? []) {
           const row = new Map<string, string | number>(
             columnKeys.map((key) => [key, ''])
           );
-          const contribution = (publisher.data.prOwnershipShare * 2)
+          const contribution = (publisher.fields.prOwnershipShare * 2)
             .toFixed(2) // ensures 2 decimal places
             .padStart(6, '0'); // pads total length to 6 (e.g. "005.00")
           row.set('iswc', iswc);
           row.set('workTitle', workTitle);
           row.set('songTypeCode', songTypeCode);
-          row.set('lastName', publisher.data.publisherName ?? '');
+          row.set('lastName', publisher.fields.publisherName ?? '');
           row.set('firstName', '');
-          row.set('capacity', publisher.data.publisherType ?? '');
+          row.set('capacity', publisher.fields.publisherType ?? '');
           row.set('contribution', contribution);
-          row.set('controlled', publisher.recordType === 'SPU' ? 'Y' : 'N');
+          row.set(
+            'controlled',
+            publisher.fields.recordType === 'SPU' ? 'Y' : 'N'
+          );
 
           // This was previously duplicated — pick the correct field
           row.set(
             'affiliation',
-            publisher.data.prAffiliationSocietyNumber ?? ''
+            publisher.fields.prAffiliationSocietyNumber ?? ''
           );
-          row.set('ipiNameNumber', publisher.data.ipiNameNumber ?? '');
+          row.set('ipiNameNumber', publisher.fields.ipiNameNumber ?? '');
           rowCollection.push(row);
         }
       }
