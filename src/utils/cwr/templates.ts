@@ -43,8 +43,8 @@ const CWR_TEMPLATES: CWRTemplate[] = [
       { key: 'ipNum', label: 'IP #', type: 'string', width: 125 },
       { key: 'publisherName', label: 'Pub. Name', type: 'string', width: 300 },
       { key: 'composerName', label: 'Writer Name', type: 'string', width: 300 },
-      { key: 'ipiNameNum', label: 'IPI Name #', type: 'string', width: 155 },
-      { key: 'society', label: 'Society', type: 'string', width: 100 },
+      { key: 'ipiNameNum', label: 'IPI Name #', type: 'string', width: 175 },
+      { key: 'society', label: 'Society', type: 'string', width: 125 },
       {
         key: 'contribution',
         label: 'Contribution',
