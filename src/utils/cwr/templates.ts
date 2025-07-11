@@ -3,7 +3,7 @@ import { CWRTemplate } from '@/types';
 const CWR_TEMPLATES: CWRTemplate[] = [
   {
     id: 'raw-viewer',
-    version: '1.7.5',
+    version: '1.8.0',
     name: 'Raw File Viewer',
     description:
       'View the original CWR .v21/.v22 file content, hover cells for additional info.',

@@ -3,7 +3,13 @@ import TooltipPortal from './TooltipPortal';
 import { recordFields } from 'cwr-parser';
 import { FieldDefinition, RecordTypeKey } from 'cwr-parser/types';
 
-const RecordLine = ({ line }: { line: Map<string, string> }) => {
+const RecordLine = ({
+  line,
+  isFullScreen,
+}: {
+  line: Map<string, string>;
+  isFullScreen: boolean;
+}) => {
   const [tooltip, setTooltip] = useState<{
     title: string;
     description: string;
@@ -74,7 +80,7 @@ const RecordLine = ({ line }: { line: Map<string, string> }) => {
           </span>
         );
       })}
-      {tooltip && (
+      {tooltip && !isFullScreen && (
         <TooltipPortal position={tooltip.position}>
           <h2 className="font-bold">{tooltip.title}</h2>
           {tooltip.description}

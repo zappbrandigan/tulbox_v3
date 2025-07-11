@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import RecordLine from './RecordLine';
 import { LoadingOverlay } from '@/components/ui';
-import { Code } from 'lucide-react';
+import { Code, Minimize } from 'lucide-react';
 import { CWRConverterRecord, CWRParsedRecord } from 'cwr-parser/types';
 import { getTemplateById } from '@/utils';
 import ParserWorker from '@/workers/parserWorker?worker';
@@ -35,6 +35,7 @@ const CodeView: React.FC<CodeViewProps> = ({
     []
   );
   const [startIndex, setStartIndex] = useState(0);
+  const [isFullScreen, setIsFullScreen] = useState(false);
 
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
@@ -83,15 +84,52 @@ const CodeView: React.FC<CodeViewProps> = ({
     };
   }, []);
 
+  useEffect(() => {
+    const handleFullScreen = (event: KeyboardEvent) => {
+      if (
+        (event.ctrlKey &&
+          !event.metaKey &&
+          event.shiftKey &&
+          event.key === 'F') ||
+        (event.metaKey && !event.ctrlKey && event.shiftKey && event.key === 'f')
+      ) {
+        setIsFullScreen(true);
+      }
+      // Check if it's Escape to exit full screen
+      if (event.key === 'Escape') {
+        setIsFullScreen(false);
+      }
+    };
+
+    // Add event listener on mount
+    window.addEventListener('keydown', handleFullScreen);
+
+    // Clean up the event listener on unmount
+    return () => {
+      window.removeEventListener('keydown', handleFullScreen);
+    };
+  }, []);
+
   if (!parseResult) return null;
 
   return (
     <>
-      <div className="flex items-center space-x-2 mb-4">
-        <Code className="w-5 h-5 text-gray-600" />
-        <h3 className="text-lg font-semibold text-gray-900">
-          {`Raw File Content (${parseResult?.statistics?.totalRecords} lines)`}
-        </h3>
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center space-x-2">
+          <Code className="w-5 h-5 text-gray-600" />
+          <h3 className="text-lg font-semibold text-gray-900">
+            {`Raw File Content (${parseResult?.statistics?.totalRecords} lines)`}
+          </h3>
+        </div>
+        <button
+          onClick={() => setIsFullScreen(() => (isFullScreen ? false : true))}
+          className="px-4 py-2 text-sm font-medium text-blue-700 bg-transparent border-2 border-blue-500 rounded-lg hover:bg-blue-100 focus:outline-none transition-colors duration-200"
+          title={`${
+            /Mac/.test(navigator.userAgent) ? 'Cmd' : 'Ctrl'
+          } + Shift + F`}
+        >
+          {isFullScreen ? 'Exit Full Screen' : 'Enter Full Screen'}
+        </button>
       </div>
 
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
@@ -112,9 +150,30 @@ const CodeView: React.FC<CodeViewProps> = ({
             </div>
 
             {/* Virtualized Scroll Area */}
-            <div className="bg-gray-900 text-gray-100 overflow-hidden">
+            <div
+              className={`bg-gray-900 text-gray-100 overflow-hidden ${
+                isFullScreen
+                  ? 'absolute top-0 left-0 right-0 bottom-0 z-50'
+                  : ''
+              }`}
+            >
+              <button
+                onClick={() => {
+                  setIsFullScreen(false);
+                }}
+                className={`${
+                  isFullScreen
+                    ? 'absolute top-2 right-2 bg-red-200 bg-opacity-25 p-2 rounded-lg z-[1001] hover:bg-opacity-100 hover:text-red-500'
+                    : 'hidden'
+                }`}
+                title="Exit Full Screen (Esc)"
+              >
+                <Minimize className="w-15 h-15" />
+              </button>
               <div
-                className="min-h-[600px] h-[73vh] overflow-auto"
+                className={`min-h-[600px] ${
+                  isFullScreen ? 'h-[100vh]' : 'h-[73vh]'
+                } overflow-auto`}
                 ref={scrollContainerRef}
                 onScroll={() => {
                   const scrollTop = scrollContainerRef.current?.scrollTop || 0;
@@ -154,14 +213,17 @@ const CodeView: React.FC<CodeViewProps> = ({
                             key={actualIndex}
                             className={`flex transition-colors ${
                               addMarginTop ? 'mt-3' : ''
-                            } hover:bg-gray-600`}
+                            }`}
                             style={{ height: `${ROW_HEIGHT}px` }}
                           >
                             <div className="flex-shrink-0 w-12 px-3 py-1 text-gray-500 text-right border-r border-gray-700 bg-gray-800 select-none">
                               {actualIndex + 1}
                             </div>
                             <div className="flex-1 px-3 py-1 whitespace-nowrap">
-                              <RecordLine line={line.data} />
+                              <RecordLine
+                                line={line.data}
+                                isFullScreen={isFullScreen}
+                              />
                             </div>
                           </div>
                         );
