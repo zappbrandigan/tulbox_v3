@@ -13,17 +13,16 @@ function trackEvent(
   if (isDev) {
     console.log(`[GA EVENT]: ${eventName}`, params ?? {});
     return;
-  }
+  } else {
+    try {
+      if (!analytics) {
+        return;
+      }
 
-  try {
-    if (!analytics) {
-      console.warn('Analytics not yet initialized. Event skipped:', eventName);
-      return;
+      logEvent(analytics, eventName, params);
+    } catch (err) {
+      console.warn('Error logging event:', err);
     }
-
-    logEvent(analytics, eventName, params);
-  } catch (err) {
-    console.warn('Error logging event:', err);
   }
 }
 
