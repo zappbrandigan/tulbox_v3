@@ -158,7 +158,7 @@ const TableView: React.FC<TableViewProps> = ({
               <div className="flex items-center justify-between text-xs text-gray-600">
                 <span>
                   <span className="text-emerald-500">{reportData.length}</span>
-                  {` records • `}
+                  {` rows • `}
                   <span className="text-red-500">{0}</span>
                   {` errors • `}
                   <span className="text-amber-500">{0}</span>

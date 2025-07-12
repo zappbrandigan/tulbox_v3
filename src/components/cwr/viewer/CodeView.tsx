@@ -1,10 +1,21 @@
 import React, { useState, useEffect, useRef } from 'react';
 import RecordLine from './RecordLine';
 import { LoadingOverlay } from '@/components/ui';
-import { Code, Minimize } from 'lucide-react';
+import {
+  Code,
+  Expand,
+  MessageSquareOff,
+  MessageSquareText,
+  Minimize,
+  Search,
+} from 'lucide-react';
 import { CWRConverterRecord, CWRParsedRecord } from 'cwr-parser/types';
 import { getTemplateById } from '@/utils';
 import ParserWorker from '@/workers/parserWorker?worker';
+import SearchCodeView from './SearchCodeView';
+import SearchWorker from '@/workers/recordSearchWorker?worker';
+import ShortcutButton from './ShortcutButton';
+import ShortcutIcon from './ShortcutIcon';
 
 const ROW_HEIGHT = 24;
 const PAGE_SIZE = 50;
@@ -36,8 +47,22 @@ const CodeView: React.FC<CodeViewProps> = ({
   );
   const [startIndex, setStartIndex] = useState(0);
   const [isFullScreen, setIsFullScreen] = useState(false);
+  const [showSearch, setShowSearch] = useState(false);
+  const [isTooltipEnabled, setIsTooltipEnabled] = useState(false);
+
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filteredLines, setFilteredLines] = useState<
+    {
+      index: number;
+      line: CWRParsedRecord<Map<string, string>>;
+    }[]
+  >([]);
+  const [currentMatchIndex, setCurrentMatchIndex] = useState(-1);
+  const [workerBusy, setWorkerBusy] = useState(false);
 
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const searchInputRef = useRef<HTMLInputElement>(null);
+  const searchWorkerRef = useRef<Worker | null>(null);
 
   useEffect(() => {
     const MIN_DURATION = 500; // ms
@@ -61,75 +86,124 @@ const CodeView: React.FC<CodeViewProps> = ({
       }, remaining);
     };
 
-    return () => worker.terminate(); // Clean up if component unmounts
+    return () => worker.terminate();
   }, [fileContent, file, setIsProcessing, setParseResult]);
-
-  // Update visible lines on scroll
-  useEffect(() => {
-    const onScroll = () => {
-      const scrollTop = scrollContainerRef.current?.scrollTop || 0;
-      const newIndex = Math.floor(scrollTop / ROW_HEIGHT);
-      setStartIndex(newIndex);
-    };
-
-    const ref = scrollContainerRef.current;
-    if (ref) {
-      ref.addEventListener('scroll', onScroll);
-    }
-
-    return () => {
-      if (ref) {
-        ref.removeEventListener('scroll', onScroll);
-      }
-    };
-  }, []);
 
   useEffect(() => {
     const handleFullScreen = (event: KeyboardEvent) => {
       if (
-        (event.ctrlKey &&
-          !event.metaKey &&
-          event.shiftKey &&
-          event.key === 'F') ||
-        (event.metaKey && !event.ctrlKey && event.shiftKey && event.key === 'f')
+        (event.ctrlKey && !event.metaKey && event.key === 'e') ||
+        (event.metaKey && !event.ctrlKey && event.key === 'e')
       ) {
-        setIsFullScreen(true);
+        event.preventDefault();
+        event.stopPropagation();
+        setIsFullScreen((prev) => !prev);
       }
-      // Check if it's Escape to exit full screen
       if (event.key === 'Escape') {
         setIsFullScreen(false);
       }
     };
 
-    // Add event listener on mount
-    window.addEventListener('keydown', handleFullScreen);
+    const handleShowSearch = (event: KeyboardEvent) => {
+      if (
+        (event.ctrlKey && !event.metaKey && event.key === 'f') ||
+        (event.metaKey && !event.ctrlKey && event.key === 'f')
+      ) {
+        event.preventDefault();
+        event.stopPropagation();
+        setShowSearch((prevShowSearch) => {
+          if (prevShowSearch) {
+            setSearchQuery('');
+            setShowSearch(false);
+            setFilteredLines([]);
+            setCurrentMatchIndex(-1);
+          }
+          return !prevShowSearch;
+        });
+      }
+    };
 
-    // Clean up the event listener on unmount
+    const handleToggleTooltip = (event: KeyboardEvent) => {
+      if (
+        (event.ctrlKey && !event.metaKey && event.key === 'k') ||
+        (event.metaKey && !event.ctrlKey && event.key === 'k')
+      ) {
+        event.preventDefault();
+        event.stopPropagation();
+        setIsTooltipEnabled((prev) => !prev);
+      }
+    };
+
+    window.addEventListener('keydown', handleFullScreen);
+    window.addEventListener('keydown', handleShowSearch);
+    window.addEventListener('keydown', handleToggleTooltip);
+
     return () => {
       window.removeEventListener('keydown', handleFullScreen);
+      window.removeEventListener('keydown', handleShowSearch);
+      window.removeEventListener('keydown', handleToggleTooltip);
     };
   }, []);
+
+  // Set focus to search bar when visible
+  useEffect(() => {
+    if (showSearch && searchInputRef.current) {
+      searchInputRef.current.focus();
+    }
+  }, [showSearch]);
+
+  //️  create & destroy once
+  useEffect(() => {
+    const worker = new SearchWorker();
+    searchWorkerRef.current = worker;
+
+    worker.onmessage = (e) => {
+      const { type, status, matches } = e.data;
+
+      if (type === 'status') {
+        setWorkerBusy(status === 'working');
+      }
+
+      if (type === 'result') {
+        setFilteredLines(matches);
+        setCurrentMatchIndex(-1);
+      }
+    };
+
+    return () => worker.terminate();
+  }, []); // only on mount/unmount
+
+  //  send heavy payload whenever lines change
+  useEffect(() => {
+    if (lines.length && searchWorkerRef.current) {
+      searchWorkerRef.current.postMessage({
+        type: 'init', // or 'updateLines'
+        payload: { lines },
+      });
+    }
+  }, [lines]); // only re-fires the postMessage
+
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const query = e.target.value;
+    setSearchQuery(query);
+
+    if (searchWorkerRef.current) {
+      searchWorkerRef.current.postMessage({
+        type: 'search',
+        payload: { query },
+      });
+    }
+  };
 
   if (!parseResult) return null;
 
   return (
     <>
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center space-x-2">
-          <Code className="w-5 h-5 text-gray-600" />
-          <h3 className="text-lg font-semibold text-gray-900">
-            {`Raw File Content (${parseResult?.statistics?.totalRecords} lines)`}
-          </h3>
-        </div>
-        <button
-          onClick={() => setIsFullScreen(() => (isFullScreen ? false : true))}
-          className="px-4 py-2 text-sm font-medium text-blue-700 bg-transparent border-2 border-blue-500 rounded-lg hover:bg-blue-100 focus:outline-none transition-colors duration-200"
-          title={`${
-            /Mac/.test(navigator.userAgent) ? 'Cmd' : 'Ctrl'
-          } + Shift + F`}
-        >
-          {isFullScreen ? 'Exit Full Screen' : 'Enter Full Screen'}
-        </button>
+      <div className="flex items-center space-x-2">
+        <Code className="w-5 h-5 text-gray-600" />
+        <h3 className="text-lg font-semibold text-gray-900">
+          {`Raw File Content (${parseResult?.statistics?.totalRecords} lines)`}
+        </h3>
       </div>
 
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
@@ -142,6 +216,24 @@ const CodeView: React.FC<CodeViewProps> = ({
                 <h4 className="text-sm font-semibold text-gray-900">
                   CWR File Records
                 </h4>
+                <div className="flex gap-1">
+                  <ShortcutButton toggle={setShowSearch}>
+                    <Search className="h-4 w-4" />
+                    <ShortcutIcon text="F" />
+                  </ShortcutButton>
+                  <ShortcutButton toggle={setIsFullScreen}>
+                    <Expand className="h-4 w-4" />
+                    <ShortcutIcon text="E" />
+                  </ShortcutButton>
+                  <ShortcutButton toggle={setIsTooltipEnabled}>
+                    {isTooltipEnabled ? (
+                      <MessageSquareText className="h-4 w-4" />
+                    ) : (
+                      <MessageSquareOff className="h-4 w-4" />
+                    )}
+                    <ShortcutIcon text="K" />
+                  </ShortcutButton>
+                </div>
                 <span className="text-xs text-gray-500">
                   {parseResult?.statistics?.totalRecords} lines •{' '}
                   {parseResult?.fileName}
@@ -157,6 +249,21 @@ const CodeView: React.FC<CodeViewProps> = ({
                   : ''
               }`}
             >
+              <SearchCodeView
+                showSearch={showSearch}
+                setShowSearch={setShowSearch}
+                searchQuery={searchQuery}
+                setSearchQuery={setSearchQuery}
+                filteredLines={filteredLines}
+                setFilteredLines={setFilteredLines}
+                handleSearch={handleSearch}
+                scrollContainerRef={scrollContainerRef}
+                setStartIndex={setStartIndex}
+                currentMatchIndex={currentMatchIndex}
+                setCurrentMatchIndex={setCurrentMatchIndex}
+                workerBusy={workerBusy}
+                ROW_HEIGHT={ROW_HEIGHT}
+              />
               <button
                 onClick={() => {
                   setIsFullScreen(false);
@@ -211,6 +318,7 @@ const CodeView: React.FC<CodeViewProps> = ({
                         return (
                           <div
                             key={actualIndex}
+                            id={`match-${actualIndex}`}
                             className={`flex transition-colors ${
                               addMarginTop ? 'mt-3' : ''
                             }`}
@@ -223,6 +331,8 @@ const CodeView: React.FC<CodeViewProps> = ({
                               <RecordLine
                                 line={line.data}
                                 isFullScreen={isFullScreen}
+                                searchQuery={searchQuery}
+                                isTooltipEnabled={isTooltipEnabled}
                               />
                             </div>
                           </div>

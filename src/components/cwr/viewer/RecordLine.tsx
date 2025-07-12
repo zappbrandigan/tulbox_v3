@@ -3,12 +3,18 @@ import TooltipPortal from './TooltipPortal';
 import { recordFields } from 'cwr-parser';
 import { FieldDefinition, RecordTypeKey } from 'cwr-parser/types';
 
-const RecordLine = ({
-  line,
-  isFullScreen,
-}: {
+interface RecordLineProps {
   line: Map<string, string>;
   isFullScreen: boolean;
+  searchQuery: string;
+  isTooltipEnabled: boolean;
+}
+
+const RecordLine: React.FC<RecordLineProps> = ({
+  line,
+  isFullScreen,
+  searchQuery,
+  isTooltipEnabled,
 }) => {
   const [tooltip, setTooltip] = useState<{
     title: string;
@@ -75,12 +81,51 @@ const RecordLine = ({
                 </span>
               </>
             ) : (
-              value.padEnd(size)
+              (() => {
+                const lowerValue = value.toLowerCase();
+                const lowerSearch = searchQuery?.toLowerCase();
+                const matchIndex =
+                  lowerSearch && lowerSearch.length
+                    ? lowerValue.indexOf(lowerSearch)
+                    : -1;
+
+                if (matchIndex === -1 || isPercentage) {
+                  return isPercentage ? (
+                    <>
+                      <span className="tracking-widest">
+                        {value.slice(0, -2)}
+                      </span>
+                      <span className="text-[.8em] relative -top-1">
+                        {value.slice(-2)}
+                      </span>
+                    </>
+                  ) : (
+                    value.padEnd(size)
+                  );
+                }
+
+                const start = value.slice(0, matchIndex);
+                const match = value.slice(
+                  matchIndex,
+                  matchIndex + lowerSearch.length
+                );
+                const end = value.slice(matchIndex + lowerSearch.length);
+
+                return (
+                  <>
+                    {start}
+                    <mark className="bg-yellow-300 text-black font-semibold">
+                      {match}
+                    </mark>
+                    {end.padEnd(size - start.length - match.length)}
+                  </>
+                );
+              })()
             )}
           </span>
         );
       })}
-      {tooltip && !isFullScreen && (
+      {tooltip && isTooltipEnabled && !isFullScreen && (
         <TooltipPortal position={tooltip.position}>
           <h2 className="font-bold">{tooltip.title}</h2>
           {tooltip.description}

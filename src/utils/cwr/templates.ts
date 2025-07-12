@@ -3,19 +3,19 @@ import { CWRTemplate } from '@/types';
 const CWR_TEMPLATES: CWRTemplate[] = [
   {
     id: 'raw-viewer',
-    version: '1.8.0',
+    version: '1.9.2',
     name: 'Raw File Viewer',
     description:
       'View the original CWR .v21/.v22 file content, hover cells for additional info.',
     fields: [],
   },
   {
-    id: 'works-report',
-    name: 'Works Report',
+    id: 'batch-report',
+    name: 'Batch Report',
     version: '1.0.0',
     description: 'Detailed works information with roles and shares',
     fields: [
-      { key: 'songCode', label: 'Song Code', type: 'string', width: 200 },
+      { key: 'songCode', label: 'Song Code', type: 'string', width: 180 },
       { key: 'workTitle', label: 'Work Title', type: 'string', width: 300 },
       { key: 'prefCode', label: 'PREF Code', type: 'string', width: 100 },
       { key: 'akas', label: 'AKAs', type: 'string', width: 150 },
@@ -39,8 +39,8 @@ const CWR_TEMPLATES: CWRTemplate[] = [
         width: 100,
       },
       { key: 'capacity', label: 'Role', type: 'string', width: 75 },
-      { key: 'controlled', label: 'Controlled', type: 'string', width: 125 },
-      { key: 'ipNum', label: 'IP #', type: 'string', width: 125 },
+      { key: 'controlled', label: 'Ctrl', type: 'string', width: 75 },
+      { key: 'ipNum', label: 'IP #', type: 'string', width: 150 },
       { key: 'publisherName', label: 'Pub. Name', type: 'string', width: 300 },
       { key: 'composerName', label: 'Writer Name', type: 'string', width: 300 },
       { key: 'ipiNameNum', label: 'IPI Name #', type: 'string', width: 175 },

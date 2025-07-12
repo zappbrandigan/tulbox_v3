@@ -78,8 +78,8 @@ class CWRReporter {
         'ogTerritoryFlag',
         publisher.spts?.[0]?.fields.inclusionExclusionIndicator ?? ''
       );
-      row.set('prCollection', prCollectionShare.toFixed(2));
-      row.set('mrCollection', mrCollectionShare.toFixed(2));
+      row.set('prCollection', (prCollectionShare ?? 0).toFixed(2));
+      row.set('mrCollection', (mrCollectionShare ?? 0).toFixed(2));
     }
 
     return row;
@@ -117,7 +117,7 @@ class CWRReporter {
       ? writer.fields.writerLastName
       : `${writer.fields.writerLastName}, ${writer.fields.writerFirstName}`;
     const writerControlFlag = writer.fields.recordType === 'SWR' ? 'Y' : 'N';
-    const adjustedContribution = writer.fields.prOwnershipShare * 2;
+    const adjustedContribution = (writer.fields.prOwnershipShare ?? 0) * 2;
     // const adjustedContribution =
     //   writerControlFlag === 'Y'
     //     ? writer.fields.prOwnershipShare ?? 0
@@ -144,16 +144,22 @@ class CWRReporter {
     row.set('composerName', writerName);
     row.set('ipiNameNum', Number(writer.fields.ipiNameNumber ?? ''));
     row.set('society', writer.fields.prAffiliationSocietyNumber ?? '');
-    row.set('prOwnership', writer.fields.prOwnershipShare.toFixed(2));
-    row.set('mrOwnership', writer.fields.mrOwnershipShare ?? 0);
+    row.set('prOwnership', (writer.fields.prOwnershipShare ?? 0).toFixed(2));
+    row.set('mrOwnership', (writer.fields.mrOwnershipShare ?? 0).toFixed(2));
     if ('swts' in writer) {
       row.set('territoryCode', writer.swts?.[0]?.fields.tisCode ?? '');
       row.set(
         'ogTerritoryFlag',
         writer.swts?.[0]?.fields.inclusionExclusionIndicator ?? ''
       );
-      row.set('prCollection', writer.swts?.[0]?.fields.prCollectionShare ?? 0);
-      row.set('mrCollection', writer.swts?.[0]?.fields.mrCollectionShare ?? 0);
+      row.set(
+        'prCollection',
+        (writer.swts?.[0]?.fields.prCollectionShare ?? 0).toFixed(2)
+      );
+      row.set(
+        'mrCollection',
+        (writer.swts?.[0]?.fields.mrCollectionShare ?? 0).toFixed(2)
+      );
     }
     return row;
   }
