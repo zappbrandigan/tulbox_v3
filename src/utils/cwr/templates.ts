@@ -16,6 +16,7 @@ const CWR_TEMPLATES: CWRTemplate[] = [
     description: 'Detailed works information with roles and shares',
     fields: [
       { key: 'songCode', label: 'Song Code', type: 'string', width: 180 },
+      { key: 'workType', label: 'New/Rev', type: 'string', width: 100 },
       { key: 'workTitle', label: 'Work Title', type: 'string', width: 300 },
       { key: 'prefCode', label: 'PREF Code', type: 'string', width: 100 },
       { key: 'akas', label: 'AKAs', type: 'string', width: 150 },
@@ -157,6 +158,31 @@ const CWR_TEMPLATES: CWRTemplate[] = [
         type: 'string',
         width: 125,
       },
+    ],
+  },
+  {
+    id: 'msg-report',
+    version: '0.0.2',
+    name: 'Message Records',
+    description: 'All message records present in the CWR file',
+    fields: [
+      {
+        key: 'transactionSeqNum',
+        label: 'Tran Seq #',
+        type: 'string',
+        width: 75,
+      },
+      { key: 'recSeqNum', label: 'Rec Seq #', type: 'string', width: 75 },
+      { key: 'ogRecSeqNum', label: 'OG Rec Seq #', type: 'string', width: 75 },
+      { key: 'ogRecType', label: 'OG Rec Type', type: 'string', width: 100 },
+      { key: 'msgLevel', label: 'Msg Level', type: 'string', width: 75 },
+      {
+        key: 'validationLevel',
+        label: 'Valication Level',
+        type: 'string',
+        width: 100,
+      },
+      { key: 'msgText', label: 'Message', type: 'string', width: 900 },
     ],
   },
 ];

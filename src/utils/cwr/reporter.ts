@@ -12,6 +12,7 @@ class CWRReporter {
   static getPublisherInfo(
     {
       songCode,
+      workType,
       workTitle,
       iswc,
       akas,
@@ -22,6 +23,7 @@ class CWRReporter {
       catalogNum,
     }: {
       songCode: string | number;
+      workType: string;
       workTitle: string;
       iswc: string;
       akas: string;
@@ -58,6 +60,7 @@ class CWRReporter {
     row.set('albumTitle', albumTitle);
     row.set('catalogNum', catalogNum);
     row.set('songCode', songCode);
+    row.set('workType', workType);
     row.set('workTitle', workTitle);
     row.set('iswc', iswc);
     row.set('akas', akas);
@@ -88,6 +91,7 @@ class CWRReporter {
   static getWriterInfo(
     {
       songCode,
+      workType,
       workTitle,
       iswc,
       akas,
@@ -98,6 +102,7 @@ class CWRReporter {
       catalogNum,
     }: {
       songCode: string | number;
+      workType: string;
       workTitle: string;
       iswc: string;
       akas: string;
@@ -130,6 +135,7 @@ class CWRReporter {
     row.set('albumTitle', albumTitle);
     row.set('catalogNum', catalogNum);
     row.set('songCode', songCode);
+    row.set('workType', workType);
     row.set('workTitle', workTitle);
     row.set('iswc', iswc);
     row.set('akas', akas);
@@ -468,7 +474,7 @@ class CWRReporter {
     return result;
   }
 
-  static generateWorkReport(
+  static generateBatchReport(
     transmission: ParsedTransmission,
     template: CWRTemplate
   ) {
@@ -483,10 +489,13 @@ class CWRReporter {
         if (!transaction.work) continue;
         const currentWork = transaction.work;
         const songCode = currentWork.header.fields.submitterWorkNumber;
+        const workType =
+          currentWork.header.fields.recordType === 'NWR' ? 'New' : 'Rev.';
         const setupNote = currentWork.orns?.[0].fields.intendedPurpose ?? '';
 
         const repeatedData = {
           songCode,
+          workType,
           languageCode: currentWork.header.fields.languageCode ?? '',
           workTitle: currentWork.header.fields.workTitle,
           iswc: currentWork.header.fields.iswc ?? '',
@@ -704,6 +713,35 @@ class CWRReporter {
       }
     }
 
+    return rowCollection;
+  }
+
+  static generateMsgReport(
+    transmission: ParsedTransmission,
+    template: CWRTemplate
+  ) {
+    const rowCollection: Map<string, string | number>[] = [];
+    const columns = template.fields.map(
+      (field: CWRTemplateField) => [field.key, ''] as [string, string]
+    );
+    for (const group of transmission.groups) {
+      for (const transaction of group.transactions ?? []) {
+        if (!transaction.msgs?.length) continue;
+        const rows: Map<string, string | number>[] = [];
+        for (const msg of transaction.msgs) {
+          const row = new Map<string, string | number>(columns);
+          row.set('transactionSeqNum', msg.fields.transactionSequenceNumber);
+          row.set('recSeqNum', msg.fields.recordSequenceNumber);
+          row.set('ogRecSeqNum', msg.fields.originalRecordSequenceNumber);
+          row.set('ogRecType', msg.fields.originalRecordType);
+          row.set('msgLevel', msg.fields.messageLevel);
+          row.set('validationLevel', msg.fields.validationNumber);
+          row.set('msgText', msg.fields.messageText);
+          rows.push(row);
+        }
+        rowCollection.push(...rows);
+      }
+    }
     return rowCollection;
   }
 }

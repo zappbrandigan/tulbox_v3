@@ -8,8 +8,9 @@ type ReportGenerator = (
 ) => Map<string, string | number>[];
 
 export const templateReportGenerators: Record<string, ReportGenerator> = {
-  'batch-report': CWRReporter.generateWorkReport.bind(CWRReporter),
+  'batch-report': CWRReporter.generateBatchReport.bind(CWRReporter),
   'isrc-report': CWRReporter.generateIsrcReport.bind(CWRReporter),
   'aka-report': CWRReporter.generateAkaReport.bind(CWRReporter),
   'cat-import': CWRReporter.generateCatImport.bind(CWRReporter),
+  'msg-report': CWRReporter.generateMsgReport.bind(CWRReporter),
 };
