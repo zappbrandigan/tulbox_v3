@@ -1,39 +1,109 @@
-// src/workers/searchWorker.ts
 import { CWRParsedRecord } from 'cwr-parser/types';
 
-let cachedLines: CWRParsedRecord<Map<string, string>>[] = [];
+interface InitMsg {
+  type: 'init';
+  lines: CWRParsedRecord<Map<string, string>>[];
+}
 
-self.onmessage = (e: MessageEvent) => {
-  const { type, payload } = e.data;
+interface SearchMsg {
+  type: 'search';
+  query: string;
+  requestId: string; // lets us ignore stale work
+}
+
+interface CancelMsg {
+  type: 'cancel';
+  requestId: string;
+}
+
+type InMsg = InitMsg | SearchMsg | CancelMsg;
+
+/* ------------------------------------------------------------------ */
+/*  Cached data                                                        */
+/* ------------------------------------------------------------------ */
+let rawLines: CWRParsedRecord<Map<string, string>>[] = [];
+let lowerLines: string[] = []; // one flat, lower-cased string per row
+
+/* ------------------------------------------------------------------ */
+/*  State so we can cancel / dedupe                                    */
+/* ------------------------------------------------------------------ */
+let currentRequest: string | null = null;
+
+self.onmessage = (e: MessageEvent<InMsg>) => {
+  const { type } = e.data;
 
   switch (type) {
+    /* ----------------------------- 1. init ---------------------------- */
     case 'init': {
-      // store lines once; avoids serialising every search
-      cachedLines = payload.lines;
+      rawLines = e.data.lines;
+      lowerLines = rawLines.map((rec) =>
+        Array.from(
+          rec.data instanceof Map ? rec.data.values() : Object.values(rec.data)
+        )
+          .join('\x1f') // non-printable delimiter keeps strings short
+          .toLowerCase()
+      );
       break;
     }
 
+    /* --------------------------- 2. cancel --------------------------- */
+    case 'cancel': {
+      if (currentRequest === e.data.requestId) currentRequest = null;
+      break;
+    }
+
+    /* --------------------------- 3. search --------------------------- */
     case 'search': {
-      const query: string = payload.query.toLowerCase();
-      postMessage({ type: 'status', status: 'working' });
+      const { query, requestId } = e.data;
+      currentRequest = requestId;
+
+      // trivial edge-case
       if (!query) {
-        postMessage({ type: 'result', matches: [] });
-        postMessage({ type: 'status', status: 'idle' });
+        postMessage({ type: 'result', requestId, matches: [] });
+        postMessage({ type: 'status', requestId, status: 'idle' });
         return;
       }
 
-      const matches = cachedLines
-        .map((line, index) => ({ index, line }))
-        .filter(({ line }) =>
-          Object.values(
-            line.data instanceof Map
-              ? Object.fromEntries(line.data.entries())
-              : line.data
-          ).some((v) => v.toLowerCase().includes(query))
-        );
+      const needle = query.toLowerCase();
+      const CHUNK = 2_000;
+      const matches: number[] = [];
 
-      postMessage({ type: 'result', matches });
-      postMessage({ type: 'status', status: 'idle' });
+      postMessage({
+        type: 'status',
+        requestId,
+        status: 'working',
+        progress: 0,
+      });
+
+      /* ----  Scan in slices so each loop iteration is < 16 ms ------- */
+      (async function scan() {
+        for (let i = 0; i < lowerLines.length; i += CHUNK) {
+          // Early exit if user kicked off another search
+          if (currentRequest !== requestId) return;
+
+          for (let j = i; j < Math.min(i + CHUNK, lowerLines.length); j++) {
+            if (lowerLines[j].includes(needle)) matches.push(j);
+          }
+
+          // Emit progress (optional)
+          postMessage({
+            type: 'status',
+            requestId,
+            status: 'working',
+            progress:
+              Math.min(i + CHUNK, lowerLines.length) / lowerLines.length,
+          });
+
+          // Micro-task delay lets the event loop breathe
+          await 0;
+        }
+
+        if (currentRequest !== requestId) return; // cancelled while finishing up
+
+        postMessage({ type: 'result', requestId, matches });
+        postMessage({ type: 'status', requestId, status: 'idle' });
+      })();
+
       break;
     }
   }

@@ -1,3 +1,5 @@
+import { CWRParsedRecord } from 'cwr-parser/types';
+
 export type productionType =
   | 'all'
   | 'movie'
@@ -357,3 +359,21 @@ export interface CWRTemplate {
   description: string;
   fields: CWRTemplateField[];
 }
+
+/**
+ * recordSearchWorker
+ */
+// searchMessages.ts
+export type WorkerStatus =
+  | {
+      type: 'status';
+      requestId: string;
+      status: 'working' | 'idle';
+      progress?: number;
+    }
+  | { type: 'result'; requestId: string; matches: number[] };
+
+export type WorkerCmd =
+  | { type: 'init'; lines: CWRParsedRecord<Map<string, string>>[] }
+  | { type: 'search'; query: string; requestId: string }
+  | { type: 'cancel'; requestId: string };
