@@ -64,23 +64,6 @@ const TemplateBox: React.FC<TemplateBoxProps> = ({
 
           {selectedTemplate !== 'raw-viewer' && (
             <>
-              {/* <button
-                disabled={isProcessing || isDownloading}
-                onClick={() => handleExport('json')}
-                className="inline-flex items-center px-4 py-2 bg-orange-600 text-white font-medium rounded-lg hover:bg-orange-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
-              >
-                {isDownloading ? (
-                  <>
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    Downloading...
-                  </>
-                ) : (
-                  <>
-                    <Download className="w-4 h-4 mr-2" />
-                    Export JSON
-                  </>
-                )}
-              </button> */}
               <button
                 disabled={isProcessing || isDownloading}
                 onClick={() => handleExport('csv')}

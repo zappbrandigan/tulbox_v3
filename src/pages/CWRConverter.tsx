@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useTransition } from 'react';
 import { FileText } from 'lucide-react';
 import { exportFile, getTemplateById, trackEvent } from '@/utils';
 import {
@@ -8,10 +8,11 @@ import {
   CodeView,
   TableView,
 } from '@/components/cwr';
-import { ToolHeader } from '@/components/ui';
+import { Progress, ToolHeader } from '@/components/ui';
 import { CWRConverterRecord } from 'cwr-parser/types';
+import ParserWorker from '@/workers/parserWorker?worker';
 
-const CWRParserPage: React.FC = () => {
+const CWRConverter: React.FC = () => {
   const [file, setFile] = useState<string>('');
   const [fileContent, setFileContent] = useState<string>('');
   const [parseResult, setParseResult] = useState<CWRConverterRecord | null>(
@@ -24,6 +25,9 @@ const CWRParserPage: React.FC = () => {
   );
   const [isProcessing, setIsProcessing] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
+  const [progress, setProgress] = useState(0);
+
+  const [isPending, startTransition] = useTransition();
 
   const handleFileUpload = async (file: File) => {
     trackEvent('cwr_file_added', {
@@ -77,6 +81,39 @@ const CWRParserPage: React.FC = () => {
   };
 
   useEffect(() => {
+    if (!fileContent) return;
+
+    setIsProcessing(true);
+    setProgress(0);
+    setParseResult(null);
+
+    const worker = new ParserWorker();
+    worker.postMessage({ type: 'parse', fileContent, file, chunk: 1_500 });
+
+    worker.onmessage = (e) => {
+      switch (e.data.type) {
+        case 'progress':
+          setProgress(Math.min(e.data.pct, 0.99)); // keep bar <100 %
+          break;
+
+        case 'done':
+          // non-urgent: may be interrupted
+          startTransition(() => {
+            setParseResult(e.data.result); // BIG object
+          });
+
+          // urgent: spinner/progress bar hides immediately
+          setIsProcessing(false);
+          setProgress(1);
+          worker.terminate();
+          break;
+      }
+    };
+
+    return () => worker.terminate();
+  }, [fileContent, file]);
+
+  useEffect(() => {
     trackEvent('screen_view', {
       firebase_screen: 'CWRConverter',
       firebase_screen_class: 'CWRConverter',
@@ -85,7 +122,7 @@ const CWRParserPage: React.FC = () => {
 
   return (
     <div className="space-y-8">
-      {!fileContent && (
+      {!parseResult && (
         <>
           <ToolHeader
             primaryText="CWR File Converter"
@@ -95,7 +132,16 @@ const CWRParserPage: React.FC = () => {
             `}
             isBeta={true}
           />
-          <DragDropZone onFilesAdded={handleFileUpload} />
+          {isProcessing ? (
+            <Progress
+              progress={progress}
+              message={progress > 0.95 ? 'Loading Viewer' : 'Parsing File'}
+            />
+          ) : isPending ? (
+            <Progress progress={1} message="Rendering" />
+          ) : (
+            <DragDropZone onFilesAdded={handleFileUpload} />
+          )}
         </>
       )}
 
@@ -112,16 +158,11 @@ const CWRParserPage: React.FC = () => {
         />
       )}
 
-      {/* Data Display */}
       {selectedTemplate === 'raw-viewer' && fileContent && (
         <CodeView
-          file={file}
-          fileContent={fileContent}
+          lines={parseResult?.lines} // progressive rows
           selectedTemplate={selectedTemplate}
-          isProcessing={isProcessing}
-          setIsProcessing={setIsProcessing}
           parseResult={parseResult}
-          setParseResult={setParseResult}
         />
       )}
 
@@ -166,4 +207,4 @@ const CWRParserPage: React.FC = () => {
   );
 };
 
-export default CWRParserPage;
+export default CWRConverter;

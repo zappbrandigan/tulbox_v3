@@ -8,7 +8,7 @@ interface InitMsg {
 interface SearchMsg {
   type: 'search';
   query: string;
-  requestId: string; // lets us ignore stale work
+  requestId: string;
 }
 
 interface CancelMsg {
@@ -23,17 +23,12 @@ type InMsg = InitMsg | SearchMsg | CancelMsg;
 /* ------------------------------------------------------------------ */
 let rawLines: CWRParsedRecord<Map<string, string>>[] = [];
 let lowerLines: string[] = []; // one flat, lower-cased string per row
-
-/* ------------------------------------------------------------------ */
-/*  State so we can cancel / dedupe                                    */
-/* ------------------------------------------------------------------ */
 let currentRequest: string | null = null;
 
 self.onmessage = (e: MessageEvent<InMsg>) => {
   const { type } = e.data;
 
   switch (type) {
-    /* ----------------------------- 1. init ---------------------------- */
     case 'init': {
       rawLines = e.data.lines;
       lowerLines = rawLines.map((rec) =>
@@ -45,14 +40,10 @@ self.onmessage = (e: MessageEvent<InMsg>) => {
       );
       break;
     }
-
-    /* --------------------------- 2. cancel --------------------------- */
     case 'cancel': {
       if (currentRequest === e.data.requestId) currentRequest = null;
       break;
     }
-
-    /* --------------------------- 3. search --------------------------- */
     case 'search': {
       const { query, requestId } = e.data;
       currentRequest = requestId;
@@ -85,7 +76,6 @@ self.onmessage = (e: MessageEvent<InMsg>) => {
             if (lowerLines[j].includes(needle)) matches.push(j);
           }
 
-          // Emit progress (optional)
           postMessage({
             type: 'status',
             requestId,
@@ -94,8 +84,7 @@ self.onmessage = (e: MessageEvent<InMsg>) => {
               Math.min(i + CHUNK, lowerLines.length) / lowerLines.length,
           });
 
-          // Micro-task delay lets the event loop breathe
-          await 0;
+          await 0; // avoid watchdog
         }
 
         if (currentRequest !== requestId) return; // cancelled while finishing up

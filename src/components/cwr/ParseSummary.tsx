@@ -1,6 +1,5 @@
 import React from 'react';
 import { AlertCircle, CheckCircle } from 'lucide-react';
-import { LoadingOverlay } from '@/components/ui';
 import { CWRConverterRecord } from 'cwr-parser/types';
 
 interface SummaryProps {
@@ -8,12 +7,7 @@ interface SummaryProps {
 }
 
 const ParseSummary: React.FC<SummaryProps> = ({ parseResult }) => {
-  if (!parseResult)
-    return (
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-        <LoadingOverlay />
-      </div>
-    );
+  if (!parseResult) return null;
 
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
