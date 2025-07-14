@@ -25,11 +25,8 @@ self.onmessage = async (e: MessageEvent<ParseMsg>) => {
 
   const rawLines = fileContent.split(/\r?\n/);
   const total = rawLines.length;
-  const deviceMem =
-    (navigator as Navigator & { deviceMemory?: number }).deviceMemory ?? 4;
-  const maxSafeLines = Math.floor(deviceMem * 150_000);
   let parsedLineCount = 0;
-  // const MAX_SAFE_LINES = 100_000;
+  const MAX_SAFE_LINES = 800_000;
 
   /* -------------------------------------------------------------- */
   /*  Accumulators                                                  */
@@ -61,8 +58,9 @@ self.onmessage = async (e: MessageEvent<ParseMsg>) => {
     }
 
     parsedLineCount += partial.lines.length;
+    console.log(parsedLineCount);
 
-    if (parsedLineCount > maxSafeLines) {
+    if (parsedLineCount > MAX_SAFE_LINES) {
       (self as DedicatedWorkerGlobalScope).postMessage({
         type: 'error',
         message:

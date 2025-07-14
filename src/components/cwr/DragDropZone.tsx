@@ -9,18 +9,21 @@ interface DragDropZoneProps {
 
 const DragDropZone: React.FC<DragDropZoneProps> = ({
   onFilesAdded,
-  accept = '.v21',
+  accept = '.v21,.v22',
   maxFiles = 1,
 }) => {
   const [isDragOver, setIsDragOver] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const validateFiles = useCallback((file: File): boolean => {
-    if (file.name.toLowerCase().endsWith('.v21')) {
+    if (
+      file.name.toLowerCase().endsWith('.v21') ||
+      file.name.toLowerCase().endsWith('.v22')
+    ) {
       setError(null);
       return true;
     }
-    setError('Invalid file type. Only .v21 files are allowed.');
+    setError('Invalid file type. Only .V21/.V22 files are allowed.');
     return false;
   }, []);
 
@@ -109,7 +112,7 @@ const DragDropZone: React.FC<DragDropZoneProps> = ({
               Drag and drop your CWR file here, or click to browse
             </p>
             <p className="text-sm text-gray-500">
-              Maximum {maxFiles} file • 150MB Limit • .v21/.v22 format only
+              Maximum {maxFiles} file • 100 Mb Limit • .v21/.v22 format only
             </p>
           </div>
         </div>

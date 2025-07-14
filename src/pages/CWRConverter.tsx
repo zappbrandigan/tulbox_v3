@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useTransition } from 'react';
-import { FileText } from 'lucide-react';
+import { CircleXIcon, FileText } from 'lucide-react';
 import { exportFile, getTemplateById, trackEvent } from '@/utils';
 import {
   DragDropZone,
@@ -34,13 +34,11 @@ const CWRConverter: React.FC = () => {
     trackEvent('cwr_file_added', {
       size: `${(file.size / 1024 / 1024).toFixed(2)} Mb`,
     });
-    const maxSizeMB = 150; // limit in megabytes
+    const maxSizeMB = 100; // limit in megabytes
     const maxSizeBytes = maxSizeMB * 1024 * 1024;
 
     if (file.size > maxSizeBytes) {
-      alert(
-        `This tool is currently in beta: maximum allowed file size is ${maxSizeMB}MB.`
-      );
+      setShowMemoryError(true);
       return;
     }
 
@@ -49,6 +47,7 @@ const CWRConverter: React.FC = () => {
       setFile(file.name);
       setFileContent(content);
       setIsProcessing(true);
+      setShowMemoryError(false);
     } catch (error) {
       console.error('Error parsing file:', error);
       alert('Error parsing CWR file. Please check the file format.');
@@ -78,6 +77,7 @@ const CWRConverter: React.FC = () => {
     setFileContent('');
     setParseResult(null);
     setReportData([]);
+    setShowMemoryError(false);
     setSelectedTemplate('raw-viewer');
   };
 
@@ -127,9 +127,18 @@ const CWRConverter: React.FC = () => {
           )}
 
           {showMemoryError && (
-            <div className="bg-red-50 border border-red-200 text-red-700 p-4 rounded-lg">
-              File too large for this device’s available memory. Try a smaller
-              file or run this on a more powerful machine.
+            <div className="flex bg-red-50 border border-red-200 text-red-700 p-4 rounded-lg">
+              File too large. Try a smaller file or make a request via the links
+              below for a CLI conversion.
+              <button
+                onClick={() => {
+                  setShowMemoryError(false);
+                  setFileContent('');
+                }}
+                className="ml-auto text-red-700 hover:text-red-500"
+              >
+                <CircleXIcon />
+              </button>
             </div>
           )}
         </>
