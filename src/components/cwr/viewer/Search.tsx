@@ -129,6 +129,7 @@ const SearchCodeView: React.FC<SearchCodeViewProps> = ({
         value={searchQuery}
         onChange={handleSearch}
         onKeyDown={handleSearchKeyDown}
+        autoComplete="off"
         placeholder="Search records…"
         className="flex-1 pl-10 pr-4 py-3 text-gray-700 focus:outline-none"
       />

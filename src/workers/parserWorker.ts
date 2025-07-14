@@ -25,6 +25,11 @@ self.onmessage = async (e: MessageEvent<ParseMsg>) => {
 
   const rawLines = fileContent.split(/\r?\n/);
   const total = rawLines.length;
+  const deviceMem =
+    (navigator as Navigator & { deviceMemory?: number }).deviceMemory ?? 4;
+  const maxSafeLines = Math.floor(deviceMem * 150_000);
+  let parsedLineCount = 0;
+  // const MAX_SAFE_LINES = 100_000;
 
   /* -------------------------------------------------------------- */
   /*  Accumulators                                                  */
@@ -53,6 +58,17 @@ self.onmessage = async (e: MessageEvent<ParseMsg>) => {
         hasErrors: false,
         hasWarnings: false,
       };
+    }
+
+    parsedLineCount += partial.lines.length;
+
+    if (parsedLineCount > maxSafeLines) {
+      (self as DedicatedWorkerGlobalScope).postMessage({
+        type: 'error',
+        message:
+          'Processing stopped early due to memory constraints. Try using a smaller file or splitting it.',
+      });
+      return;
     }
 
     /* Merge statistics ------------------------------------------ */

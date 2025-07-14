@@ -18,6 +18,7 @@ interface Props {
   startTransition: React.TransitionStartFunction;
   onProgress: (pct: number) => void;
   onReady: () => void;
+  setShowMemoryError: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const CodeView: React.FC<Props> = ({
@@ -30,6 +31,7 @@ const CodeView: React.FC<Props> = ({
   startTransition,
   onProgress,
   onReady,
+  setShowMemoryError,
 }) => {
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
@@ -60,6 +62,12 @@ const CodeView: React.FC<Props> = ({
         case 'progress':
           onProgress(Math.min(e.data.pct, 99));
           break;
+
+        case 'error':
+          worker.terminate();
+          setShowMemoryError(true);
+          onReady();
+          return;
 
         case 'done': {
           const elapsed = Date.now() - startTime;

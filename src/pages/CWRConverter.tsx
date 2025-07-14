@@ -26,6 +26,7 @@ const CWRConverter: React.FC = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [showMemoryError, setShowMemoryError] = useState(false);
 
   const [isPending, startTransition] = useTransition();
 
@@ -124,6 +125,13 @@ const CWRConverter: React.FC = () => {
           ) : (
             <DragDropZone onFilesAdded={handleFileUpload} />
           )}
+
+          {showMemoryError && (
+            <div className="bg-red-50 border border-red-200 text-red-700 p-4 rounded-lg">
+              File too large for this device’s available memory. Try a smaller
+              file or run this on a more powerful machine.
+            </div>
+          )}
         </>
       )}
 
@@ -152,6 +160,7 @@ const CWRConverter: React.FC = () => {
           onProgress={setProgress}
           onReady={() => setIsProcessing(false)}
           startTransition={startTransition}
+          setShowMemoryError={setShowMemoryError}
         />
       )}
 
