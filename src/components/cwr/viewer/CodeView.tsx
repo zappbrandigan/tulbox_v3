@@ -44,10 +44,15 @@ const CodeView: React.FC<Props> = ({
       return;
     }
 
+    const MIN_DURATION = 500;
+    const startTime = Date.now();
+
     onProgress(0);
     setParseResult(null);
 
     const worker = new ParserWorker();
+    let timeoutId: ReturnType<typeof setTimeout> | null = null;
+
     worker.postMessage({ type: 'parse', fileContent, file, chunk: 1_500 });
 
     worker.onmessage = (e) => {
@@ -56,19 +61,27 @@ const CodeView: React.FC<Props> = ({
           onProgress(Math.min(e.data.pct, 99));
           break;
 
-        case 'done':
-          startTransition(() => {
-            setParseResult(e.data.result);
-          });
+        case 'done': {
+          const elapsed = Date.now() - startTime;
+          const delay = Math.max(0, MIN_DURATION - elapsed);
 
-          onProgress(100);
-          onReady();
+          timeoutId = setTimeout(() => {
+            startTransition(() => {
+              setParseResult(e.data.result);
+            });
+            onProgress(100);
+            onReady();
+          }, delay);
           worker.terminate();
           break;
+        }
       }
     };
 
-    return () => worker.terminate();
+    return () => {
+      if (timeoutId) clearTimeout(timeoutId);
+      worker.terminate();
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [file, fileContent]);
 
