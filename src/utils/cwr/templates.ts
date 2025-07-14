@@ -185,10 +185,14 @@ const CWR_TEMPLATES: CWRTemplate[] = [
       { key: 'msgText', label: 'Message', type: 'string', width: 900 },
     ],
   },
-];
+] as const;
 
-const getTemplateById = (id: string): CWRTemplate | undefined => {
-  return CWR_TEMPLATES.find((template) => template.id === id);
+const getTemplateById = (id: CWRTemplate['id']): CWRTemplate => {
+  const template = CWR_TEMPLATES.find((template) => template.id === id);
+  if (!template) {
+    throw new Error(`Template with id ${id} not found`);
+  }
+  return template;
 };
 
 export const getRecordTypeColor = (recordType: string): string => {

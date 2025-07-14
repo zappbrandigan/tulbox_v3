@@ -8,7 +8,6 @@ interface SearchCodeViewProps {
   searchQuery: string;
   setSearchQuery: React.Dispatch<React.SetStateAction<string>>;
 
-  /* ---- NEW ---- */
   hitRows: number[]; // sorted array of row indices with ≥1 match
   currentMatchIndex: number;
   setCurrentMatchIndex: React.Dispatch<React.SetStateAction<number>>;
@@ -124,6 +123,7 @@ const SearchCodeView: React.FC<SearchCodeViewProps> = ({
 
       {/* input */}
       <input
+        id="record-search-box"
         ref={searchInputRef}
         type="text"
         value={searchQuery}

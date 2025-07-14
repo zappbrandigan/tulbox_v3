@@ -10,7 +10,7 @@ import {
 } from '@/components/cwr';
 import { Progress, ToolHeader } from '@/components/ui';
 import { CWRConverterRecord } from 'cwr-parser/types';
-import ParserWorker from '@/workers/parserWorker?worker';
+import { CWRTemplate } from '@/types';
 
 const CWRConverter: React.FC = () => {
   const [file, setFile] = useState<string>('');
@@ -19,7 +19,7 @@ const CWRConverter: React.FC = () => {
     null
   );
   const [selectedTemplate, setSelectedTemplate] =
-    useState<string>('raw-viewer');
+    useState<CWRTemplate['id']>('raw-viewer');
   const [reportData, setReportData] = useState<Map<string, string | number>[]>(
     []
   );
@@ -64,7 +64,7 @@ const CWRConverter: React.FC = () => {
     if (!template) return;
 
     const baseFileName = parseResult.fileName.replace(/\.[^/.]+$/, '');
-    const exportFileName = `${baseFileName}_${template.name.replace(
+    const exportFileName = `${baseFileName}_${selectedTemplate.replace(
       /\s+/g,
       '_'
     )}`;
@@ -80,38 +80,16 @@ const CWRConverter: React.FC = () => {
     setSelectedTemplate('raw-viewer');
   };
 
-  useEffect(() => {
-    if (!fileContent) return;
+  const switchTemplate = (next: CWRTemplate['id']) => {
+    if (next === selectedTemplate) return;
 
     setIsProcessing(true);
     setProgress(0);
-    setParseResult(null);
 
-    const worker = new ParserWorker();
-    worker.postMessage({ type: 'parse', fileContent, file, chunk: 1_500 });
-
-    worker.onmessage = (e) => {
-      switch (e.data.type) {
-        case 'progress':
-          setProgress(Math.min(e.data.pct, 0.99)); // keep bar <100 %
-          break;
-
-        case 'done':
-          // non-urgent: may be interrupted
-          startTransition(() => {
-            setParseResult(e.data.result); // BIG object
-          });
-
-          // urgent: spinner/progress bar hides immediately
-          setIsProcessing(false);
-          setProgress(1);
-          worker.terminate();
-          break;
-      }
-    };
-
-    return () => worker.terminate();
-  }, [fileContent, file]);
+    requestAnimationFrame(() =>
+      startTransition(() => setSelectedTemplate(next))
+    );
+  };
 
   useEffect(() => {
     trackEvent('screen_view', {
@@ -133,12 +111,16 @@ const CWRConverter: React.FC = () => {
             isBeta={true}
           />
           {isProcessing ? (
-            <Progress
-              progress={progress}
-              message={progress > 0.95 ? 'Loading Viewer' : 'Parsing File'}
-            />
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200">
+              <Progress
+                progress={progress}
+                message={progress > 0.95 ? 'Loading Viewer' : 'Parsing File'}
+              />
+            </div>
           ) : isPending ? (
-            <Progress progress={1} message="Rendering" />
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200">
+              <Progress progress={1} message="Rendering" />
+            </div>
           ) : (
             <DragDropZone onFilesAdded={handleFileUpload} />
           )}
@@ -150,19 +132,26 @@ const CWRConverter: React.FC = () => {
       {fileContent && parseResult && (
         <TemplateBox
           selectedTemplate={selectedTemplate}
-          setSelectedTemplate={setSelectedTemplate}
+          setSelectedTemplate={switchTemplate}
           isProcessing={isProcessing}
           isDownloading={isDownloading}
           handleFileRemove={handleFileRemove}
           handleExport={handleExport}
+          reportHasData={reportData.length > 0}
         />
       )}
 
       {selectedTemplate === 'raw-viewer' && fileContent && (
         <CodeView
-          lines={parseResult?.lines} // progressive rows
+          file={file}
+          fileContent={fileContent}
           selectedTemplate={selectedTemplate}
           parseResult={parseResult}
+          setParseResult={setParseResult}
+          isProcessing={isProcessing}
+          onProgress={setProgress}
+          onReady={() => setIsProcessing(false)}
+          startTransition={startTransition}
         />
       )}
 
@@ -171,10 +160,12 @@ const CWRConverter: React.FC = () => {
           fileName={file}
           fileContent={fileContent}
           selectedTemplate={selectedTemplate}
-          isProcessing={isProcessing}
-          setIsProcessing={setIsProcessing}
           reportData={reportData}
           setReportData={setReportData}
+          isProcessing={isProcessing}
+          progress={progress}
+          onProgress={setProgress}
+          onReady={() => setIsProcessing(false)}
         />
       )}
 

@@ -1,70 +1,97 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { trackEvent } from '@/utils';
-import { CWRTemplate, CWRTemplateField } from '@/types';
-import { LoadingOverlay } from '@/components/ui';
+import React, { useState, useEffect, useRef, useTransition } from 'react';
+import { getTemplateById, trackEvent } from '@/utils';
+import { CWRTemplateField } from '@/types';
 import { Table } from 'lucide-react';
 import ReportWorker from '@/workers/reportWorker?worker';
+import { Progress } from '@/components/ui';
 
 const ROW_HEIGHT = 36;
 const PAGE_SIZE = 50;
 
-interface TableViewProps {
+interface Props {
   fileName: string;
   fileContent: string;
   selectedTemplate: string;
-  isProcessing: boolean;
-  setIsProcessing: React.Dispatch<React.SetStateAction<boolean>>;
   reportData: Map<string, string | number>[];
   setReportData: React.Dispatch<
     React.SetStateAction<Map<string, string | number>[]>
   >;
+  isProcessing: boolean;
+  progress: number;
+  onProgress: (pct: number) => void;
+  onReady: () => void;
 }
 
-const TableView: React.FC<TableViewProps> = ({
+const TableView: React.FC<Props> = ({
   fileName,
   fileContent,
   selectedTemplate,
-  isProcessing,
-  setIsProcessing,
   reportData,
   setReportData,
+  isProcessing,
+  progress,
+  onProgress,
+  onReady,
 }) => {
-  const [template, setTemplate] = useState<CWRTemplate | undefined>(undefined);
   const [startIndex, setStartIndex] = useState(0);
+
+  const [isPending, startTransition] = useTransition();
+
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    if (!fileContent) return;
     trackEvent('cwr_report_viewed', { report: selectedTemplate });
-    const MIN_DURATION = 500; // ms
+
+    const MIN_DURATION = 500;
     const start = Date.now();
-    setIsProcessing(true);
+
+    onProgress(0);
+    setReportData([]); // clear old rows
 
     const worker = new ReportWorker();
-    worker.postMessage({ fileContent, fileName, selectedTemplate });
+    worker.postMessage({
+      type: 'generate',
+      fileContent,
+      fileName,
+      selectedTemplate,
+      chunk: 4_000,
+    });
 
     worker.onmessage = (e) => {
-      const { template, reportData, error } = e.data;
-      const elapsed = Date.now() - start;
-      const remaining = Math.max(0, MIN_DURATION - elapsed);
+      const { type } = e.data as { type: string };
+      if (type === 'progress') {
+        onProgress(Math.min(e.data.pct, 0.99));
+        return;
+      }
 
-      if (error) {
-        console.error('Worker Error:', error);
-        setIsProcessing(false);
+      if (type === 'error') {
+        console.error('Worker Error:', e.data.error);
+        onReady();
         worker.terminate();
         return;
       }
 
-      setTemplate(template);
-      setReportData(reportData);
+      if (type === 'done') {
+        const elapsed = Date.now() - start;
+        const remaining = Math.max(0, MIN_DURATION - elapsed);
 
-      setTimeout(() => {
-        setIsProcessing(false);
-        worker.terminate();
-      }, remaining);
+        startTransition(() => {
+          setReportData(e.data.reportData);
+        });
+
+        setTimeout(() => {
+          onProgress(100);
+          onReady();
+          worker.terminate();
+        }, remaining);
+      }
     };
 
     return () => worker.terminate();
-  }, [fileContent, fileName, selectedTemplate, setIsProcessing, setReportData]);
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fileContent, fileName, selectedTemplate]);
 
   const handleScroll = () => {
     const scrollTop = scrollRef.current?.scrollTop || 0;
@@ -72,6 +99,7 @@ const TableView: React.FC<TableViewProps> = ({
     setStartIndex(newIndex);
   };
 
+  const template = getTemplateById(selectedTemplate);
   const visibleData = reportData.slice(startIndex, startIndex + PAGE_SIZE);
 
   return (
@@ -83,7 +111,12 @@ const TableView: React.FC<TableViewProps> = ({
 
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
         {isProcessing ? (
-          <LoadingOverlay message={'Rendering Template...'} />
+          <Progress
+            progress={progress}
+            message={progress > 0.95 ? 'Loading Table' : 'Generating Report'}
+          />
+        ) : isPending ? (
+          <Progress progress={1} message="Rendering" />
         ) : !template || reportData.length === 0 ? (
           <div className="py-12 text-center text-sm text-gray-500">
             No data to display. Try selecting a different template or uploading
@@ -166,7 +199,7 @@ const TableView: React.FC<TableViewProps> = ({
                 </span>
                 <span>
                   <span>{template.name}</span>{' '}
-                  <span className="text-blue-500">v{template?.version}</span>
+                  <span className="text-blue-500">v{template.version}</span>
                 </span>
               </div>
             </div>

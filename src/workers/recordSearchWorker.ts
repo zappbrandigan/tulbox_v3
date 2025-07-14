@@ -1,22 +1,5 @@
+import { WorkerCmd } from '@/types';
 import { CWRParsedRecord } from 'cwr-parser/types';
-
-interface InitMsg {
-  type: 'init';
-  lines: CWRParsedRecord<Map<string, string>>[];
-}
-
-interface SearchMsg {
-  type: 'search';
-  query: string;
-  requestId: string;
-}
-
-interface CancelMsg {
-  type: 'cancel';
-  requestId: string;
-}
-
-type InMsg = InitMsg | SearchMsg | CancelMsg;
 
 /* ------------------------------------------------------------------ */
 /*  Cached data                                                        */
@@ -25,7 +8,7 @@ let rawLines: CWRParsedRecord<Map<string, string>>[] = [];
 let lowerLines: string[] = []; // one flat, lower-cased string per row
 let currentRequest: string | null = null;
 
-self.onmessage = (e: MessageEvent<InMsg>) => {
+self.onmessage = (e: MessageEvent<WorkerCmd>) => {
   const { type } = e.data;
 
   switch (type) {

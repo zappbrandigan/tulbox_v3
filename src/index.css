@@ -9,14 +9,18 @@
   }
   .animate-progress-bar {
     background-size: 1rem 1rem;            
+    background-color: #3b82f6;
     background-image: linear-gradient(
-      135deg,
-      rgba(255,255,255,.35) 25%,
-      rgba(255,255,255,0)   25% 50%,
-      rgba(255,255,255,.35) 50% 75%,
-      rgba(255,255,255,0)   75%
-    );
+    135deg,
+    rgba(96, 165, 250, 0.35) 25%,   /* blue-400 @ 35 % */
+    rgba(96, 165, 250, 0)    25% 50%,
+    rgba(96, 165, 250, 0.35) 50% 75%,
+    rgba(96, 165, 250, 0)    75%
+  );
     animation: progress-bar 1s linear infinite;
   }
 }
 
+.scroll-inner {
+  position: relative;   /* live wrapper is absolute inside */
+}

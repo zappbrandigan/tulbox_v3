@@ -31,6 +31,7 @@ const ScrollArea: React.FC<Props> = ({
   const [startIndex, setStartIndex] = useState(0);
   const [currentMatchIndex, setCurrentMatchIndex] = useState(-1);
   const [hitRows, setHitRows] = useState<number[]>([]);
+
   const { runSearch, matchLines, busy, progress } = useSearch(lines);
 
   const scrollContainerRef = useRef<HTMLDivElement>(null);

@@ -1,9 +1,10 @@
+import { getTemplateById } from '@/utils';
+
 interface Props {
   totalRecords: number;
   errorCount: number;
   warningCount: number;
-  templateName: string;
-  templateVersion: string;
+  templateId: string;
   cwrFileVersion: string;
 }
 
@@ -11,10 +12,11 @@ const CodeViewFooter: React.FC<Props> = ({
   totalRecords,
   errorCount,
   warningCount,
-  templateName,
-  templateVersion,
+  templateId,
   cwrFileVersion,
 }) => {
+  const template = getTemplateById(templateId);
+
   return (
     <div className="bg-gray-50 border-t border-gray-200 px-4 py-2">
       <div className="flex items-center justify-between text-xs text-gray-600">
@@ -27,8 +29,8 @@ const CodeViewFooter: React.FC<Props> = ({
           {` warnings`}
         </span>
         <span>
-          CWR v{Number(cwrFileVersion)} format • {templateName}
-          <span className="text-blue-500">v{templateVersion}</span>
+          CWR v{Number(cwrFileVersion)} format • {template.name}{' '}
+          <span className="text-blue-500">v{template.version}</span>
         </span>
       </div>
     </div>
