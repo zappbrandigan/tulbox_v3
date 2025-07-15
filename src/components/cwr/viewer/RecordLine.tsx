@@ -82,7 +82,7 @@ export default memo(
               handleMouseEnter(e, def),
             onMouseLeave: handleMouseLeave,
             className:
-              'text-sm bg-gray-300 text-gray-800 px-1.5 py-0.5 mx-1 rounded whitespace-pre hover:bg-blue-100',
+              'text-sm bg-gray-300 dark:bg-gray-700 text-gray-800 dark:text-gray-100 px-1.5 py-0.5 mx-1 rounded whitespace-pre hover:bg-blue-100 dark:hover:bg-blue-900',
           };
 
           /* ---------- fast branch: no highlighting needed ---------- */

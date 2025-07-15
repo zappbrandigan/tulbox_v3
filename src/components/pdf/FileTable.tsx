@@ -73,16 +73,18 @@ const FileTable: React.FC<FileTableProps> = ({
   };
 
   const getRowClassName = (status: FileItem['status']) => {
-    const base = 'transition-all duration-200 hover:bg-gray-50';
+    const base =
+      'transition-all duration-200 hover:bg-gray-50 dark:hover:bg-gray-800';
+
     switch (status) {
       case 'valid':
-        return `${base} border-l-4 border-l-emerald-500`;
+        return `${base} border-l-4 border-l-emerald-500 dark:border-l-emerald-400`;
       case 'dotified':
-        return `${base} border-l-4 border-l-blue-500`;
+        return `${base} border-l-4 border-l-blue-500 dark:border-l-blue-400`;
       case 'invalid':
-        return `${base} border-l-4 border-l-red-500 bg-red-50/30`;
+        return `${base} border-l-4 border-l-red-500 bg-red-50/30 dark:bg-red-500/10`;
       case 'duplicate':
-        return `${base} border-l-4 border-l-amber-500 bg-amber-50/30`;
+        return `${base} border-l-4 border-l-amber-500 bg-amber-50/30 dark:bg-amber-500/10`;
       default:
         return base;
     }
@@ -90,7 +92,7 @@ const FileTable: React.FC<FileTableProps> = ({
 
   if (files.length === 0) {
     return (
-      <div className="text-center py-12 text-gray-500">
+      <div className="text-center py-12 text-gray-500 dark:text-gray-400">
         <p>
           All data is processed locally in your browser. It is neither stored
           nor transmitted, and is discarded when you refresh or exit the page.
@@ -100,34 +102,28 @@ const FileTable: React.FC<FileTableProps> = ({
   }
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+    <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
       <div className="overflow-x-auto">
         <table className="w-full">
-          <thead className="bg-gray-50 border-b border-gray-200">
+          <thead className="bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
             <tr>
-              {/* <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wide">
-                Original Name
-              </th> */}
-              <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wide">
+              <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wide">
                 Current Name
               </th>
-              <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wide">
+              <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wide">
                 Characters
               </th>
-              <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wide">
+              <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wide">
                 Status
               </th>
-              <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wide">
+              <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wide">
                 Actions
               </th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-y-gray-200">
+          <tbody className="divide-y divide-gray-200 dark:divide-gray-800">
             {files.map((file) => (
               <tr key={file.id} className={getRowClassName(file.status)}>
-                {/* <td className="px-6 py-4 text-sm text-gray-600 max-w-xs truncate">
-                  {file.originalName}
-                </td> */}
                 <td className="px-6 py-4 text-sm">
                   {editingId === file.id ? (
                     <div className="flex items-center space-x-2">
@@ -135,7 +131,7 @@ const FileTable: React.FC<FileTableProps> = ({
                         type="text"
                         value={editValue}
                         onChange={(e) => setEditValue(e.target.value)}
-                        className="flex-1 px-3 py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="flex-1 px-3 py-1 border border-gray-300 dark:border-gray-600 rounded-md text-sm dark:bg-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                         onKeyDown={(e) => {
                           if (e.key === 'Enter') saveEdit();
                           if (e.key === 'Escape') cancelEdit();
@@ -144,33 +140,33 @@ const FileTable: React.FC<FileTableProps> = ({
                       />
                       <button
                         onClick={saveEdit}
-                        className="p-1 text-emerald-600 hover:text-emerald-700 transition-colors"
+                        className="p-1 text-emerald-600 hover:text-emerald-400 transition-colors"
                       >
                         <Check className="w-4 h-4" />
                       </button>
                       <button
                         onClick={cancelEdit}
-                        className="p-1 text-red-600 hover:text-red-700 transition-colors"
+                        className="p-1 text-red-600 hover:text-red-400 transition-colors"
                       >
                         <X className="w-4 h-4" />
                       </button>
                     </div>
                   ) : (
                     <div className="flex items-center space-x-2 group">
-                      <span className="flex-1 font-medium text-gray-900 whitespace-pre">
+                      <span className="flex-1 font-medium text-gray-900 dark:text-white whitespace-pre">
                         {file.currentName}
                       </span>
                       <button
                         onClick={() => startEditing(file)}
-                        className="opacity-0 group-hover:opacity-100 p-1 text-gray-500 hover:text-blue-600 transition-all"
+                        className="opacity-0 group-hover:opacity-100 p-1 text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-all"
                       >
                         <Edit3 className="w-4 h-4" />
                       </button>
                     </div>
                   )}
                 </td>
-                <td className="px-6 py-4 text-sm text-gray-600">
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-300">
+                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200">
                     {file.characterCount}
                   </span>
                 </td>
@@ -180,16 +176,16 @@ const FileTable: React.FC<FileTableProps> = ({
                     <span
                       className={`text-sm font-medium ${
                         file.status === 'valid'
-                          ? 'text-emerald-700'
+                          ? 'text-emerald-700 dark:text-emerald-400'
                           : file.status === 'invalid'
-                          ? 'text-red-700'
+                          ? 'text-red-700 dark:text-red-400'
                           : file.status === 'dotified'
-                          ? 'text-blue-700'
+                          ? 'text-blue-700 dark:text-blue-400'
                           : file.status === 'modified'
-                          ? 'text-green-700'
+                          ? 'text-green-700 dark:text-green-400'
                           : file.status === 'error'
-                          ? 'text-red-700'
-                          : 'text-amber-700'
+                          ? 'text-red-700 dark:text-red-400'
+                          : 'text-amber-700 dark:text-amber-400'
                       }`}
                     >
                       {getStatusText(file.status)}
@@ -199,7 +195,7 @@ const FileTable: React.FC<FileTableProps> = ({
                 <td className="px-6 py-4 text-sm">
                   <button
                     onClick={() => onFileRemove(file.id)}
-                    className="text-red-600 hover:text-red-700 transition-colors"
+                    className="text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 transition-colors"
                   >
                     <X className="w-4 h-4" />
                   </button>

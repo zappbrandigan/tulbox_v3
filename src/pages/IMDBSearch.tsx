@@ -152,7 +152,7 @@ const IMDBSearch: React.FC = () => {
 
       {/* Loading Details */}
       {isLoadingDetails && (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center">
+        <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-12 text-center">
           <LoadingOverlay message="Loading production details" />
         </div>
       )}
@@ -174,12 +174,12 @@ const IMDBSearch: React.FC = () => {
         !selectedProduction &&
         searchQuery &&
         error && (
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center">
-            <Search className="w-12 h-12 mx-auto mb-4 text-gray-300" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">
+          <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-12 text-center">
+            <Search className="w-12 h-12 mx-auto mb-4 text-gray-300 dark:text-gray-500" />
+            <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
               No results found
             </h3>
-            <p className="text-gray-600">
+            <p className="text-gray-600 dark:text-gray-400">
               Try adjusting your search terms or filters
             </p>
           </div>

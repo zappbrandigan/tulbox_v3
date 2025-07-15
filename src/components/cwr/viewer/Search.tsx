@@ -90,9 +90,9 @@ const SearchCodeView: React.FC<SearchCodeViewProps> = ({
         showSearch ? 'max-h-[80px] scale-100' : 'max-h-0 scale-y-95'
       }`}
     >
-      <div className="w-full flex items-center bg-white border border-gray-300 focus-within:border-blue-500">
+      <div className="w-full flex items-center bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 focus-within:border-blue-500 dark:focus-within:border-blue-400">
         {/* left counter / loader */}
-        <div className="w-[200px] py-4 text-md text-gray-500 bg-blue-50 flex justify-center items-center border-r-2">
+        <div className="w-[200px] py-4 text-md text-gray-500 dark:text-gray-200 bg-blue-50 dark:bg-blue-950 flex justify-center items-center border-r-2 border-gray-300 dark:border-gray-700">
           {busy ? (
             <div className="flex items-center gap-2">
               <Loader className="animate-spin" />
@@ -109,14 +109,14 @@ const SearchCodeView: React.FC<SearchCodeViewProps> = ({
         <button
           onClick={handlePrev}
           disabled={!totalHits || busy}
-          className="text-gray-500 disabled:text-gray-300 hover:text-blue-500 disabled:hover:bg-transparent"
+          className="text-gray-500 dark:text-gray-300 disabled:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400 disabled:hover:text-gray-300 disabled:hover:bg-transparent"
         >
           <ChevronUp className="w-8 h-8 mx-1 rounded-lg" />
         </button>
         <button
           onClick={handleNext}
           disabled={!totalHits || busy}
-          className="text-gray-500 disabled:text-gray-300 hover:text-blue-500 disabled:hover:bg-transparent"
+          className="text-gray-500 dark:text-gray-300 disabled:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400 disabled:hover:text-gray-300 disabled:hover:bg-transparent"
         >
           <ChevronDown className="w-8 h-8 mx-1 rounded-lg" />
         </button>
@@ -139,7 +139,7 @@ const SearchCodeView: React.FC<SearchCodeViewProps> = ({
           onKeyDown={handleSearchKeyDown}
           autoComplete="off"
           placeholder="Search records…"
-          className="flex-1 pl-10 pr-4 py-3 text-gray-700 focus:outline-none"
+          className="flex-1 pl-10 pr-4 py-3 text-gray-700 dark:text-gray-100 bg-white dark:bg-gray-900 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:outline-none"
         />
       </div>
     </div>

@@ -12,21 +12,19 @@ const ProductionHeader: React.FC<ProductionHeaderProps> = ({
   getTypeIcon,
 }) => {
   return (
-    <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-6">
+    <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-6 dark:from-blue-700 dark:to-indigo-700">
       <div className="flex items-start justify-between">
         <div className="flex-1">
           <div className="flex items-center space-x-3 mb-2">
             {getTypeIcon(selectedProduction.type)}
-            <span
-              className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-white/20 text-white`}
-            >
+            <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-white/20 text-white dark:bg-white/30">
               {selectedProduction.type}
             </span>
           </div>
           <h2 className="text-2xl font-bold mb-2">
             {selectedProduction.title}
           </h2>
-          <div className="flex items-center space-x-4 text-blue-100">
+          <div className="flex items-center space-x-4 text-blue-100 dark:text-blue-200">
             <div className="flex items-center space-x-1">
               <Calendar className="w-4 h-4" />
               <span>{selectedProduction.releaseYear}</span>

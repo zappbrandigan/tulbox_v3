@@ -91,42 +91,44 @@ Thanks!
 `.trim();
 
   return (
-    <footer className="w-full py-2 px-4 text-xs text-gray-500 flex flex-wrap justify-center items-center gap-x-4 gap-y-1 bg-gray-50 border-t">
-      <div className="text-gray-400">
-        v{version} <GitCommitHorizontal className="inline h-4 w-4" /> {commit}
+    <footer
+      className="w-full py-2 px-4 text-xs text-gray-500 dark:text-gray-400
+    flex flex-wrap justify-center items-center gap-x-4 gap-y-1
+    bg-gray-50 dark:bg-gray-900 border-t dark:border-gray-700 transition-colors"
+    >
+      <div className="flex items-center gap-1 text-gray-400 dark:text-gray-500">
+        <span>v{version}</span>
+        <GitCommitHorizontal className="inline h-3 w-3 opacity-70" />
+        <span>{commit}</span>
       </div>
-      <span className="text-gray-300">•</span>
-      <div className="text-gray-400">Last Updated {updated}</div>
-      <span className="text-gray-300">•</span>
-      <span className="flex gap-2">
+
+      <div className="text-gray-400 dark:text-gray-500">Updated {updated}</div>
+
+      <div className="flex gap-2 items-center text-blue-500">
         <a
           href={`mailto:brandon@tulbox.app?subject=Bug/Feedback:%20v${version}-${commit}&body=${encodeURIComponent(
             emailTemplate
           )}`}
           onClick={() => {
-            trackEvent('bugs_link_click', {
-              label: 'Bugs Link Clicked',
-            });
+            trackEvent('bugs_link_click', { label: 'Bugs Link Clicked' });
           }}
-          className="text-blue-500 hover:underline"
+          className="hover:underline underline-offset-2"
         >
           Feedback
         </a>
-        <span>•</span>
+        <span className="text-gray-300 dark:text-gray-600">|</span>
         <a
           href={`mailto:brandon@tulbox.app?subject=Request:%20v${version}-${commit}&body=${encodeURIComponent(
             requestTemplate
           )}`}
           onClick={() => {
-            trackEvent('request_link_click', {
-              label: 'Request Link Clicked',
-            });
+            trackEvent('request_link_click', { label: 'Request Link Clicked' });
           }}
-          className="text-blue-500 hover:underline"
+          className="hover:underline underline-offset-2"
         >
           Requests
         </a>
-      </span>
+      </div>
     </footer>
   );
 };

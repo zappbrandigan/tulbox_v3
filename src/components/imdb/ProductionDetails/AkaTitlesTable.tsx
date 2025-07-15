@@ -14,7 +14,7 @@ const AkaTitlesTable: React.FC<AkaTitlesTableProps> = ({
 }) => {
   if (isLoadingAkas) {
     return (
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center">
+      <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-12 text-center">
         <LoadingOverlay message="Detecting AKA Languages..." />
       </div>
     );
@@ -24,29 +24,27 @@ const AkaTitlesTable: React.FC<AkaTitlesTableProps> = ({
 
   return (
     <div>
-      <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center">
+      <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3 flex items-center">
         <Globe className="w-5 h-5 mr-2" />
         International Titles
       </h3>
       <div className="overflow-x-auto">
         <table className="w-full">
-          <thead className="bg-gray-50">
+          <thead className="bg-gray-50 dark:bg-gray-800">
             <tr>
-              <th className="px-4 py-2 text-left text-sm font-medium text-gray-600">
-                Transliterated Title
-              </th>
-              <th className="px-4 py-2 text-left text-sm font-medium text-gray-600">
-                Article
-              </th>
-              <th className="px-4 py-2 text-left text-sm font-medium text-gray-600">
-                Language
-              </th>
-              <th className="px-4 py-2 text-left text-sm font-medium text-gray-600">
-                Type
-              </th>
+              {['Transliterated Title', 'Article', 'Language', 'Type'].map(
+                (heading) => (
+                  <th
+                    key={heading}
+                    className="px-4 py-2 text-left text-sm font-medium text-gray-600 dark:text-gray-300"
+                  >
+                    {heading}
+                  </th>
+                )
+              )}
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-200">
+          <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
             {akaTitles?.map((aka, index) => (
               <tr
                 key={index}
@@ -56,18 +54,20 @@ const AkaTitlesTable: React.FC<AkaTitlesTableProps> = ({
                   );
                   showToast();
                 }}
-                className="hover:bg-gray-50 hover:cursor-pointer"
+                className="hover:bg-gray-50 dark:hover:bg-gray-700 hover:cursor-pointer transition-colors"
               >
-                <td className="px-4 py-2 text-sm text-gray-600 font-mono">
+                <td className="px-4 py-2 text-sm text-gray-700 dark:text-gray-200 font-mono">
                   {aka.transliterated}
                 </td>
-                <td className="px-4 py-2 text-sm text-gray-600">
+                <td className="px-4 py-2 text-sm text-gray-700 dark:text-gray-200">
                   {aka.article}
                 </td>
-                <td className="px-4 py-2 text-sm text-gray-600">
+                <td className="px-4 py-2 text-sm text-gray-700 dark:text-gray-200">
                   {aka.language}
                 </td>
-                <td className="px-4 py-2 text-sm text-gray-600">{aka.type}</td>
+                <td className="px-4 py-2 text-sm text-gray-700 dark:text-gray-200">
+                  {aka.type}
+                </td>
               </tr>
             ))}
           </tbody>

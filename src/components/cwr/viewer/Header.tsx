@@ -28,12 +28,14 @@ const CodeViewHeader: React.FC<CodeViewHeaderProps> = ({
   fileName,
 }) => {
   return (
-    <div className="bg-gray-50 border-b border-gray-200 p-4">
+    <div className="bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 p-4 transition-colors">
       <div className="relative flex items-center justify-between">
-        <h4 className="text-sm font-semibold text-gray-900 z-10">
+        {/* Left: Title */}
+        <h4 className="text-sm font-semibold text-gray-900 dark:text-gray-100 z-10">
           CWR File Records
         </h4>
 
+        {/* Center: Shortcut Buttons */}
         <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex gap-1">
           <ShortcutButton
             title="Toggle Search"
@@ -65,7 +67,8 @@ const CodeViewHeader: React.FC<CodeViewHeaderProps> = ({
           </ShortcutButton>
         </div>
 
-        <span className="text-xs text-gray-500 z-10 hidden md:inline">
+        {/* Right: File info */}
+        <span className="text-xs text-gray-500 dark:text-gray-400 z-10 hidden md:inline">
           {totalRecords} lines • {fileName}
         </span>
       </div>

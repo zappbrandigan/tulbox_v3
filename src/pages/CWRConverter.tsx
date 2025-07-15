@@ -107,36 +107,41 @@ const CWRConverter: React.FC = () => {
           <ToolHeader
             primaryText="CWR File Converter"
             secondaryText={`
-            Upload and parse Common Works Registration (.v21 or .v22) files.
-            Inspect them with an enhanced raw viewer and export reports to CSV.
-            `}
+          Upload and parse Common Works Registration (.v21 or .v22) files.
+          Inspect them with an enhanced raw viewer and export reports to CSV.
+        `}
             isBeta={true}
           />
+
+          {/* Progress States */}
           {isProcessing ? (
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200">
+            <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
               <Progress
                 progress={progress}
                 message={progress > 0.95 ? 'Loading Viewer' : 'Parsing File'}
               />
             </div>
           ) : isPending ? (
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200">
+            <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
               <Progress progress={1} message="Rendering" />
             </div>
           ) : (
             <DragDropZone onFilesAdded={handleFileUpload} />
           )}
 
+          {/* Memory Error Message */}
           {showMemoryError && (
-            <div className="flex bg-red-50 border border-red-200 text-red-700 p-4 rounded-lg">
-              File too large. Try a smaller file or make a request via the links
-              below for a CLI conversion.
+            <div className="flex items-start gap-4 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-500/50 text-red-700 dark:text-red-300 p-4 rounded-lg transition-colors">
+              <span className="flex-1">
+                File too large. Try a smaller file or make a request via the
+                links below for a CLI conversion.
+              </span>
               <button
                 onClick={() => {
                   setShowMemoryError(false);
                   setFileContent('');
                 }}
-                className="ml-auto text-red-700 hover:text-red-500"
+                className="ml-auto text-red-700 dark:text-red-300 hover:text-red-500 dark:hover:text-red-200"
               >
                 <CircleXIcon />
               </button>
@@ -206,7 +211,7 @@ const CWRConverter: React.FC = () => {
         )}
 
       {!fileContent && (
-        <div className="text-center py-12 text-gray-500">
+        <div className="text-center py-12 text-gray-500 dark:text-gray-400">
           <p>
             All data is processed locally in your browser. It is neither stored
             nor transmitted, and is discarded when you refresh or exit the page.

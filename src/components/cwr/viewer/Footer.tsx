@@ -18,8 +18,8 @@ const CodeViewFooter: React.FC<Props> = ({
   const template = getTemplateById(templateId);
 
   return (
-    <div className="bg-gray-50 border-t border-gray-200 px-4 py-2">
-      <div className="flex items-center justify-between text-xs text-gray-600">
+    <div className="bg-gray-50 dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 px-4 py-2 transition-colors">
+      <div className="flex items-center justify-between text-xs text-gray-600 dark:text-gray-300">
         <span>
           <span className="text-emerald-500">{totalRecords}</span>
           {` records • `}

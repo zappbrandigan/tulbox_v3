@@ -105,11 +105,13 @@ const TableView: React.FC<Props> = ({
   return (
     <>
       <div className="flex items-center space-x-2 mb-4">
-        <Table className="w-5 h-5 text-gray-600" />
-        <h3 className="text-lg font-semibold text-gray-900">Data Preview</h3>
+        <Table className="w-5 h-5 text-gray-600 dark:text-gray-300" />
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+          Data Preview
+        </h3>
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+      <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
         {isProcessing ? (
           <Progress
             progress={progress}
@@ -118,7 +120,7 @@ const TableView: React.FC<Props> = ({
         ) : isPending ? (
           <Progress progress={1} message="Rendering" />
         ) : !template || reportData.length === 0 ? (
-          <div className="py-12 text-center text-sm text-gray-500">
+          <div className="py-12 text-center text-sm text-gray-500 dark:text-gray-400">
             No data to display. Try selecting a different template or uploading
             a file.
           </div>
@@ -130,20 +132,21 @@ const TableView: React.FC<Props> = ({
               onScroll={handleScroll}
             >
               <table className="min-w-full table-fixed">
-                <thead className="sticky top-0 bg-gray-50 border-b border-gray-200">
+                <thead className="sticky top-0 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
                   <tr>
                     {template.fields.map((field: CWRTemplateField) => (
                       <th
                         key={field.label}
                         style={{ minWidth: field.width, maxWidth: field.width }}
-                        className={`px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wide`}
+                        className="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wide"
                       >
                         {field.label}
                       </th>
                     ))}
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-200">
+
+                <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
                   {startIndex > 0 && (
                     <tr style={{ height: `${startIndex * ROW_HEIGHT}px` }}>
                       <td colSpan={template.fields.length}></td>
@@ -153,7 +156,7 @@ const TableView: React.FC<Props> = ({
                   {visibleData.map((record, index) => (
                     <tr
                       key={startIndex + index}
-                      className="hover:bg-gray-50 transition-colors"
+                      className="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
                       style={{ height: `${ROW_HEIGHT}px` }}
                     >
                       {template.fields.map((field) => (
@@ -163,7 +166,7 @@ const TableView: React.FC<Props> = ({
                             minWidth: field.width,
                             maxWidth: field.width,
                           }}
-                          className="px-6 py-2 text-sm text-gray-900 min-w-xs max-w-xs truncate"
+                          className="px-6 py-2 text-sm text-gray-900 dark:text-gray-100 truncate"
                         >
                           {record.get(field.key)}
                         </td>
@@ -187,8 +190,8 @@ const TableView: React.FC<Props> = ({
               </table>
             </div>
 
-            <div className="bg-gray-50 border-t border-gray-200 px-4 py-2">
-              <div className="flex items-center justify-between text-xs text-gray-600">
+            <div className="bg-gray-50 dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 px-4 py-2">
+              <div className="flex items-center justify-between text-xs text-gray-600 dark:text-gray-300">
                 <span>
                   <span className="text-emerald-500">{reportData.length}</span>
                   {` rows • `}

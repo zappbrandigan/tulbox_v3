@@ -28,7 +28,7 @@ const TooltipPortal = ({ children, position }: Props) => {
   return createPortal(
     <div
       ref={tooltipRef}
-      className="relative bg-white text-black text-sm rounded px-2 py-1 z-[1000] max-h-20 max-w-xs pointer-events-none"
+      className="relative bg-white dark:bg-gray-800 text-black dark:text-gray-100 text-sm rounded px-2 py-1 z-[1000] max-h-20 max-w-xs pointer-events-none shadow-md dark:shadow-lg"
       style={{
         top: position.y - tooltipHeight - 8,
         left: position.x,

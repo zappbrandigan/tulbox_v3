@@ -97,14 +97,16 @@ const CodeView: React.FC<Props> = ({
 
   return (
     <>
-      <div className="flex items-center space-x-2">
-        <Code className="w-5 h-5 text-gray-600" />
-        <h3 className="text-lg font-semibold text-gray-900">
+      {/* Section Header */}
+      <div className="flex items-center space-x-2 mb-4">
+        <Code className="w-5 h-5 text-gray-600 dark:text-gray-300" />
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
           {`Raw File Content (${parseResult?.statistics?.totalRecords} lines)`}
         </h3>
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+      {/* Scrollable Container */}
+      <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden transition-colors duration-300">
         {!isProcessing && (
           <>
             <Header

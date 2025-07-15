@@ -22,7 +22,7 @@ const ProductionDetails: React.FC<ProductionDetailsProps> = ({
   getTypeIcon,
 }) => {
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+    <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
       <ProductionHeader
         selectedProduction={selectedProduction}
         getTypeIcon={getTypeIcon}

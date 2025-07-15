@@ -8,7 +8,7 @@ interface IMDBCodeProps {
 
 const IMDBCode: React.FC<IMDBCodeProps> = ({ imdbCode }) => {
   return (
-    <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+    <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
       <div
         onClick={() => {
           navigator.clipboard.writeText(`${imdbCode.substring(1)}`);
@@ -16,8 +16,10 @@ const IMDBCode: React.FC<IMDBCodeProps> = ({ imdbCode }) => {
         }}
         className="flex items-center space-x-2"
       >
-        <span className="font-medium text-gray-900">IMDB Code:</span>
-        <code className="px-2 py-1 bg-gray-200 rounded text-sm font-mono hover:cursor-pointer">
+        <span className="font-medium text-gray-900 dark:text-gray-100">
+          IMDB Code:
+        </span>
+        <code className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-sm font-mono hover:cursor-pointer text-gray-800 dark:text-gray-100">
           {imdbCode}
         </code>
       </div>
@@ -25,10 +27,10 @@ const IMDBCode: React.FC<IMDBCodeProps> = ({ imdbCode }) => {
         href={`https://www.imdb.com/title/${imdbCode}/`}
         target="_blank"
         rel="noopener noreferrer"
-        className="flex items-center gap-2 text-blue-600 hover:text-blue-700 transition-colors"
+        className="flex items-center gap-2 text-blue-600 hover:text-blue-700 dark:hover:text-blue-400 transition-colors"
       >
         View on IMDB
-        <ExternalLink className="inline w-5 h-5 text-gray-600" />
+        <ExternalLink className="inline w-5 h-5 text-gray-600 dark:text-gray-300" />
       </a>
     </div>
   );

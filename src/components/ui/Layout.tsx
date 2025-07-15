@@ -17,7 +17,7 @@ const Layout: React.FC<LayoutProps> = ({
   onToolChange,
 }) => {
   return (
-    <div className="flex flex-col min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
+    <div className="flex flex-col min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-slate-900 dark:via-gray-900 dark:to-black transition-color duration-300">
       <Header
         appName={appName}
         currentTool={currentTool}
