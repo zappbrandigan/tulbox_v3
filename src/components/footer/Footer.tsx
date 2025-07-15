@@ -110,7 +110,7 @@ Thanks!
           }}
           className="text-blue-500 hover:underline"
         >
-          Feedback/Bug Report
+          Feedback
         </a>
         <span>•</span>
         <a
