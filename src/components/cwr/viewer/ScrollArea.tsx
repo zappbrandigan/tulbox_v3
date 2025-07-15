@@ -1,6 +1,6 @@
 import { Minimize } from 'lucide-react';
 import RecordLine from './RecordLine';
-import SearchCodeView from './Search';
+import Search from './Search';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useSearch } from '@/hooks/useSearch';
 import { CWRParsedRecord } from 'cwr-parser/types';
@@ -117,11 +117,11 @@ const ScrollArea: React.FC<Props> = ({
 
   return (
     <div
-      className={`bg-gray-900 text-gray-100 overflow-hidden ${
+      className={`bg-gray-900 text-gray-100 overflow-hidden transition-all duration-500 ease ${
         isFullScreen ? 'absolute top-0 left-0 right-0 bottom-0 z-50' : ''
       }`}
     >
-      <SearchCodeView
+      <Search
         showSearch={showSearch}
         setShowSearch={setShowSearch}
         searchQuery={searchQuery}

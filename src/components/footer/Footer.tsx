@@ -1,4 +1,5 @@
 import { trackEvent } from '@/utils';
+import { GitCommitHorizontal } from 'lucide-react';
 import React from 'react';
 
 interface FooterProps {
@@ -12,7 +13,7 @@ const Footer: React.FC<FooterProps> = ({ appName }) => {
     day: 'numeric',
     year: 'numeric',
   });
-  const commit = __APP_COMMIT__.substring(0, 6);
+  const commit = __APP_COMMIT__.substring(0, 7);
   const note = `
 Note to sender: You can use Markdown formatting in the template above if you know it — for example:
 
@@ -90,12 +91,14 @@ Thanks!
 `.trim();
 
   return (
-    <footer className="w-full py-3 text-xs text-gray-500 flex flex-col items-center space-y-1">
+    <footer className="w-full py-2 px-4 text-xs text-gray-500 flex flex-wrap justify-center items-center gap-x-4 gap-y-1 bg-gray-50 border-t">
       <div className="text-gray-400">
-        v{version} • {commit}
+        v{version} <GitCommitHorizontal className="inline h-4 w-4" /> {commit}
       </div>
+      <span className="text-gray-300">•</span>
       <div className="text-gray-400">Last Updated {updated}</div>
-      <span>
+      <span className="text-gray-300">•</span>
+      <span className="flex gap-2">
         <a
           href={`mailto:brandon@tulbox.app?subject=Bug/Feedback:%20v${version}-${commit}&body=${encodeURIComponent(
             emailTemplate
@@ -109,7 +112,7 @@ Thanks!
         >
           Feedback/Bug Report
         </a>
-        {` • `}
+        <span>•</span>
         <a
           href={`mailto:brandon@tulbox.app?subject=Request:%20v${version}-${commit}&body=${encodeURIComponent(
             requestTemplate

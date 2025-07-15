@@ -79,6 +79,7 @@ const CWRConverter: React.FC = () => {
     setReportData([]);
     setShowMemoryError(false);
     setSelectedTemplate('raw-viewer');
+    setProgress(0);
   };
 
   const switchTemplate = (next: CWRTemplate['id']) => {

@@ -42,9 +42,15 @@ const SearchCodeView: React.FC<SearchCodeViewProps> = ({
 }) => {
   const searchInputRef = useRef<HTMLInputElement>(null);
 
-  /* focus when bar appears */
   useEffect(() => {
-    if (showSearch) searchInputRef.current?.focus();
+    if (showSearch) {
+      const t = setTimeout(() => {
+        searchInputRef.current?.focus();
+      }, 300);
+      return () => clearTimeout(t);
+    } else {
+      searchInputRef.current?.blur();
+    }
   }, [showSearch]);
 
   /* --- helpers ---------------------------------------------------- */
@@ -78,61 +84,64 @@ const SearchCodeView: React.FC<SearchCodeViewProps> = ({
     if (e.key === 'Enter' && totalHits) handleNext();
   };
 
-  /* --- render ------------------------------------------------------ */
-  if (!showSearch) return null;
-
   return (
-    <div className="w-full flex items-center bg-white border-2 border-gray-300 focus-within:border-blue-300">
-      {/* left counter / loader */}
-      <div className="w-[200px] py-4 text-md text-gray-500 bg-blue-50 flex justify-center items-center border-r-2">
-        {busy ? (
-          <div className="flex items-center gap-2">
-            <Loader className="animate-spin" />
-            <span>{Math.round(progress * 100)}%</span>
-          </div>
-        ) : (
-          <span>
-            {totalHits ? currentMatchIndex + 1 : 0} / {totalHits}
-          </span>
-        )}
+    <div
+      className={`w-full flex items-center transition-all duration-500 ease-out overflow-hidden transform ${
+        showSearch ? 'max-h-[80px] scale-100' : 'max-h-0 scale-y-95'
+      }`}
+    >
+      <div className="w-full flex items-center bg-white border border-gray-300 focus-within:border-blue-500">
+        {/* left counter / loader */}
+        <div className="w-[200px] py-4 text-md text-gray-500 bg-blue-50 flex justify-center items-center border-r-2">
+          {busy ? (
+            <div className="flex items-center gap-2">
+              <Loader className="animate-spin" />
+              <span>{Math.round(progress * 100)}%</span>
+            </div>
+          ) : (
+            <span>
+              {totalHits ? currentMatchIndex + 1 : 0} / {totalHits}
+            </span>
+          )}
+        </div>
+
+        {/* nav buttons */}
+        <button
+          onClick={handlePrev}
+          disabled={!totalHits || busy}
+          className="text-gray-500 disabled:text-gray-300 hover:text-blue-500 disabled:hover:bg-transparent"
+        >
+          <ChevronUp className="w-8 h-8 mx-1 rounded-lg" />
+        </button>
+        <button
+          onClick={handleNext}
+          disabled={!totalHits || busy}
+          className="text-gray-500 disabled:text-gray-300 hover:text-blue-500 disabled:hover:bg-transparent"
+        >
+          <ChevronDown className="w-8 h-8 mx-1 rounded-lg" />
+        </button>
+
+        {/* clear */}
+        <button
+          onClick={handleClear}
+          className="text-gray-500 hover:text-red-500"
+        >
+          <CircleX className="w-6 h-6 mx-2" />
+        </button>
+
+        {/* input */}
+        <input
+          id="record-search-box"
+          ref={searchInputRef}
+          type="text"
+          value={searchQuery}
+          onChange={handleSearch}
+          onKeyDown={handleSearchKeyDown}
+          autoComplete="off"
+          placeholder="Search records…"
+          className="flex-1 pl-10 pr-4 py-3 text-gray-700 focus:outline-none"
+        />
       </div>
-
-      {/* nav buttons */}
-      <button
-        onClick={handlePrev}
-        disabled={!totalHits || busy}
-        className="text-gray-500 disabled:text-gray-300 hover:text-blue-500 disabled:hover:bg-transparent"
-      >
-        <ChevronUp className="w-8 h-8 mx-1 rounded-lg" />
-      </button>
-      <button
-        onClick={handleNext}
-        disabled={!totalHits || busy}
-        className="text-gray-500 disabled:text-gray-300 hover:text-blue-500 disabled:hover:bg-transparent"
-      >
-        <ChevronDown className="w-8 h-8 mx-1 rounded-lg" />
-      </button>
-
-      {/* clear */}
-      <button
-        onClick={handleClear}
-        className="text-gray-500 hover:text-red-500"
-      >
-        <CircleX className="w-6 h-6 mx-2" />
-      </button>
-
-      {/* input */}
-      <input
-        id="record-search-box"
-        ref={searchInputRef}
-        type="text"
-        value={searchQuery}
-        onChange={handleSearch}
-        onKeyDown={handleSearchKeyDown}
-        autoComplete="off"
-        placeholder="Search records…"
-        className="flex-1 pl-10 pr-4 py-3 text-gray-700 focus:outline-none"
-      />
     </div>
   );
 };

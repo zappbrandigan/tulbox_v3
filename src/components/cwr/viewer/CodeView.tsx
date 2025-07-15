@@ -46,11 +46,11 @@ const CodeView: React.FC<Props> = ({
       return;
     }
 
-    const MIN_DURATION = 500;
+    const MIN_DURATION = 300;
     const startTime = Date.now();
 
     onProgress(0);
-    setParseResult(null);
+    // setParseResult(null);
 
     const worker = new ParserWorker();
     let timeoutId: ReturnType<typeof setTimeout> | null = null;
@@ -108,10 +108,12 @@ const CodeView: React.FC<Props> = ({
         {!isProcessing && (
           <>
             <Header
+              showSearch={showSearch}
               setShowSearch={setShowSearch}
+              isFullScreen={isFullScreen}
               setIsFullScreen={setIsFullScreen}
-              setIsTooltipEnabled={setIsTooltipEnabled}
               isTooltipEnabled={isTooltipEnabled}
+              setIsTooltipEnabled={setIsTooltipEnabled}
               totalRecords={parseResult?.statistics?.totalRecords ?? 0}
               fileName={parseResult?.fileName ?? 'Unknown'}
             />

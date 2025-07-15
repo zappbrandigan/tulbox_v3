@@ -58,7 +58,6 @@ self.onmessage = async (e: MessageEvent<ParseMsg>) => {
     }
 
     parsedLineCount += partial.lines.length;
-    console.log(parsedLineCount);
 
     if (parsedLineCount > MAX_SAFE_LINES) {
       (self as DedicatedWorkerGlobalScope).postMessage({

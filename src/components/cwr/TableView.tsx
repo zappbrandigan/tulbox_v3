@@ -125,7 +125,7 @@ const TableView: React.FC<Props> = ({
         ) : (
           <>
             <div
-              className="overflow-auto min-h-[650px] h-[82vh]"
+              className="overflow-auto max-h-[82vh]"
               ref={scrollRef}
               onScroll={handleScroll}
             >
