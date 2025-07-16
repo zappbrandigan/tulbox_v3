@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Moon, PocketKnife, Sun } from 'lucide-react';
 
 interface BrandProps {
@@ -6,10 +6,16 @@ interface BrandProps {
 }
 
 const Brand: React.FC<BrandProps> = ({ appName }) => {
-  const toggleDarkMode = () => {
-    const root = document.documentElement;
-    root.classList.toggle('dark');
-  };
+  const [theme, setTheme] = useState(
+    () => localStorage.getItem('theme') ?? 'light'
+  );
+
+  useEffect(() => {
+    document.documentElement.classList.toggle('dark', theme === 'dark');
+    localStorage.setItem('theme', theme);
+  }, [theme]);
+
+  const toggleDarkMode = () => setTheme(theme === 'dark' ? 'light' : 'dark');
 
   return (
     <div className="flex items-center space-x-3">
