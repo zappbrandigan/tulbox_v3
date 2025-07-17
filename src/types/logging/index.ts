@@ -27,16 +27,21 @@ export const USER_EVENT = {
   FILE_UPLOAD: 'file-upload',
   FILE_DOWNLOAD: 'file-download',
   SEARCH_REPLACE: 'search-replace',
+  SEARCH: 'search',
 } as const;
 
 export const USER_EVENT_TARGETS = {
   DOCS_LINK: 'docs-link',
   SUPPORT_LINK: 'support-link',
+  KB_SHORTCUT: 'kb-shortcut',
   THEME_TOGGLE: 'theme-toggle',
   RAW_VIEWER: 'raw-viewer',
   PDF_MANAGER: 'pdf-manager',
   CWR_CONVERTER: 'cwr-converter',
   FILE_EDIT: 'file-edit',
+  PROD_SEARCH: 'prod-search',
+  AKA_SEARCH: 'aka-search',
+  PROD_SELECT: 'prod-select',
 } as const;
 
 type ValueOf<T> = T[keyof T];

@@ -25,24 +25,30 @@ const ProductionHeader: React.FC<ProductionHeaderProps> = ({
             {selectedProduction.title}
           </h2>
           <div className="flex items-center space-x-4 text-blue-100 dark:text-blue-200">
-            <div className="flex items-center space-x-1">
-              <Calendar className="w-4 h-4" />
-              <span>{selectedProduction.releaseYear}</span>
-            </div>
-            <div className="flex items-center space-x-1">
-              <Languages className="w-4 h-4" />
-              <span>{selectedProduction.language}</span>
-            </div>
-            <div className="flex items-center space-x-1">
-              <Globe className="w-4 h-4" />
-              <span>{selectedProduction.originCountry}</span>
-            </div>
-            {selectedProduction.rating && (
+            {selectedProduction.releaseYear && (
+              <div className="flex items-center space-x-1">
+                <Calendar className="w-4 h-4" />
+                <span>{selectedProduction.releaseYear}</span>
+              </div>
+            )}
+            {selectedProduction.language && (
+              <div className="flex items-center space-x-1">
+                <Languages className="w-4 h-4" />
+                <span>{selectedProduction.language}</span>
+              </div>
+            )}
+            {selectedProduction.originCountry && (
+              <div className="flex items-center space-x-1">
+                <Globe className="w-4 h-4" />
+                <span>{selectedProduction.originCountry}</span>
+              </div>
+            )}
+            {selectedProduction.rating ? (
               <div className="flex items-center space-x-1">
                 <Star className="w-4 h-4" />
                 <span>{selectedProduction.rating}/10</span>
               </div>
-            )}
+            ) : null}
           </div>
         </div>
         {selectedProduction.poster && (

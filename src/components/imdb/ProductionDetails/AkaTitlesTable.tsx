@@ -20,7 +20,19 @@ const AkaTitlesTable: React.FC<AkaTitlesTableProps> = ({
     );
   }
 
-  if (!akaTitles) return null;
+  if (akaTitles.length === 0 || !akaTitles) {
+    return (
+      <div>
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3 flex items-center">
+          <Globe className="w-5 h-5 mr-2" />
+          International Titles
+        </h3>
+        <div className="flex justify-center text-gray-500 dark:text-gray-400 text-sm italic">
+          No Alternative Titles Found
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div>

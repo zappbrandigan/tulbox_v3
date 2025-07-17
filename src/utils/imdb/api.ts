@@ -157,6 +157,10 @@ const getAkas = async (result: IMDBSearchResult): Promise<AKATitle[]> => {
   );
   const uniqueAkaTitles = uniqueByTitle(akaTitles);
 
+  if (uniqueAkaTitles.length === 0) {
+    return [];
+  }
+
   const akaTitleLanguageDetails: LanguageDetectionResponse = await axios.post(
     `${
       import.meta.env.VITE_REQUEST_URL

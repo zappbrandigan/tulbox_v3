@@ -75,7 +75,7 @@ const PDFManager: React.FC = () => {
       {
         action: 'search-replace',
         target: 'pdf-manager',
-        value: searchReplaceRules.join(', '),
+        value: JSON.stringify(searchReplaceRules),
       },
       'pdf-manager'
     );
