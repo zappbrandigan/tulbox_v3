@@ -3,6 +3,8 @@ import { ExternalLink, MenuIcon } from 'lucide-react';
 import { TOOLS } from '@/constants/appTools';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
 import { trackEvent } from '@/utils';
+import { logUserEvent } from '@/utils/general/logEvent';
+import { LogSource } from '@/types/logging';
 
 interface NavProps {
   currentTool: string;
@@ -12,6 +14,14 @@ interface NavProps {
 const Nav: React.FC<NavProps> = ({ currentTool, onToolChange }) => {
   function DocsLink() {
     const handleClick = () => {
+      logUserEvent(
+        'User viewed Docs',
+        {
+          action: 'link-click',
+          target: 'docs-link',
+        },
+        currentTool as LogSource
+      );
       trackEvent('docs_link_click', {
         destination: 'https://docs.tulbox.app/tulbox/intro',
         label: 'Documentation',

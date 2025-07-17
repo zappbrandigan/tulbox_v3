@@ -14,6 +14,7 @@ import {
   trackEvent,
 } from '@/utils';
 import { ToolHeader } from '@/components/ui';
+import { logUserEvent } from '@/utils/general/logEvent';
 
 const PDFManager: React.FC = () => {
   const [files, setFiles] = useState<FileItem[]>([]);
@@ -23,7 +24,15 @@ const PDFManager: React.FC = () => {
   const [isDownloading, setIsDownloading] = useState(false);
 
   const handleFilesAdded = (newFiles: File[]) => {
-    trackEvent('pdf_files_added', { count: newFiles.length });
+    logUserEvent(
+      'User added files',
+      {
+        action: 'file-upload',
+        target: 'pdf-manager',
+        value: newFiles.length,
+      },
+      'pdf-manager'
+    );
 
     const fileItems: FileItem[] = newFiles.map((file) => ({
       id: generateFileId(),
@@ -61,10 +70,15 @@ const PDFManager: React.FC = () => {
   };
 
   const handleApplySearchReplace = () => {
-    trackEvent('pdf_search_replace_applied', {
-      rulesCount: searchReplaceRules.length,
-      rule: searchReplaceRules,
-    });
+    logUserEvent(
+      'Search and Replace Applied',
+      {
+        action: 'search-replace',
+        target: 'pdf-manager',
+        value: searchReplaceRules.join(', '),
+      },
+      'pdf-manager'
+    );
 
     setFiles((prevFiles) => {
       const updatedFiles = applySearchReplace(prevFiles, searchReplaceRules);
@@ -78,18 +92,29 @@ const PDFManager: React.FC = () => {
     );
     if (downloadableFiles.length === 0) return;
 
-    trackEvent('pdf_download_started', {
-      count: downloadableFiles.length,
-    });
-
     setIsDownloading(true);
     try {
       await downloadRenamedFiles(downloadableFiles);
-      trackEvent('pdf_download_success', {
-        count: downloadableFiles.length,
-      });
+      logUserEvent(
+        'PDF File Downloaded',
+        {
+          action: 'file-download',
+          target: 'pdf-manager',
+          value: downloadableFiles.length,
+        },
+        'pdf-manager'
+      );
     } catch (error) {
-      trackEvent('pdf_download_error', { error: error });
+      logUserEvent(
+        'Download Error',
+        {
+          action: 'file-download',
+          target: 'pdf-manager',
+          value: String(error),
+        },
+        'pdf-manager',
+        'error'
+      );
       console.error('Error downloading files:', error);
     } finally {
       setIsDownloading(false);
@@ -97,10 +122,6 @@ const PDFManager: React.FC = () => {
   };
 
   const handleClearAll = () => {
-    trackEvent('pdf_clear_all', {
-      fileCount: files.length,
-      rulesCount: searchReplaceRules.length,
-    });
     setFiles([]);
     setSearchReplaceRules([]);
   };

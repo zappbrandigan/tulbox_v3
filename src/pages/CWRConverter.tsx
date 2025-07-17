@@ -11,6 +11,7 @@ import {
 import { Progress, ToolHeader } from '@/components/ui';
 import { CWRConverterRecord } from 'cwr-parser/types';
 import { CWRTemplate } from '@/types';
+import { logUserEvent } from '@/utils/general/logEvent';
 
 const CWRConverter: React.FC = () => {
   const [file, setFile] = useState<string>('');
@@ -31,9 +32,6 @@ const CWRConverter: React.FC = () => {
   const [isPending, startTransition] = useTransition();
 
   const handleFileUpload = async (file: File) => {
-    trackEvent('cwr_file_added', {
-      size: `${(file.size / 1024 / 1024).toFixed(2)} Mb`,
-    });
     const maxSizeMB = 100; // limit in megabytes
     const maxSizeBytes = maxSizeMB * 1024 * 1024;
 
@@ -48,16 +46,33 @@ const CWRConverter: React.FC = () => {
       setFileContent(content);
       setIsProcessing(true);
       setShowMemoryError(false);
+      logUserEvent(
+        'CWR File Added',
+        {
+          action: 'file-upload',
+          target: 'cwr-converter',
+          value: `${(file.size / 1024 / 1024).toFixed(2)} Mb`,
+        },
+        'cwr-converter'
+      );
     } catch (error) {
       console.error('Error parsing file:', error);
       alert('Error parsing CWR file. Please check the file format.');
       setIsProcessing(false);
+      logUserEvent(
+        'CWR File Added',
+        {
+          action: 'file-upload',
+          target: 'cwr-converter',
+          value: `${(file.size / 1024 / 1024).toFixed(2)} Mb`,
+        },
+        'cwr-converter',
+        'error'
+      );
     }
   };
 
-  const handleExport = (format: 'csv' | 'json') => {
-    trackEvent('cwr_file_exported', { format: format });
-
+  const handleExport = (format: 'csv') => {
     if (!parseResult) return;
 
     const template = getTemplateById(selectedTemplate);
@@ -68,6 +83,15 @@ const CWRConverter: React.FC = () => {
       /\s+/g,
       '_'
     )}`;
+    logUserEvent(
+      'CWR Template Selected',
+      {
+        action: 'report-view',
+        target: 'cwr-converter',
+        value: exportFileName,
+      },
+      'cwr-converter'
+    );
 
     exportFile(reportData, template, exportFileName, format, setIsDownloading);
   };
@@ -84,6 +108,16 @@ const CWRConverter: React.FC = () => {
 
   const switchTemplate = (next: CWRTemplate['id']) => {
     if (next === selectedTemplate) return;
+
+    logUserEvent(
+      'CWR Template Selected',
+      {
+        action: 'report-view',
+        target: 'cwr-converter',
+        value: next,
+      },
+      'cwr-converter'
+    );
 
     setIsProcessing(true);
     setProgress(0);

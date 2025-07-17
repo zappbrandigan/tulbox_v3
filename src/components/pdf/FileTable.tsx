@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Edit3, Check, X, AlertCircle, CheckCircle, Copy } from 'lucide-react';
 import { FileItem } from '@/types';
-import { trackEvent } from '@/utils';
+import { logUserEvent } from '@/utils/general/logEvent';
 
 interface FileTableProps {
   files: FileItem[];
@@ -18,7 +18,11 @@ const FileTable: React.FC<FileTableProps> = ({
   const [editValue, setEditValue] = useState('');
 
   const startEditing = (file: FileItem) => {
-    trackEvent('pdf_edit_inline', { filename: file.currentName });
+    logUserEvent('PDF Files Inline Edit', {
+      action: 'ui-interaction',
+      target: 'file-edit',
+      value: file.currentName,
+    });
     setEditingId(file.id);
     setEditValue(file.currentName);
   };

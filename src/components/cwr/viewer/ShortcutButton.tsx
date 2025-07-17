@@ -1,3 +1,5 @@
+import { logUserEvent } from '@/utils/general/logEvent';
+
 interface ShortcutButtonProps {
   children: React.ReactNode;
   title?: string;
@@ -11,10 +13,23 @@ const ShortcutButton: React.FC<ShortcutButtonProps> = ({
   title = 'Shortcut',
   active,
 }) => {
+  const handleClick = () => {
+    toggle((prev) => !prev);
+    logUserEvent(
+      'Shortcut Button Clicked',
+      {
+        action: 'ui-interaction',
+        target: 'cwr-converter',
+        value: title,
+      },
+      'cwr-converter'
+    );
+  };
+
   return (
     <button
       title={title}
-      onClick={() => toggle((prev) => !prev)}
+      onClick={handleClick}
       className={`inline-flex items-center gap-1.5 rounded-full border ${
         active
           ? 'border-blue-500 text-blue-500'

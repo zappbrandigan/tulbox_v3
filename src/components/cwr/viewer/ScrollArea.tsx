@@ -4,6 +4,7 @@ import Search from './Search';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useSearch } from '@/hooks/useSearch';
 import { CWRParsedRecord } from 'cwr-parser/types';
+import { logUserEvent } from '@/utils/general/logEvent';
 
 const ROW_HEIGHT = 24;
 const PAGE_SIZE = 50;
@@ -54,6 +55,15 @@ const ScrollArea: React.FC<Props> = ({
       if (isCmdOrCtrl(e) && key(e) === 'e') {
         e.preventDefault();
         setIsFullScreen((prev) => !prev);
+        logUserEvent(
+          'Shortcut Key Used',
+          {
+            action: 'ui-interaction',
+            target: 'kb-shortcut',
+            value: 'Full Screen',
+          },
+          'cwr-converter'
+        );
         return;
       }
 
@@ -68,6 +78,15 @@ const ScrollArea: React.FC<Props> = ({
           }
           return !show;
         });
+        logUserEvent(
+          'Shortcut Key Used',
+          {
+            action: 'ui-interaction',
+            target: 'kb-shortcut',
+            value: 'Search Bar',
+          },
+          'cwr-converter'
+        );
         return;
       }
 
@@ -75,6 +94,15 @@ const ScrollArea: React.FC<Props> = ({
       if (isCmdOrCtrl(e) && key(e) === 'k') {
         e.preventDefault();
         setIsTooltipEnabled((prev) => !prev);
+        logUserEvent(
+          'Shortcut Key Used',
+          {
+            action: 'ui-interaction',
+            target: 'kb-shortcut',
+            value: 'Toggle Tooltips',
+          },
+          'cwr-converter'
+        );
         return;
       }
 

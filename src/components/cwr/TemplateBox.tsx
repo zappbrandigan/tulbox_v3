@@ -7,7 +7,7 @@ interface TemplateBoxProps {
   isProcessing: boolean;
   isDownloading: boolean;
   handleFileRemove: () => void;
-  handleExport: (format: 'csv' | 'json') => void;
+  handleExport: (format: 'csv') => void;
   reportHasData: boolean;
 }
 

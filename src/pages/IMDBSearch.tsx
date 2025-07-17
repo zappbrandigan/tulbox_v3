@@ -24,6 +24,7 @@ import {
   ProductionDetails,
 } from '@/components/imdb';
 import { ToolHeader, LoadingOverlay } from '@/components/ui';
+import { logUserEvent } from '@/utils/general/logEvent';
 
 const IMDBSearch: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -38,7 +39,6 @@ const IMDBSearch: React.FC = () => {
   const [error, setError] = useState(false);
 
   const handleSearch = async () => {
-    trackEvent('imdb_prod_search', { query: searchQuery });
     if (!searchQuery.trim()) return;
 
     setIsSearching(true);
@@ -49,8 +49,26 @@ const IMDBSearch: React.FC = () => {
     try {
       const results = await searchIMDB(searchQuery, searchType);
       setSearchResults(results);
+      logUserEvent(
+        'IMDb Search',
+        {
+          action: 'search',
+          target: 'prod-search',
+          value: searchQuery,
+        },
+        'imdb-search'
+      );
     } catch (error) {
-      trackEvent('imdb_prod_search_error', { query: searchQuery });
+      logUserEvent(
+        'Error: IMDb Search Failed',
+        {
+          action: 'search',
+          target: 'prod-search',
+          value: `${searchQuery}: ${error}`,
+        },
+        'imdb-search',
+        'error'
+      );
       setError(true);
       console.error('Search failed:', error);
     } finally {
@@ -59,14 +77,31 @@ const IMDBSearch: React.FC = () => {
   };
 
   const handleGetAkas = async (result: IMDBSearchResult) => {
-    trackEvent('imdb_prod_akas', { production: result.id });
     setIsLoadingAkas(true);
     try {
       const akas = await getAkas(result);
       setAkaTitles(akas);
       setIsLoadingAkas(false);
+      logUserEvent(
+        'IMDb Search AKAs',
+        {
+          action: 'search',
+          target: 'aka-search',
+          value: result.id,
+        },
+        'imdb-search'
+      );
     } catch (error) {
-      trackEvent('imdb_prod_akas_error', { query: result.id });
+      logUserEvent(
+        'Error: Failed to load AKAs:',
+        {
+          action: 'search',
+          target: 'aka-search',
+          value: `${result.id}: ${error}`,
+        },
+        'imdb-search',
+        'error'
+      );
       console.error('Failed to load AKAs:', error);
     } finally {
       setIsLoadingAkas(false);
@@ -74,15 +109,32 @@ const IMDBSearch: React.FC = () => {
   };
 
   const handleSelectProduction = async (result: IMDBSearchResult) => {
-    trackEvent('imdb_prod_selection', { production: result.id });
     setIsLoadingDetails(true);
     setSelectedProduction(null);
 
     try {
       const details = await getProductionDetails(result);
       setSelectedProduction(details);
+      logUserEvent(
+        'IMDb Production Select',
+        {
+          action: 'search',
+          target: 'prod-select',
+          value: result.id,
+        },
+        'imdb-search'
+      );
     } catch (error) {
-      trackEvent('imdb_prod_selection_error', { production: result.id });
+      logUserEvent(
+        'Error: Failed to Load Production Details',
+        {
+          action: 'search',
+          target: 'prod-select',
+          value: `${result.id}: ${error}`,
+        },
+        'imdb-search',
+        'error'
+      );
       console.error('Failed to load production details:', error);
     } finally {
       setIsLoadingDetails(false);
