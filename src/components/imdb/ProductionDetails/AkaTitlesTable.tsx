@@ -1,6 +1,6 @@
 import { LoadingOverlay } from '@/components/ui';
 import { AKATitle } from '@/types';
-import { showToast } from '@/utils';
+import { useToast } from '@/hooks/useToast';
 import { Globe } from 'lucide-react';
 
 interface AkaTitlesTableProps {
@@ -12,6 +12,7 @@ const AkaTitlesTable: React.FC<AkaTitlesTableProps> = ({
   akaTitles,
   isLoadingAkas,
 }) => {
+  const { showToast } = useToast();
   if (isLoadingAkas) {
     return (
       <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-12 text-center">

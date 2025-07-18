@@ -50,11 +50,13 @@ const Summary: React.FC<SummaryProps> = ({
           </div>
           <div className="text-center p-4 bg-red-50 dark:bg-red-900 rounded-lg min-w-[100px]">
             <div className="text-2xl font-bold text-red-600 dark:text-red-300">
-              {files.filter((f) => f.status === 'invalid').length}
+              {
+                files.filter(
+                  (f) => f.status === 'invalid' || f.status === 'error'
+                ).length
+              }
             </div>
-            <div className="text-sm text-red-600 dark:text-red-200">
-              Invalid
-            </div>
+            <div className="text-sm text-red-600 dark:text-red-200">Issues</div>
           </div>
         </div>
 

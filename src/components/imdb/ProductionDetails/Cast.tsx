@@ -1,11 +1,12 @@
 import { User, Users } from 'lucide-react';
-import { showToast } from '@/utils';
+import { useToast } from '@/hooks/useToast';
 
 interface CastProps {
   actors: string[];
 }
 
 const Cast: React.FC<CastProps> = ({ actors }) => {
+  const { showToast } = useToast();
   return (
     <div>
       <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3 flex items-center">

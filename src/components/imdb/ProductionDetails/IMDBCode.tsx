@@ -1,12 +1,14 @@
 import React from 'react';
 import { ExternalLink } from 'lucide-react';
-import { showToast } from '@/utils';
+import { useToast } from '@/hooks/useToast';
 
 interface IMDBCodeProps {
   imdbCode: string;
 }
 
 const IMDBCode: React.FC<IMDBCodeProps> = ({ imdbCode }) => {
+  const { showToast } = useToast();
+
   return (
     <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
       <div

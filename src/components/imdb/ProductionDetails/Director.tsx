@@ -1,11 +1,12 @@
 import { User } from 'lucide-react';
-import { showToast } from '@/utils';
+import { useToast } from '@/hooks/useToast';
 
 interface DirectorProps {
   director: string | null;
 }
 
 const Director: React.FC<DirectorProps> = ({ director }) => {
+  const { showToast } = useToast();
   if (!director) return null;
 
   return (

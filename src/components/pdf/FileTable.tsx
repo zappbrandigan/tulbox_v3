@@ -1,7 +1,16 @@
 import React, { useState } from 'react';
-import { Edit3, Check, X, AlertCircle, CheckCircle, Copy } from 'lucide-react';
+import {
+  Edit3,
+  Check,
+  X,
+  AlertCircle,
+  CheckCircle,
+  Layers2,
+  Download,
+} from 'lucide-react';
 import { FileItem } from '@/types';
 import { logUserEvent } from '@/utils/general/logEvent';
+import { ensurePdfExtension } from '@/utils';
 
 interface FileTableProps {
   files: FileItem[];
@@ -40,58 +49,100 @@ const FileTable: React.FC<FileTableProps> = ({
     setEditValue('');
   };
 
-  const getStatusIcon = (status: FileItem['status']) => {
+  const GetStatusText = (status: FileItem['status']) => {
+    const base = 'text-sm font-medium';
     switch (status) {
       case 'valid':
-        return <CheckCircle className="w-5 h-5 text-emerald-500" />;
-      case 'dotified':
-        return <CheckCircle className="w-5 h-5 text-blue-500" />;
-      case 'modified':
-        return <CheckCircle className="w-5 h-5 text-emerald-500" />;
+        return (
+          <>
+            <CheckCircle className="w-5 h-5 text-green-800 dark:text-green-200" />
+            <span className={`${base} text-green-800 dark:text-green-200`}>
+              Valid
+            </span>
+          </>
+        );
       case 'invalid':
-        return <AlertCircle className="w-5 h-5 text-red-500" />;
-      case 'error':
-        return <AlertCircle className="w-5 h-5 text-red-500" />;
+        return (
+          <>
+            <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400" />
+            <span className={`${base} text-red-600 dark:text-red-400`}>
+              Invalid Name
+            </span>
+          </>
+        );
       case 'duplicate':
-        return <Copy className="w-5 h-5 text-amber-500" />;
-    }
-  };
-
-  const getStatusText = (status: FileItem['status']) => {
-    switch (status) {
-      case 'valid':
-        return 'Valid';
-      case 'invalid':
-        return 'Invalid name';
-      case 'duplicate':
-        return 'Duplicate name';
+        return (
+          <>
+            <Layers2 className="w-5 h-5 text-amber-600 dark:text-amber-500" />
+            <span className={`${base} text-amber-600 dark:text-amber-500`}>
+              Duplicate Name
+            </span>
+          </>
+        );
       case 'dotified':
-        return 'Dotified';
+        return (
+          <>
+            <CheckCircle className="w-5 h-5 text-blue-700 dark:text-blue-400" />
+            <span className={`${base} text-blue-700 dark:text-blue-400`}>
+              Dotified
+            </span>
+          </>
+        );
       case 'modified':
-        return 'Modified';
-      case 'error':
-        return 'Error';
+        return (
+          <>
+            <CheckCircle className="w-5 h-5 text-green-700 dark:text-green-400" />
+            <span className={`${base} text-green-700 dark:text-green-400`}>
+              Modified
+            </span>
+          </>
+        );
       default:
-        return 'Error';
+        return (
+          <>
+            <AlertCircle className="w-5 h-5 text-red-700 dark:text-red-400" />
+            <span className={`${base} text-red-700 dark:text-red-400`}>
+              Error
+            </span>
+          </>
+        );
     }
   };
 
   const getRowClassName = (status: FileItem['status']) => {
     const base =
-      'transition-all duration-200 hover:bg-gray-50 dark:hover:bg-gray-800';
+      'transition-all duration-200 hover:bg-gray-50 dark:hover:bg-gray-800 border-b border-gray-200 dark:border-gray-800 last:border-b-0';
 
     switch (status) {
       case 'valid':
-        return `${base} border-l-4 border-l-emerald-500 dark:border-l-emerald-400`;
+        return `${base} border-l-4 border-l-green-800 dark:border-l-green-200`;
+      case 'modified':
+        return `${base} border-l-4 border-l-green-500 dark:border-l-green-500`;
       case 'dotified':
-        return `${base} border-l-4 border-l-blue-500 dark:border-l-blue-400`;
+        return `${base} border-l-4 border-l-blue-500 dark:border-l-blue-500`;
       case 'invalid':
-        return `${base} border-l-4 border-l-red-500 bg-red-50/30 dark:bg-red-500/10`;
+        return `${base} border-l-4 border-l-red-500 dark:border-l-red-500`;
+      case 'error':
+        return `${base} border-l-4 border-l-red-700 dark:border-l-red-400`;
       case 'duplicate':
-        return `${base} border-l-4 border-l-amber-500 bg-amber-50/30 dark:bg-amber-500/10`;
+        return `${base} border-l-4 border-l-amber-600 dark:border-l-amber-500`;
       default:
         return base;
     }
+  };
+
+  const downloadFile = (selectedFile: FileItem) => {
+    const blob = new Blob([selectedFile.file], {
+      type: selectedFile.file.type,
+    });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = ensurePdfExtension(selectedFile.currentName);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   };
 
   if (files.length === 0) {
@@ -125,7 +176,7 @@ const FileTable: React.FC<FileTableProps> = ({
               </th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-200 dark:divide-gray-800">
+          <tbody>
             {files.map((file) => (
               <tr key={file.id} className={getRowClassName(file.status)}>
                 <td className="px-6 py-4 text-sm">
@@ -170,38 +221,34 @@ const FileTable: React.FC<FileTableProps> = ({
                   )}
                 </td>
                 <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-300">
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200">
+                  <span
+                    className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium  ${
+                      file.characterCount > 60
+                        ? 'bg-red-200 dark:bg-red-500 text-red-800 dark:text-white'
+                        : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200'
+                    }`}
+                  >
                     {file.characterCount}
                   </span>
                 </td>
                 <td className="px-6 py-4 text-sm">
                   <div className="flex items-center space-x-2">
-                    {getStatusIcon(file.status)}
-                    <span
-                      className={`text-sm font-medium ${
-                        file.status === 'valid'
-                          ? 'text-emerald-700 dark:text-emerald-400'
-                          : file.status === 'invalid'
-                          ? 'text-red-700 dark:text-red-400'
-                          : file.status === 'dotified'
-                          ? 'text-blue-700 dark:text-blue-400'
-                          : file.status === 'modified'
-                          ? 'text-green-700 dark:text-green-400'
-                          : file.status === 'error'
-                          ? 'text-red-700 dark:text-red-400'
-                          : 'text-amber-700 dark:text-amber-400'
-                      }`}
-                    >
-                      {getStatusText(file.status)}
-                    </span>
+                    {GetStatusText(file.status)}
                   </div>
                 </td>
-                <td className="px-6 py-4 text-sm">
+                <td className="flex space-x-4 px-6 py-4 text-sm">
                   <button
                     onClick={() => onFileRemove(file.id)}
                     className="text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 transition-colors"
                   >
-                    <X className="w-4 h-4" />
+                    <X className="size-5" />
+                  </button>
+                  <button
+                    onClick={() => downloadFile(file)}
+                    className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 transition-colors"
+                    title="Download file"
+                  >
+                    <Download className="size-5" />
                   </button>
                 </td>
               </tr>

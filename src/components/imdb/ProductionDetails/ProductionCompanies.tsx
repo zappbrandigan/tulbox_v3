@@ -1,5 +1,5 @@
 import { Building } from 'lucide-react';
-import { showToast } from '@/utils';
+import { useToast } from '@/hooks/useToast';
 
 interface ProductionCompaniesProps {
   productionCompanies: string[];
@@ -8,6 +8,7 @@ interface ProductionCompaniesProps {
 const ProductionCompanies: React.FC<ProductionCompaniesProps> = ({
   productionCompanies,
 }) => {
+  const { showToast } = useToast();
   if (!productionCompanies) return null;
 
   return (

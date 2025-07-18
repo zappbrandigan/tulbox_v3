@@ -34,10 +34,10 @@ const Nav: React.FC<NavProps> = ({ currentTool, onToolChange }) => {
         target="_blank"
         rel="noopener noreferrer"
         onClick={handleClick}
-        className="block px-4 py-2 text-sm text-gray-700 rounded-lg dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+        className="flex items-center px-4 rounded-lg text-sm font-medium transition-all duration-200 whitespace-nowrap text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
       >
+        <ExternalLink className="inline pr-2" />
         Docs
-        <ExternalLink className="inline pl-2" />
       </a>
     );
   }
@@ -46,7 +46,7 @@ const Nav: React.FC<NavProps> = ({ currentTool, onToolChange }) => {
       {/* Mobile Nav (Dropdown) */}
       <div className="md:hidden relative">
         <Menu>
-          <MenuButton className="px-4 py-2 rounded-lg bg-gray-100 text-sm text-gray-700">
+          <MenuButton className="px-4 py-2 rounded-lg bg-gray-100 dark:bg-slate-500 text-sm dark:text-gray-300">
             <MenuIcon />
           </MenuButton>
           <MenuItems className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-900 border dark:border-gray-700 rounded-lg shadow-lg z-50">
@@ -83,7 +83,7 @@ const Nav: React.FC<NavProps> = ({ currentTool, onToolChange }) => {
             key={tool.id}
             onClick={() => onToolChange(tool.id)}
             disabled={tool.id === 'coming-soon'}
-            className={`flex items-center px-4 rounded-lg text-sm font-medium transition-all duration-200 whitespace-nowrap ${
+            className={`flex items-center md:px-2 lg:px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 whitespace-nowrap ${
               tool.id === 'coming-soon'
                 ? 'text-gray-400 cursor-not-allowed'
                 : currentTool === tool.id

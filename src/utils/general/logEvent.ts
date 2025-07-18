@@ -22,12 +22,16 @@ export const logEvent = (
       ...data,
     };
 
-    navigator.sendBeacon(
-      `${import.meta.env.VITE_REQUEST_URL}/log`,
-      new Blob([JSON.stringify(payload)], {
-        type: 'application/json',
-      })
-    );
+    if (import.meta.env.DEV) {
+      console.log(payload);
+    } else {
+      navigator.sendBeacon(
+        `${import.meta.env.VITE_REQUEST_URL}/log`,
+        new Blob([JSON.stringify(payload)], {
+          type: 'application/json',
+        })
+      );
+    }
   } catch (err) {
     console.warn('logEvent failed:', err);
   }

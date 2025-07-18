@@ -2,6 +2,7 @@ import { FileItem, fileStatus, SearchReplaceRule } from '@/types';
 import JSZip from 'jszip';
 import { saveAs } from 'file-saver';
 import dotifyTitle from '@/utils/pdf/dotify';
+import dotifyTitleNoEp from '@/utils/pdf/dotifyTwo';
 
 const generateFileId = (): string => {
   return Date.now().toString(36) + Math.random().toString(36).substring(2);
@@ -33,8 +34,13 @@ const checkForDuplicates = (files: FileItem[]): FileItem[] => {
   });
 };
 
-const applyCueSheetConvention = (filename: string): [string, fileStatus] => {
+const applyCueSheetConventionOne = (filename: string): [string, fileStatus] => {
   const cleanTitle = dotifyTitle(filename);
+  return cleanTitle;
+};
+
+const applyCueSheetConventionTwo = (filename: string): [string, fileStatus] => {
+  const cleanTitle = dotifyTitleNoEp(filename);
   return cleanTitle;
 };
 
@@ -50,8 +56,20 @@ const applySearchReplace = (
       if (!rule.isEnabled) return;
 
       // Handle cue sheet template
-      if (rule.replaceWith === 'CUE_SHEET_TEMPLATE') {
-        const results = applyCueSheetConvention(newName);
+      if (rule.replaceWith === 'CUE_SHEET') {
+        const results = applyCueSheetConventionOne(newName);
+        newName = Array.isArray(results) ? results[0] : results;
+        if (newName !== file.currentName && results[1] !== 'dotified') {
+          status = 'modified';
+        } else {
+          status = Array.isArray(results)
+            ? (results[1] as FileItem['status'])
+            : file.status;
+        }
+        return;
+      }
+      if (rule.replaceWith === 'CUE_SHEET_NO_EP') {
+        const results = applyCueSheetConventionTwo(newName);
         newName = Array.isArray(results) ? results[0] : results;
         if (newName !== file.currentName && results[1] !== 'dotified') {
           status = 'modified';
@@ -130,7 +148,8 @@ export {
   ensurePdfExtension,
   downloadRenamedFiles,
   escapeRegExp,
-  applyCueSheetConvention,
+  applyCueSheetConventionOne,
+  applyCueSheetConventionTwo,
   applySearchReplace,
   checkForDuplicates,
   validateFileName,
