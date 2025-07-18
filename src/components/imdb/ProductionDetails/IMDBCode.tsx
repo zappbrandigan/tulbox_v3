@@ -13,7 +13,8 @@ const IMDBCode: React.FC<IMDBCodeProps> = ({ imdbCode }) => {
     <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
       <div
         onClick={() => {
-          navigator.clipboard.writeText(`${imdbCode.substring(1)}`);
+          const code = imdbCode.length < 10 ? imdbCode : imdbCode.substring(1);
+          navigator.clipboard.writeText(code);
           showToast();
         }}
         className="flex items-center space-x-2"
