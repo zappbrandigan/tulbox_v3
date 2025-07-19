@@ -57,27 +57,17 @@ const applySearchReplace = (
 
       // Handle cue sheet template
       if (rule.replaceWith === 'CUE_SHEET') {
-        const results = applyCueSheetConventionOne(newName);
-        newName = Array.isArray(results) ? results[0] : results;
-        if (newName !== file.currentName && results[1] !== 'dotified') {
-          status = 'modified';
-        } else {
-          status = Array.isArray(results)
-            ? (results[1] as FileItem['status'])
-            : file.status;
-        }
+        const [updatedName, updatedStatus] =
+          applyCueSheetConventionOne(newName);
+        newName = updatedName;
+        status = updatedStatus;
         return;
       }
       if (rule.replaceWith === 'CUE_SHEET_NO_EP') {
-        const results = applyCueSheetConventionTwo(newName);
-        newName = Array.isArray(results) ? results[0] : results;
-        if (newName !== file.currentName && results[1] !== 'dotified') {
-          status = 'modified';
-        } else {
-          status = Array.isArray(results)
-            ? (results[1] as FileItem['status'])
-            : file.status;
-        }
+        const [updatedName, updatedStatus] =
+          applyCueSheetConventionTwo(newName);
+        newName = updatedName;
+        status = updatedStatus;
         return;
       }
 

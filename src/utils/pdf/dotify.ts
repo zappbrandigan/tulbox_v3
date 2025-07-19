@@ -182,7 +182,7 @@ const dotifyTitle = (title: string): [string, FileItem['status']] => {
     [prodTitle, epTitle, epNumber] = getTokens(cleanTitle);
   } catch {
     status = 'error';
-    return [cleanTitle, status];
+    return [title, status];
   }
 
   [prodTitle, epTitle, epNumber, status] = trimWhiteSpace(
