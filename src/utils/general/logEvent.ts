@@ -5,6 +5,15 @@ import type {
   LogType,
 } from '@/types/logging';
 
+export const getOrCreateSessionId = () => {
+  const key = 'tulbox_session';
+  const existing = localStorage.getItem(key);
+  if (existing) return existing;
+  const newId = crypto.randomUUID?.() || Date.now().toString(36);
+  localStorage.setItem(key, newId);
+  return newId;
+};
+
 export const logEvent = (
   message: string,
   data: Partial<LogContext> = {},
@@ -19,6 +28,7 @@ export const logEvent = (
       logKey: import.meta.env.VITE_LOGGING_SECRET,
       type,
       source,
+      sessionId: getOrCreateSessionId(),
       ...data,
     };
 

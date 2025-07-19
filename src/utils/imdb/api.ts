@@ -13,6 +13,7 @@ import {
 import { transliterate } from 'transliteration';
 import PosterPlaceHolder from '@/static/imdb.jpg';
 import languageArticles from '@/utils/imdb/articles';
+import { getOrCreateSessionId } from '../general/logEvent';
 import axios from 'axios';
 
 const uniqueByTitle = (arr: { text: string }[]): { text: string }[] => {
@@ -69,6 +70,7 @@ const searchIMDB = async (
       import.meta.env.VITE_REQUEST_URL
     }/api/external/imdbMain/api/autocomplete`,
     params: { q: query },
+    headers: { 'x-session-id': getOrCreateSessionId() },
   };
 
   const results: ApiTitleSearchResponse = await axios.request(options);
@@ -100,6 +102,7 @@ const getProductionDetails = async (
     url: `${
       import.meta.env.VITE_REQUEST_URL
     }/api/external/imdbDetails/api/imdb/${production.id}`,
+    headers: { 'x-session-id': getOrCreateSessionId() },
   };
 
   const results: ApiProductionDetails = await axios.request(
@@ -145,6 +148,7 @@ const getAkas = async (result: IMDBSearchResult): Promise<AKATitle[]> => {
       tt: result.id,
       limit: '30',
     },
+    headers: { 'x-session-id': getOrCreateSessionId() },
   };
 
   const akaResults: ApiAkaResponse = await axios.request(productionAkaOptions);
@@ -167,6 +171,11 @@ const getAkas = async (result: IMDBSearchResult): Promise<AKATitle[]> => {
     }/api/external/langDetect/detect-language-batch`,
     {
       texts: uniqueAkaTitles,
+    },
+    {
+      headers: {
+        'x-session-id': getOrCreateSessionId(),
+      },
     }
   );
 

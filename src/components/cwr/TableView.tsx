@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useTransition } from 'react';
-import { getTemplateById, trackEvent } from '@/utils';
+import { getTemplateById } from '@/utils';
 import { CWRTemplateField } from '@/types';
 import { Table } from 'lucide-react';
 import ReportWorker from '@/workers/reportWorker?worker';
@@ -41,7 +41,6 @@ const TableView: React.FC<Props> = ({
 
   useEffect(() => {
     if (!fileContent) return;
-    trackEvent('cwr_report_viewed', { report: selectedTemplate });
 
     const MIN_DURATION = 500;
     const start = Date.now();
