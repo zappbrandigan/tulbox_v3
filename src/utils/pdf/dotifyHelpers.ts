@@ -20,6 +20,20 @@ export const removeExtension = (title: string) => {
   return posFileExtension !== -1 ? title.substring(0, posFileExtension) : title;
 };
 
+export const formatEpNumToken = (
+  epNum: string,
+  status: FileItem['status']
+): [string, FileItem['status']] => {
+  const trimmed = epNum.trim();
+  const normalized = trimmed.replace(/^Ep No\.\s*/, 'Ep No. ');
+
+  if (normalized === epNum) {
+    return [epNum, status];
+  } else {
+    return [normalized, 'modified'];
+  }
+};
+
 export const removeAmp = (
   title: string,
   currentStatus: FileItem['status']

@@ -4,6 +4,7 @@ import {
   removeExtension,
   removeAmp,
   capitalizeAB,
+  formatEpNumToken,
 } from './dotifyHelpers';
 
 const getTokens = (title: string) => {
@@ -101,6 +102,7 @@ const dotifyTitleNoEp = (title: string): [string, FileItem['status']] => {
   }
 
   [prodTitle, epNumber, status] = trimWhiteSpace(prodTitle, epNumber, status);
+  [epNumber, status] = formatEpNumToken(epNumber, status);
   [prodTitle, status] = moveArticles(prodTitle, status);
   [epNumber, status] = removeAmp(epNumber, status);
   [epNumber, status] = capitalizeAB(epNumber, status);

@@ -136,7 +136,7 @@ const SearchReplace: React.FC<SearchReplaceProps> = ({
       </div>
 
       {showAdvanced && (
-        <div className="mb-3 mt-3 p-4 bg-blue-50 dark:bg-blue-900 rounded-lg border border-blue-200 dark:border-blue-700">
+        <div className="mb-3 mt-3 p-4 bg-blue-50 dark:bg-slate-700 rounded-lg border border-blue-200 dark:border-blue-700">
           <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2">
             {commonReplacements.map((template, index) => (
               <button
