@@ -6,6 +6,7 @@ import type {
 } from '@/types/logging';
 
 export const getOrCreateSessionId = () => {
+  if (typeof window === 'undefined') return '';
   const key = 'tulbox_session';
   const existing = localStorage.getItem(key);
   if (existing) return existing;
@@ -53,7 +54,6 @@ export const logUserEvent = (
   source: LogSource = 'frontend',
   level: LogPayload['level'] = 'info',
   type: LogType = 'user-event'
-  // extra: Omit<Partial<LogContext>, 'event'> = {}
 ) => {
   logEvent(message, { event }, level, source, type);
 };
