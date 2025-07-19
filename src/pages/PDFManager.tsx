@@ -15,6 +15,7 @@ import {
 } from '@/utils';
 import { ToolHeader } from '@/components/ui';
 import { logUserEvent } from '@/utils/general/logEvent';
+import { PageMeta } from '@/PageMeta';
 
 const PDFManager: React.FC = () => {
   const [files, setFiles] = useState<FileItem[]>([]);
@@ -134,44 +135,50 @@ const PDFManager: React.FC = () => {
   }, []);
 
   return (
-    <div className="space-y-8">
-      {files.length === 0 && (
-        <ToolHeader
-          primaryText="PDF File Manager"
-          secondaryText={`
+    <>
+      <PageMeta
+        title="PDF Manager | TūlBOX"
+        description="Batch rename PDF files using RegEx and quick templates."
+      />
+      <div className="space-y-8">
+        {files.length === 0 && (
+          <ToolHeader
+            primaryText="PDF File Manager"
+            secondaryText={`
             Upload PDF files, rename them individually or in batches using search & replace rules, 
             then download your organized files.`}
-        />
-      )}
+          />
+        )}
 
-      {files.length === 0 && <DragDropZone onFilesAdded={handleFilesAdded} />}
+        {files.length === 0 && <DragDropZone onFilesAdded={handleFilesAdded} />}
 
-      {/* Stats & Actions */}
-      {files.length > 0 && (
-        <Summary
+        {/* Stats & Actions */}
+        {files.length > 0 && (
+          <Summary
+            files={files}
+            isDownloading={isDownloading}
+            handleClearAll={handleClearAll}
+            handleDownloadAll={handleDownloadAll}
+          />
+        )}
+
+        {/* Search & Replace */}
+        {files.length > 0 && (
+          <SearchReplace
+            rules={searchReplaceRules}
+            onRulesChange={setSearchReplaceRules}
+            onApply={handleApplySearchReplace}
+          />
+        )}
+
+        {/* File Table */}
+        <FileTable
           files={files}
-          isDownloading={isDownloading}
-          handleClearAll={handleClearAll}
-          handleDownloadAll={handleDownloadAll}
+          onFileUpdate={handleFileUpdate}
+          onFileRemove={handleFileRemove}
         />
-      )}
-
-      {/* Search & Replace */}
-      {files.length > 0 && (
-        <SearchReplace
-          rules={searchReplaceRules}
-          onRulesChange={setSearchReplaceRules}
-          onApply={handleApplySearchReplace}
-        />
-      )}
-
-      {/* File Table */}
-      <FileTable
-        files={files}
-        onFileUpdate={handleFileUpdate}
-        onFileRemove={handleFileRemove}
-      />
-    </div>
+      </div>
+    </>
   );
 };
 

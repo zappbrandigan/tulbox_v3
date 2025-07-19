@@ -25,6 +25,7 @@ import {
 } from '@/components/imdb';
 import { ToolHeader, LoadingOverlay } from '@/components/ui';
 import { logUserEvent } from '@/utils/general/logEvent';
+import { PageMeta } from '@/PageMeta';
 
 const IMDBSearch: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -172,71 +173,77 @@ const IMDBSearch: React.FC = () => {
   }, []);
 
   return (
-    <div className="space-y-8">
-      <ToolHeader
-        primaryText="IMDb Production Search"
-        secondaryText={`
+    <>
+      <PageMeta
+        title="IMDb Search | TūlBOX"
+        description="Search movies, TV, and games, and view detailed metadata instantly with TūlBOX."
+      />
+      <div className="space-y-8">
+        <ToolHeader
+          primaryText="IMDb Production Search"
+          secondaryText={`
           Search for movies, TV shows, games and more.
           Get detailed production information including cast, crew, and international titles.
         `}
-      />
-
-      {/* Search Section */}
-      <SearchContainer>
-        <SearchFilter searchType={searchType} setSearchType={setSearchType} />
-        <SearchInput
-          searchQuery={searchQuery}
-          handleSearch={handleSearch}
-          isSearching={isSearching}
-          setSearchQuery={setSearchQuery}
         />
-      </SearchContainer>
 
-      {/* Search Results */}
-      {!isLoadingDetails && !selectedProduction && (
-        <SearchResult
-          searchType={searchType}
-          searchResults={searchResults}
-          handleSelectProduction={handleSelectProduction}
-          getTypeIcon={getTypeIcon}
-        />
-      )}
+        {/* Search Section */}
+        <SearchContainer>
+          <SearchFilter searchType={searchType} setSearchType={setSearchType} />
+          <SearchInput
+            searchQuery={searchQuery}
+            handleSearch={handleSearch}
+            isSearching={isSearching}
+            setSearchQuery={setSearchQuery}
+          />
+        </SearchContainer>
 
-      {/* Loading Details */}
-      {isLoadingDetails && (
-        <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-12 text-center">
-          <LoadingOverlay message="Loading production details" />
-        </div>
-      )}
+        {/* Search Results */}
+        {!isLoadingDetails && !selectedProduction && (
+          <SearchResult
+            searchType={searchType}
+            searchResults={searchResults}
+            handleSelectProduction={handleSelectProduction}
+            getTypeIcon={getTypeIcon}
+          />
+        )}
 
-      {/* Production Details */}
-      {selectedProduction && (
-        <ProductionDetails
-          selectedProduction={selectedProduction}
-          isLoadingAkas={isLoadingAkas}
-          akaTitles={akaTitles}
-          getTypeIcon={getTypeIcon}
-        />
-      )}
-
-      {/* Empty State */}
-      {!isSearching &&
-        !isLoadingDetails &&
-        searchResults.length === 0 &&
-        !selectedProduction &&
-        searchQuery &&
-        error && (
+        {/* Loading Details */}
+        {isLoadingDetails && (
           <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-12 text-center">
-            <Search className="w-12 h-12 mx-auto mb-4 text-gray-300 dark:text-gray-500" />
-            <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
-              No results found
-            </h3>
-            <p className="text-gray-600 dark:text-gray-400">
-              Try adjusting your search terms or filters
-            </p>
+            <LoadingOverlay message="Loading production details" />
           </div>
         )}
-    </div>
+
+        {/* Production Details */}
+        {selectedProduction && (
+          <ProductionDetails
+            selectedProduction={selectedProduction}
+            isLoadingAkas={isLoadingAkas}
+            akaTitles={akaTitles}
+            getTypeIcon={getTypeIcon}
+          />
+        )}
+
+        {/* Empty State */}
+        {!isSearching &&
+          !isLoadingDetails &&
+          searchResults.length === 0 &&
+          !selectedProduction &&
+          searchQuery &&
+          error && (
+            <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-12 text-center">
+              <Search className="w-12 h-12 mx-auto mb-4 text-gray-300 dark:text-gray-500" />
+              <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
+                No results found
+              </h3>
+              <p className="text-gray-600 dark:text-gray-400">
+                Try adjusting your search terms or filters
+              </p>
+            </div>
+          )}
+      </div>
+    </>
   );
 };
 
