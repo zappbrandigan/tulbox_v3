@@ -5,13 +5,21 @@ import type {
   LogType,
 } from '@/types/logging';
 
+let sessionId: string | null = null;
+
 export const getOrCreateSessionId = () => {
   if (typeof window === 'undefined') return '';
+  if (sessionId) return sessionId;
+
   const key = 'tulbox_session';
   const existing = localStorage.getItem(key);
-  if (existing) return existing;
+  if (existing) {
+    sessionId = existing;
+    return existing;
+  }
   const newId = crypto.randomUUID?.() || Date.now().toString(36);
   localStorage.setItem(key, newId);
+  sessionId = newId;
   return newId;
 };
 
@@ -23,13 +31,15 @@ export const logEvent = (
   type: LogType
 ) => {
   try {
+    const session = getOrCreateSessionId();
+
     const payload: LogPayload = {
       message,
       level,
       logKey: import.meta.env.VITE_LOGGING_SECRET,
       type,
       source,
-      sessionId: getOrCreateSessionId(),
+      sessionId: session,
       ...data,
     };
 
