@@ -1,9 +1,10 @@
 import { FileItem } from '@/types';
-
-const removeExtension = (title: string) => {
-  const posFileExtension = title.search(/(\.pdf)$/i);
-  return posFileExtension !== -1 ? title.substring(0, posFileExtension) : title;
-};
+import {
+  articles,
+  removeExtension,
+  removeAmp,
+  capitalizeAB,
+} from './dotifyHelpers';
 
 const getTokens = (title: string) => {
   let prodTitle, epNumber;
@@ -32,25 +33,14 @@ const moveArticles = (
   prodTitle: string,
   currentStatus: FileItem['status']
 ): [string, FileItem['status']] => {
-  const articles = [
-    'El ',
-    'Il ',
-    'Lo ',
-    'La ',
-    'Los ',
-    'Las ',
-    "L'",
-    'The ',
-    'An ',
-    'A ',
-    'Un ',
-    'Una ',
-  ];
   let art = null;
   let status: FileItem['status'] = currentStatus;
 
-  art = articles.filter((art) =>
-    prodTitle.toLowerCase().startsWith(art.toLowerCase())
+  art = articles.filter(
+    (art) =>
+      prodTitle
+        .toLowerCase()
+        .startsWith(`${art.toLowerCase()}${art === "l'" ? '' : ' '}`) // article with trailing space
   );
   prodTitle = art.length
     ? `${prodTitle.substring(art[0].length)}, ${art[0].toUpperCase().trim()}`
@@ -59,41 +49,6 @@ const moveArticles = (
   status = art.length > 0 ? 'modified' : currentStatus;
 
   return [prodTitle, status];
-};
-
-const removeAmp = (
-  title: string,
-  currentStatus: FileItem['status']
-): [string, FileItem['status']] => {
-  let status: FileItem['status'] = currentStatus;
-  let epNumber = title;
-  if (epNumber.search('&') !== -1) {
-    epNumber = epNumber.replace('&', '-');
-    status = 'modified';
-  }
-  return [epNumber, status];
-};
-
-const capitalizeAB = (
-  title: string,
-  currentStatus: FileItem['status']
-): [string, FileItem['status']] => {
-  let result = null;
-  let status: FileItem['status'] = currentStatus;
-  const epNumber = title;
-  const re = /\d+(a)|\d+(b)/g;
-  const matches = epNumber.match(re);
-  if (matches) {
-    status = 'modified';
-    const lastOcc = matches[matches.length - 1];
-    const remIndex = epNumber.search(lastOcc) + lastOcc.length + 1;
-    result = matches.map((part) => part.toUpperCase());
-    const newNumber = `Ep No. ${result.join(' - ')} ${epNumber.substring(
-      remIndex
-    )}`.trim();
-    return [newNumber, status];
-  }
-  return [epNumber, status];
 };
 
 const buildFullTitle = (prodTitle: string, epNumber: string): string => {

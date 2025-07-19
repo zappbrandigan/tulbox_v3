@@ -1,7 +1,7 @@
 const languageArticles: Record<string, string[]> = {
   en: ['a', 'an', 'the'],
   es: ['el', 'la', 'los', 'las', 'un', 'una', 'unos', 'unas'],
-  fr: ['le', 'la', 'les', 'un', 'une', 'des'],
+  fr: ['le', 'la', 'les', 'un', 'une', 'des', "l'"],
   de: ['der', 'die', 'das', 'ein', 'eine', 'einen', 'einem', 'einer'],
   it: ['il', 'lo', 'la', 'i', 'gli', 'le', 'un', 'uno', 'una', "un'"],
   pt: ['o', 'a', 'os', 'as', 'um', 'uma', 'uns', 'umas'],
