@@ -33,16 +33,6 @@ const checkForDuplicates = (files: FileItem[]): FileItem[] => {
   });
 };
 
-// const applyCueSheetConventionOne = (filename: string): [string, fileStatus] => {
-//   const cleanTitle = dotifyTitle(filename);
-//   return cleanTitle;
-// };
-
-// const applyCueSheetConventionTwo = (filename: string): [string, fileStatus] => {
-//   const cleanTitle = dotifyTitleNoEp(filename);
-//   return cleanTitle;
-// };
-
 const applySearchReplace = (
   files: FileItem[],
   rules: SearchReplaceRule[]
@@ -56,17 +46,13 @@ const applySearchReplace = (
 
       // Handle cue sheet template
       if (rule.replaceWith === 'CUE_SHEET') {
-        const { title, status } =
-          // applyCueSheetConventionOne(newName);
-          dotifyTitleGeneric(newName, true);
+        const { title, status } = dotifyTitleGeneric(newName, true);
         newName = title;
         newStatus = status;
         return;
       }
       if (rule.replaceWith === 'CUE_SHEET_NO_EP') {
-        const { title, status } =
-          // applyCueSheetConventionTwo(newName);
-          dotifyTitleGeneric(newName, false);
+        const { title, status } = dotifyTitleGeneric(newName, false);
         newName = title;
         newStatus = status;
         return;
