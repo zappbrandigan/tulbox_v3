@@ -1,166 +1,243 @@
-import { FileItem } from '@/types';
 import {
   articles,
-  titleCase,
   removeExtension,
   removeAmp,
   capitalizeAB,
   formatEpNumToken,
+  titleCase,
 } from './dotifyHelpers';
 
-const getTokens = (title: string) => {
-  let prodTitle, epTitle, epNumber, tokens;
+export interface TitleParts {
+  prodTitle: string;
+  epTitle?: string | null;
+  epNum: string;
+}
+
+export type DotifyStatus = 'valid' | 'modified' | 'dotified' | 'error';
+
+export interface DotifyResult {
+  title: string;
+  status: DotifyStatus;
+}
+
+function parseTokens(
+  input: string,
+  hasEpisodeTitle: boolean
+): TitleParts | null {
   try {
-    [prodTitle, tokens] = title.split('   '); // three spaces
-    [epTitle, epNumber] = tokens.split('  '); // two spaces
-    if (!prodTitle || !epTitle || !epNumber) throw TypeError; // if a token is missing
+    const [prod, rest] = input.split('   ');
+    if (!prod || !rest) return null;
+
+    if (hasEpisodeTitle) {
+      const [ep, num] = rest.split('  ');
+      if (!ep || !num) return null;
+      return { prodTitle: prod, epTitle: ep, epNum: num };
+    }
+
+    return { prodTitle: prod, epNum: rest };
   } catch {
-    throw TypeError;
+    return null;
   }
-  return [prodTitle, epTitle, epNumber];
-};
+}
 
-const trimWhiteSpace = (
-  prodTitle: string,
-  epTitle: string,
-  epNumber: string,
-  currentStatus: FileItem['status']
-): [string, string, string, FileItem['status']] => {
-  let status: FileItem['status'] = currentStatus;
-  const newPd = prodTitle.trim();
-  const newEp = epTitle.trim();
-  const newNum = epNumber.trim();
-  if (newPd !== prodTitle || newEp !== epTitle || newNum !== epNumber)
-    status = 'modified';
-  return [newPd, newEp, newNum, status];
-};
+function normalizeParts(
+  parts: TitleParts,
+  track: (s: DotifyStatus | null) => void
+): TitleParts {
+  let { prodTitle, epTitle, epNum } = parts;
 
-const moveArticles = (
-  prodTitle: string,
-  epTitle: string,
-  currentStatus: FileItem['status']
-): [string, string, FileItem['status']] => {
-  let art = null;
-  let status: FileItem['status'] = currentStatus;
+  const trim = (s: string | null | undefined): string | null | undefined => {
+    if (s === null) return null;
+    if (s === undefined) return undefined;
+    return s.trim();
+  };
 
-  art = articles.filter(
-    (art) =>
-      prodTitle
-        .toLowerCase()
-        .startsWith(`${art.toLowerCase()}${art === "l'" ? '' : ' '}`) // article with trailing space
+  const newProd = trim(prodTitle);
+  const newEp = trim(epTitle);
+  const newNum = trim(epNum);
+
+  if (newProd !== prodTitle || newEp !== epTitle || newNum !== epNum) {
+    track('modified');
+  }
+  console.log(newEp, epTitle);
+
+  prodTitle = newProd!;
+  epTitle = newEp;
+  epNum = newNum!;
+
+  prodTitle = moveArticle(prodTitle, track);
+  if (epTitle) epTitle = moveArticle(epTitle, track);
+
+  let resultStatus: DotifyStatus;
+
+  [epNum, resultStatus] = formatEpNumToken(epNum, 'valid');
+  if (resultStatus === 'modified') track('modified');
+
+  [epNum, resultStatus] = removeAmp(epNum, 'valid');
+  if (resultStatus === 'modified') track('modified');
+
+  [epNum, resultStatus] = capitalizeAB(epNum, 'valid');
+  if (resultStatus === 'modified') track('modified');
+
+  return { prodTitle, epTitle, epNum };
+}
+
+function moveArticle(
+  title: string,
+  track: (s: DotifyStatus | null) => void
+): string {
+  const matchedArticle = articles.find((a) =>
+    title.toLowerCase().startsWith(`${a.toLowerCase()}${a === "l'" ? '' : ' '}`)
   );
-  prodTitle = art.length
-    ? `${prodTitle.substring(art[0].length)}, ${art[0].toUpperCase().trim()}`
-    : prodTitle;
 
-  status = art.length ? 'modified' : currentStatus;
+  if (!matchedArticle) return title;
 
-  art = articles.filter(
-    (art) =>
-      epTitle
-        .toLowerCase()
-        .startsWith(`${art.toLowerCase()}${art === "l'" ? '' : ' '}`) // article with trailing space
-  );
-  epTitle = art.length
-    ? `${epTitle.substring(art[0].length)}, ${art[0].trim()}`
-    : epTitle;
+  const prefixLength =
+    matchedArticle === "l'" ? matchedArticle.length : matchedArticle.length + 1;
 
-  status = art.length ? 'modified' : status;
+  const originalArticle = title.substring(0, prefixLength);
+  const remainder = title.substring(prefixLength).trim();
 
-  return [prodTitle, epTitle, status];
-};
+  const newTitle = `${remainder}, ${originalArticle.trim()}`;
+  if (newTitle !== title) track('modified');
+  return `${remainder}, ${originalArticle.trim()}`;
+}
 
-const buildFullTitle = (
-  prodTitle: string,
-  epTitle: string,
-  epNumber: string
-): string => {
-  return `${prodTitle.toUpperCase()}   ${titleCase(epTitle)}  ${epNumber}`;
-};
+function sanitizeDotification(
+  parts: TitleParts,
+  track: (s: DotifyStatus | null) => void
+): TitleParts {
+  const dotVariants = [
+    /\.{3,}/g, // "..."
+    /\s?\.\s?\.\s?\./g, // " . . ." or " . . ." or even ". . ."
+  ];
 
-const dotify = (
-  cleanTitle: string,
-  prodTitle: string,
-  epTitle: string,
-  epNumber: string,
-  currentStatus: FileItem['status']
-): [string, FileItem['status']] => {
-  let status: FileItem['status'] = currentStatus;
-  const endings = ['.', ',', '!', '?', "'"];
-  let dotifyEpTitle = false;
-  let dotifyProdTitle = false;
-  let stopCount = 50;
+  const clean = (text: string) =>
+    dotVariants.reduce((acc, rx) => acc.replace(rx, '. . .'), text);
 
-  while (prodTitle.length + epTitle.length + epNumber.length > stopCount) {
-    if (epTitle.length > 3) {
-      epTitle = epTitle.substring(0, epTitle.length - 1);
-      dotifyEpTitle = true;
+  const { prodTitle, epTitle, epNum } = parts;
+
+  const cleanedProd = clean(prodTitle);
+  const cleanedEp = epTitle ? clean(epTitle) : epTitle;
+
+  if (cleanedProd !== prodTitle || cleanedEp !== epTitle) {
+    track('modified');
+  }
+
+  return {
+    prodTitle: cleanedProd,
+    epTitle: cleanedEp,
+    epNum,
+  };
+}
+
+function getFullTitleLength(
+  parts: TitleParts,
+  options: { addDotsToProd?: boolean; addDotsToEp?: boolean } = {}
+): number {
+  const prod = parts.prodTitle.trim();
+  const ep = parts.epTitle?.trim() ?? '';
+  const num = parts.epNum.trim();
+
+  const prodDotPad = options.addDotsToProd && !prod.endsWith('. . .') ? 5 : 0;
+  const epDotPad = options.addDotsToEp && !ep.endsWith('. . .') ? 5 : 0;
+
+  const baseLength = prod.length + prodDotPad + 3 + num.length;
+
+  return parts.epTitle
+    ? baseLength + ep.length + epDotPad + 2 // +2 for ep/num separator
+    : baseLength;
+}
+
+function removeTrailingPunct(s: string): string {
+  const trailing = [',', '.', "'", '!'];
+  while (trailing.includes(s.at(-1)!)) {
+    s = s.slice(0, -1).trimEnd();
+  }
+  return s;
+}
+
+function dotifyIfOverflow(parts: TitleParts): TitleParts {
+  const maxLength = 60;
+  let { prodTitle, epTitle } = parts;
+  const { epNum } = parts;
+
+  let epTruncated = false;
+  let prodTruncated = false;
+
+  while (
+    getFullTitleLength(
+      { prodTitle, epTitle, epNum },
+      {
+        addDotsToEp: epTruncated,
+        addDotsToProd: !epTitle || prodTruncated,
+      }
+    ) > maxLength
+  ) {
+    if (epTitle && epTitle.length > 3) {
+      epTitle = epTitle.slice(0, -1).trimEnd();
+      epTruncated = true;
     } else {
-      prodTitle = prodTitle.substring(0, prodTitle.length - 1);
-      dotifyProdTitle = true;
-      stopCount = 45;
+      prodTitle = prodTitle.slice(0, -1).trimEnd();
+      prodTruncated = true;
     }
   }
-
-  epTitle = epTitle.trim(); // if shortened string ends with space char
-  prodTitle = prodTitle.trim();
-
-  if (endings.includes(epTitle[epTitle.length - 1]))
-    epTitle = epTitle.substring(0, epTitle.length - 1); // don't end on special char
-
-  if (dotifyEpTitle) {
-    status = 'dotified';
-    epTitle += '. . .';
+  if (epTruncated && epTitle && !epTitle.endsWith('. . .')) {
+    epTitle = removeTrailingPunct(epTitle).trimEnd() + '. . .';
   }
-  if (dotifyProdTitle) {
-    status = 'dotified';
-    prodTitle += '. . .';
-  }
-  if (!dotifyEpTitle && !dotifyProdTitle) {
-    status = 'modified';
-    return [cleanTitle, status]; // dots in title but not dotified
+  if (prodTruncated && !prodTitle.endsWith('. . .')) {
+    prodTitle = removeTrailingPunct(prodTitle).trimEnd() + '. . .';
   }
 
-  const newTitle = buildFullTitle(prodTitle, epTitle, epNumber);
-  return [newTitle, status];
-};
+  return {
+    prodTitle: prodTitle.trim(),
+    epTitle: epTitle?.trim(),
+    epNum,
+  };
+}
 
-const dotifyTitle = (title: string): [string, FileItem['status']] => {
-  let prodTitle, epTitle, epNumber;
-  let status: FileItem['status'] = 'valid';
-  let cleanTitle = removeExtension(title);
+function buildTitle({ prodTitle, epTitle, epNum }: TitleParts): string {
+  return epTitle
+    ? `${prodTitle.toUpperCase()}   ${titleCase(epTitle)}  ${epNum}`
+    : `${prodTitle.toUpperCase()}   ${epNum}`;
+}
 
-  try {
-    [prodTitle, epTitle, epNumber] = getTokens(cleanTitle);
-  } catch {
-    status = 'error';
-    return [title, status];
-  }
+function dotifyTitleGeneric(
+  title: string,
+  hasEpisodeTitle: boolean
+): DotifyResult {
+  const cleanTitle = removeExtension(title);
+  let status: DotifyStatus = 'valid';
 
-  [prodTitle, epTitle, epNumber, status] = trimWhiteSpace(
-    prodTitle,
-    epTitle,
-    epNumber,
-    status
+  const parts = parseTokens(cleanTitle, hasEpisodeTitle);
+  if (!parts) return { title, status: 'error' };
+
+  const normalized = normalizeParts(parts, (s) => (status = s ?? status));
+  const sanitized = sanitizeDotification(
+    normalized,
+    (s) => (status = s ?? status)
   );
-  [epNumber, status] = formatEpNumToken(epNumber, status);
-  [prodTitle, epTitle, status] = moveArticles(prodTitle, epTitle, status);
-  [epNumber, status] = removeAmp(epNumber, status);
-  [epNumber, status] = capitalizeAB(epNumber, status);
+  let finalParts = sanitized;
 
-  cleanTitle = buildFullTitle(prodTitle, epTitle, epNumber);
-
-  if (cleanTitle.length > 60 || epTitle.search(/(\.\.\.)$/) !== -1) {
-    return dotify(cleanTitle, prodTitle, epTitle, epNumber, status);
-  } else if (epTitle.search(/(\s\.\s\.\s\.)$/) !== -1) {
-    epTitle = `${epTitle.substring(
-      0,
-      epTitle.search(/(\s\.\s\.\s\.)$/)
-    )}${epTitle.substring(epTitle.search(/(\s\.\s\.\s\.)$/) + 1)}`;
-    cleanTitle = buildFullTitle(prodTitle, epTitle, epNumber);
-    status = 'modified';
+  if (getFullTitleLength(finalParts) > 60) {
+    finalParts = dotifyIfOverflow(sanitized);
+    status = 'dotified';
   }
-  return [cleanTitle, status];
-};
 
-export default dotifyTitle;
+  const finalTitle = buildTitle(finalParts);
+
+  return { title: finalTitle, status };
+}
+
+export default dotifyTitleGeneric;
+
+export const __test__ = {
+  parseTokens,
+  normalizeParts,
+  moveArticle,
+  sanitizeDotification,
+  getFullTitleLength,
+  removeTrailingPunct,
+  dotifyIfOverflow,
+  buildTitle,
+};

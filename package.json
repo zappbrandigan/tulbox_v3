@@ -8,7 +8,8 @@
     "serve": "vite --host",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "vitest"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.4",

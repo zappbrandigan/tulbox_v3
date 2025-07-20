@@ -1,8 +1,7 @@
-import { FileItem, fileStatus, SearchReplaceRule } from '@/types';
+import { FileItem, SearchReplaceRule } from '@/types';
 import JSZip from 'jszip';
 import { saveAs } from 'file-saver';
-import dotifyTitle from '@/utils/pdf/dotify';
-import dotifyTitleNoEp from '@/utils/pdf/dotifyTwo';
+import dotifyTitleGeneric from './dotify';
 
 const generateFileId = (): string => {
   return Date.now().toString(36) + Math.random().toString(36).substring(2);
@@ -34,15 +33,15 @@ const checkForDuplicates = (files: FileItem[]): FileItem[] => {
   });
 };
 
-const applyCueSheetConventionOne = (filename: string): [string, fileStatus] => {
-  const cleanTitle = dotifyTitle(filename);
-  return cleanTitle;
-};
+// const applyCueSheetConventionOne = (filename: string): [string, fileStatus] => {
+//   const cleanTitle = dotifyTitle(filename);
+//   return cleanTitle;
+// };
 
-const applyCueSheetConventionTwo = (filename: string): [string, fileStatus] => {
-  const cleanTitle = dotifyTitleNoEp(filename);
-  return cleanTitle;
-};
+// const applyCueSheetConventionTwo = (filename: string): [string, fileStatus] => {
+//   const cleanTitle = dotifyTitleNoEp(filename);
+//   return cleanTitle;
+// };
 
 const applySearchReplace = (
   files: FileItem[],
@@ -50,24 +49,26 @@ const applySearchReplace = (
 ): FileItem[] => {
   return files.map((file) => {
     let newName = file.currentName;
-    let status = file.status;
+    let newStatus = file.status;
 
     rules.forEach((rule) => {
       if (!rule.isEnabled) return;
 
       // Handle cue sheet template
       if (rule.replaceWith === 'CUE_SHEET') {
-        const [updatedName, updatedStatus] =
-          applyCueSheetConventionOne(newName);
-        newName = updatedName;
-        status = updatedStatus;
+        const { title, status } =
+          // applyCueSheetConventionOne(newName);
+          dotifyTitleGeneric(newName, true);
+        newName = title;
+        newStatus = status;
         return;
       }
       if (rule.replaceWith === 'CUE_SHEET_NO_EP') {
-        const [updatedName, updatedStatus] =
-          applyCueSheetConventionTwo(newName);
-        newName = updatedName;
-        status = updatedStatus;
+        const { title, status } =
+          // applyCueSheetConventionTwo(newName);
+          dotifyTitleGeneric(newName, false);
+        newName = title;
+        newStatus = status;
         return;
       }
 
@@ -90,7 +91,7 @@ const applySearchReplace = (
       ...file,
       currentName: newName,
       characterCount: newName.length,
-      status: status,
+      status: newStatus,
     };
   });
 };
@@ -138,8 +139,8 @@ export {
   ensurePdfExtension,
   downloadRenamedFiles,
   escapeRegExp,
-  applyCueSheetConventionOne,
-  applyCueSheetConventionTwo,
+  // applyCueSheetConventionOne,
+  // applyCueSheetConventionTwo,
   applySearchReplace,
   checkForDuplicates,
   validateFileName,

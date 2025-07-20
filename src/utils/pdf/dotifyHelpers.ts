@@ -1,18 +1,56 @@
 import { FileItem } from '@/types';
 import languageArticles from '../imdb/articles';
 
+type DotifyStatus = 'valid' | 'modified' | 'dotified' | 'error';
+
+const SMALL_WORDS = new Set([
+  'a',
+  'an',
+  'the',
+  'and',
+  'but',
+  'or',
+  'nor',
+  'for',
+  'so',
+  'yet',
+  'at',
+  'around',
+  'by',
+  'after',
+  'along',
+  'for',
+  'from',
+  'of',
+  'on',
+  'to',
+  'with',
+  'without',
+  'in',
+  'over',
+  'under',
+]);
+
 export const articles = [
   ...languageArticles['en'],
   ...languageArticles['es'],
   ...languageArticles['fr'],
 ];
 
-export const titleCase = (title: string): string => {
-  const titleWords = title.toLowerCase().split(' ');
-  const newTitle = titleWords.map(
-    (word: string) => word.charAt(0).toUpperCase() + word.slice(1)
-  );
-  return newTitle.join(' ');
+export const titleCase = (input: string): string => {
+  const words = input.trim().split(/\s+/);
+  const len = words.length;
+
+  return words
+    .map((word, index) => {
+      const lower = word.toLowerCase();
+
+      const isFirstOrLast = index === 0 || index === len - 1;
+      const needsCap = isFirstOrLast || !SMALL_WORDS.has(lower);
+
+      return needsCap ? lower.charAt(0).toUpperCase() + lower.slice(1) : lower;
+    })
+    .join(' ');
 };
 
 export const removeExtension = (title: string) => {
@@ -22,22 +60,28 @@ export const removeExtension = (title: string) => {
 
 export const formatEpNumToken = (
   epNum: string,
-  status: FileItem['status']
-): [string, FileItem['status']] => {
+  status: DotifyStatus
+): [string, DotifyStatus] => {
   const trimmed = epNum.trim();
-  const normalized = trimmed.replace(/^Ep No\.\s*/, 'Ep No. ');
 
-  if (normalized === epNum) {
-    return [epNum, status];
-  } else {
+  const match = trimmed.match(/^(ep\.?\s*no\.?)\s*(.+)$/i);
+
+  if (match) {
+    const remainder = match[2].trimStart();
+    const normalized = `Ep No. ${remainder}`;
+    if (normalized === trimmed) {
+      return [trimmed, status];
+    }
     return [normalized, 'modified'];
   }
+
+  return [epNum, status];
 };
 
 export const removeAmp = (
   title: string,
-  currentStatus: FileItem['status']
-): [string, FileItem['status']] => {
+  currentStatus: DotifyStatus
+): [string, DotifyStatus] => {
   let status: FileItem['status'] = currentStatus;
   let epNumber = title;
   if (epNumber.search('&') !== -1) {
@@ -49,8 +93,8 @@ export const removeAmp = (
 
 export const capitalizeAB = (
   title: string,
-  currentStatus: FileItem['status']
-): [string, FileItem['status']] => {
+  currentStatus: DotifyStatus
+): [string, DotifyStatus] => {
   let result = null;
   let status: FileItem['status'] = currentStatus;
   const epNumber = title;
