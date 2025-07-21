@@ -5,6 +5,7 @@ export const SOURCES = {
   PDF_TOOL: 'pdf-manager',
   IMDB: 'imdb-search',
   CWR: 'cwr-converter',
+  CUE_SHEET: 'cue-sheet-converter',
   UNKNOWN: 'unknown',
 } as const;
 
@@ -38,6 +39,7 @@ export const USER_EVENT_TARGETS = {
   RAW_VIEWER: 'raw-viewer',
   PDF_MANAGER: 'pdf-manager',
   CWR_CONVERTER: 'cwr-converter',
+  CUE_SHEET: 'cue-sheet-converter',
   FILE_EDIT: 'file-edit',
   PROD_SEARCH: 'prod-search',
   AKA_SEARCH: 'aka-search',
