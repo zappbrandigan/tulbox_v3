@@ -32,6 +32,8 @@ export default defineConfig({
           firebase: ['firebase/app', 'firebase/analytics'],
           jszip: ['jszip'],
           transliteration: ['transliteration'],
+          'csv-stringify': ['csv-stringify'],
+          'pdfjs-dist': ['pdfjs-dist'],
         },
       },
     },
