@@ -7,10 +7,9 @@ interface ToolContainerProps {
 const ToolContainer: React.FC<ToolContainerProps> = ({ children }) => {
   return (
     <main className="container flex-1 mx-auto px-4 sm:px-2 lg:px-4 py-8 transition-colors">
-      {children}
+      <div className="space-y-8">{children}</div>
 
-      {/* Clipboard Toast */}
-      <div
+      {/* <div
         id="clipboard-toast"
         className="hidden fixed right-6 bottom-6 z-50 px-5 py-3 border-l-4 border-blue-500 bg-white dark:bg-gray-900 dark:text-gray-100 shadow-xl rounded-lg text-sm flex items-center gap-2 transition-all duration-300"
       >
@@ -18,7 +17,7 @@ const ToolContainer: React.FC<ToolContainerProps> = ({ children }) => {
           i
         </div>
         <p>Copied to clipboard.</p>
-      </div>
+      </div> */}
     </main>
   );
 };

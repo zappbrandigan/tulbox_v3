@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Layout } from './components/ui';
 import { PDFManager, IMDBSearch, CWRConverter } from './pages';
+import CueSheetConverter from './pages/CueSheetConverter';
 
 function App() {
   const [currentTool, setCurrentTool] = useState(() => {
@@ -22,6 +23,8 @@ function App() {
         return <IMDBSearch />;
       case 'cwr-converter':
         return <CWRConverter />;
+      case 'cue-sheet-converter':
+        return <CueSheetConverter />;
       default:
         return <PDFManager />;
     }

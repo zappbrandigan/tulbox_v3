@@ -360,6 +360,30 @@ export interface CWRTemplate {
   fields: CWRTemplateField[];
 }
 
+export interface CueSheetTemplateField {
+  key: string;
+  label: string;
+  type: 'string' | 'number';
+  width?: number;
+  style?: object;
+}
+export interface CueSheetTemplate {
+  id: string;
+  version: string;
+  name: string;
+  description: string;
+  fields: CueSheetTemplateField[];
+  repeatGroup: {
+    key: string;
+    countKey: string;
+    subfields: {
+      key: string;
+      label: string;
+      width: number;
+    }[];
+  };
+}
+
 /**
  * recordSearchWorker
  */

@@ -1,4 +1,4 @@
-import { FileText, Search, AudioLines, Zap } from 'lucide-react';
+import { FileText, Search, AudioLines } from 'lucide-react';
 
 export type Tool = {
   id: string;
@@ -27,9 +27,9 @@ export const TOOLS: Tool[] = [
     icon: <AudioLines className="inline pr-2" />,
   },
   {
-    id: 'coming-soon',
-    title: 'More Tools',
-    description: 'Additional automation tools coming soon',
-    icon: <Zap className="inline pr-2" />,
-  }
+    id: 'cue-sheet-converter',
+    title: 'Cue Sheet Converter',
+    description: 'Converts PDF Cue Sheets to CSV',
+    icon: <AudioLines className="inline pr-2" />,
+  },
 ];
