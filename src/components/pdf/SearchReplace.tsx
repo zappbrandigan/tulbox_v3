@@ -94,7 +94,7 @@ const SearchReplace: React.FC<SearchReplaceProps> = ({
     {
       name: 'Reorder Tokens',
       desc: 'Common reordering of file name pieces, e.g. Prod Title - 104 - Ep Title → Prod Title   Ep Title  Ep No. 104',
-      search: '(.+)\\s\\-\\s(.+)\\s\\-\\s(.+)',
+      search: '^(.+)\\s-\\s(\\d+)\\s-\\s(.+)$',
       replace: '$1   $3  Ep No. $2',
       regex: true,
     },
