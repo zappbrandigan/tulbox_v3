@@ -72,14 +72,14 @@ const SearchReplace: React.FC<SearchReplaceProps> = ({
     },
     {
       name: 'Date Conversion 1',
-      desc: 'Convert abbreviated European date to U.S., e.g. 011425 → 14012025',
+      desc: 'Swap day/month of date, e.g. 011425 → 14012025',
       search: '(\\d{2})(\\d{2})(\\d{2})',
       replace: '$2$120$3',
       regex: true,
     },
     {
       name: 'Date Conversion 2',
-      desc: 'Convert European date to U.S., e.g. 01142025 → 14012025',
+      desc: 'Swap day/month of date., e.g. 01142025 → 14012025',
       search: '(\\d{2})(\\d{2})(\\d{4})',
       replace: '$2$1$3',
       regex: true,
