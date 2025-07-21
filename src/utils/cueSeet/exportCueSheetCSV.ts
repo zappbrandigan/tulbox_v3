@@ -43,7 +43,8 @@ export function exportCueSheetCSV(
     .map((row) =>
       row
         .map((val) =>
-          typeof val === 'string' && val.includes(',')
+          typeof val === 'string' &&
+          (val.includes(',') || val.includes('"') || val.includes('\n'))
             ? `"${val.replace(/"/g, '""')}"`
             : val
         )
@@ -52,7 +53,7 @@ export function exportCueSheetCSV(
     .join('\n');
 
   // Trigger download
-  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
   link.href = url;
