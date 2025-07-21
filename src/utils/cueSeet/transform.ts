@@ -14,7 +14,7 @@ export function parseSoundmouseText(
   sanitizedText = sanitizedText.replace(cueKeyPattern, '');
 
   const cueHeaderRegex =
-    /\s(\d{1,3})\s{3}(?:\b\d+M\d+[A-Za-z]*\b\s+)?(.*?)\s+((?:[A-Z]{2})(?:\s*\/\s*[A-Z]{1,2})?)\s+(?:\d{2}:)?(\d{2}:\d{2})/g;
+    /\s(\d{1,3})\s{3}(?:\b\d+M\d+[A-Za-z]*\b\s+)?(.*?)\s+((?:[A-Z]{2})(?:\s*\/\s*[A-Z]{1,2})?(?:\s*\/\s*[A-Z]{1,2})?)\s+(?:\d{2}:)?(\d{2}:\d{2})/g;
 
   // /\s(\d{1,3})\s{3}(?:\b\d+M\d+[A-Za-z]*\b)?(.*?)\s+(BI|BV|VI|VV|OT|CT|MT|ET|EE)(?:\s?\/\s?L)?\s{3}(?:\d{2}:)?(\d{2}:\d{2})/g;
 
@@ -64,7 +64,7 @@ export function parseSoundmouseText(
       )
       .map((line) => {
         const composerMatch = line.match(
-          /^(C|CA|A|AR|PD)\s+(.*?)\s+(?:(non-affiliated|[a-zA-Z]{2,7})(?:\s+\[(\d+.?\d+%)\])?)?$/u
+          /^(C|CA|A|AR|PD)\s+(.*?)\s+(?:(non-affiliated|[a-zA-Z]{2,7})(?:\s+\[(\d+.?\d+%)\])?)?$/
         );
         // Handle fallback case if name ends with PRO-like word
         if (!composerMatch) return null;
@@ -87,7 +87,7 @@ export function parseSoundmouseText(
       )
       .map((line) => {
         const pubMatch = line.match(
-          /^E\s{3}(.+?)\s+([a-zA-Z]{2,7})(?:\s+\[(\d+%)\])/u
+          /^E\s{3}(.+?)\s+([a-zA-Z]{2,7})(?:\s+\[(\d+%)\])/
         );
 
         // Handle fallback case if name ends with PRO-like word

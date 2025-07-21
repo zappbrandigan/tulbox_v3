@@ -77,7 +77,12 @@ const CueSheetConverter: React.FC = () => {
   };
 
   const template = CUE_SHEET_FORMATS.find((f) => f.id === selectedTemplate);
-  const uniqueWorks = new Set(cueRows.map((row) => JSON.stringify(row)));
+  const uniqueWorks = new Set(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    cueRows.map(({ fileName: _f, sequenceNumber: _s, duration: _d, ...rest }) =>
+      JSON.stringify(rest)
+    )
+  );
   const uniqueWorkCount = uniqueWorks.size;
 
   return (
