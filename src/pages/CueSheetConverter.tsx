@@ -5,7 +5,14 @@ import { FileItem } from '@/types';
 import { useState } from 'react';
 import { DragDropZone } from '@/components/pdf';
 import { checkForDuplicates, generateFileId } from '@/utils';
-import { CheckCircle, Download, Settings, Table, Trash } from 'lucide-react';
+import {
+  AlertCircle,
+  CheckCircle,
+  Download,
+  Settings,
+  Table,
+  Trash,
+} from 'lucide-react';
 import CUE_SHEET_FORMATS from '@/utils/cueSeet/templates';
 import { extractTextFromPDF } from '@/utils/cueSeet/extract';
 import { parseSoundmouseText } from '@/utils/cueSeet/transform';
@@ -21,6 +28,7 @@ const CueSheetConverter: React.FC = () => {
   const [warnings, setWarnings] = useState<string[]>([]);
   const [showWarnings, setShowWarnings] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isError, setIsError] = useState(false);
 
   const handleFilesAdded = (newFiles: File[]) => {
     logUserEvent(
@@ -56,7 +64,30 @@ const CueSheetConverter: React.FC = () => {
     const currentTemplate = CUE_SHEET_FORMATS.find(
       (f) => f.id === selectedTemplate
     )!;
-    exportCueSheetCSV(cueRows, currentTemplate, `${currentTemplate.id}.csv`);
+    try {
+      exportCueSheetCSV(cueRows, currentTemplate, `${currentTemplate.id}.csv`);
+      logUserEvent(
+        'Cue Sheet CSV Downloaded',
+        {
+          action: 'file-download',
+          target: 'cue-sheet-converter',
+          value: cueRows.length,
+        },
+        'cue-sheet-converter'
+      );
+    } catch (error) {
+      logUserEvent(
+        'Error: Cue Sheet CSV Downloaded',
+        {
+          action: 'file-download',
+          target: 'cue-sheet-converter',
+          value: String(error),
+        },
+        'cue-sheet-converter',
+        'error'
+      );
+      console.error('Export Error:', error);
+    }
   };
 
   const convertCueSheet = async () => {
@@ -71,9 +102,19 @@ const CueSheetConverter: React.FC = () => {
       allWarnings.push(...warnings);
     }
 
+    if (allRows.length === 0) setIsError(true);
     setCueRows(allRows);
     setWarnings(allWarnings);
     setIsProcessing(false);
+    logUserEvent(
+      'Cue Sheet Converted',
+      {
+        action: 'cue-sheet-conversion',
+        target: 'cue-sheet-converter',
+        value: `Format: ${selectedTemplate}`,
+      },
+      'cue-sheet-converter'
+    );
   };
 
   const template = CUE_SHEET_FORMATS.find((f) => f.id === selectedTemplate);
@@ -115,14 +156,14 @@ const CueSheetConverter: React.FC = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-5 gap-6 mb-6">
-            <div className="flex flex-col justify-center items-center text-center p-4 bg-amber-50 dark:bg-amber-900/30 rounded-lg">
+            <div className="flex flex-col justify-center items-center text-center p-4 bg-gray-50 dark:bg-gray-900/30 rounded-lg">
               <div
-                className="text-sm font-bold text-amber-600 dark:text-amber-300 truncate overflow-hidden whitespace-nowrap w-full max-w-[180px] sm:max-w-none"
+                className="text-sm font-bold text-gray-600 dark:text-gray-300 truncate overflow-hidden whitespace-nowrap w-full max-w-[180px] sm:max-w-none"
                 title={template?.name}
               >
                 {template?.name}
               </div>
-              <div className="text-sm text-amber-800 dark:text-amber-400">
+              <div className="text-sm text-gray-800 dark:text-gray-400">
                 Format
               </div>
             </div>
@@ -399,6 +440,19 @@ const CueSheetConverter: React.FC = () => {
               ))}
             </ul>
           </div>
+        </div>
+      )}
+
+      {!isProcessing && files.length > 0 && isError && (
+        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700 text-red-800 dark:text-red-300 rounded-xl shadow-sm p-6">
+          <h3 className="text-lg font-semibold mb-2 flex items-center">
+            <AlertCircle className="w-5 h-5 mr-2" />
+            Parsing Error
+          </h3>
+          <p className="text-sm leading-relaxed">
+            A parsing issue occurred. Please double-check that the selected
+            format matches the structure of your cue sheet.
+          </p>
         </div>
       )}
     </>

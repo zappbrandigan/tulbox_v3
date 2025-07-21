@@ -107,7 +107,7 @@ const PDFManager: React.FC = () => {
       );
     } catch (error) {
       logUserEvent(
-        'Download Error',
+        'Error: PDF Download',
         {
           action: 'file-download',
           target: 'pdf-manager',

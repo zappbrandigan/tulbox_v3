@@ -29,6 +29,7 @@ export const USER_EVENT = {
   FILE_DOWNLOAD: 'file-download',
   SEARCH_REPLACE: 'search-replace',
   SEARCH: 'search',
+  CS_CONVERSION: 'cue-sheet-conversion',
 } as const;
 
 export const USER_EVENT_TARGETS = {
