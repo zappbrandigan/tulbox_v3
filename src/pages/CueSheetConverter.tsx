@@ -308,7 +308,7 @@ const CueSheetConverter: React.FC = () => {
 
           return (
             <>
-              <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
+              <div className="text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
                 <div className="overflow-auto max-h-[82vh] rounded-t-xl">
                   <table className="min-w-full table-fixed text-sm text-left">
                     <thead className="sticky top-0 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 text-xs uppercase font-semibold">
