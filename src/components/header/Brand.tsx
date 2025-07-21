@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { Moon, PocketKnife, Sun } from 'lucide-react';
 import { logUserEvent } from '@/utils/general/logEvent';
+import { useSessionId } from '@/context/sessionContext';
 
 interface BrandProps {
   appName: string;
 }
 
 const Brand: React.FC<BrandProps> = ({ appName }) => {
+  const sessionId = useSessionId();
   const [theme, setTheme] = useState(
     () => localStorage.getItem('theme') ?? 'light'
   );
@@ -18,7 +20,7 @@ const Brand: React.FC<BrandProps> = ({ appName }) => {
 
   const toggleDarkMode = () => {
     setTheme(theme === 'dark' ? 'light' : 'dark');
-    logUserEvent('User changed theme', {
+    logUserEvent(sessionId, 'User changed theme', {
       action: 'ui-interaction',
       target: 'theme-toggle',
       value: theme === 'light' ? 'dark' : 'light',

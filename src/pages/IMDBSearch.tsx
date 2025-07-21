@@ -26,6 +26,7 @@ import {
 import { ToolHeader, LoadingOverlay } from '@/components/ui';
 import { logUserEvent } from '@/utils/general/logEvent';
 import { PageMeta } from '@/PageMeta';
+import { useSessionId } from '@/context/sessionContext';
 
 const IMDBSearch: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -39,6 +40,8 @@ const IMDBSearch: React.FC = () => {
   const [searchType, setSearchType] = useState<productionType>('all');
   const [error, setError] = useState(false);
 
+  const sessionId = useSessionId();
+
   const handleSearch = async () => {
     if (!searchQuery.trim()) return;
 
@@ -48,9 +51,10 @@ const IMDBSearch: React.FC = () => {
     setAkaTitles([]);
 
     try {
-      const results = await searchIMDB(searchQuery, searchType);
+      const results = await searchIMDB(searchQuery, searchType, sessionId);
       setSearchResults(results);
       logUserEvent(
+        sessionId,
         'IMDb Search',
         {
           action: 'search',
@@ -61,6 +65,7 @@ const IMDBSearch: React.FC = () => {
       );
     } catch (error) {
       logUserEvent(
+        sessionId,
         'Error: IMDb Search Failed',
         {
           action: 'search',
@@ -80,10 +85,11 @@ const IMDBSearch: React.FC = () => {
   const handleGetAkas = async (result: IMDBSearchResult) => {
     setIsLoadingAkas(true);
     try {
-      const akas = await getAkas(result);
+      const akas = await getAkas(result, sessionId);
       setAkaTitles(akas);
       setIsLoadingAkas(false);
       logUserEvent(
+        sessionId,
         'IMDb Search AKAs',
         {
           action: 'search',
@@ -94,6 +100,7 @@ const IMDBSearch: React.FC = () => {
       );
     } catch (error) {
       logUserEvent(
+        sessionId,
         'Error: Failed to load AKAs:',
         {
           action: 'search',
@@ -114,9 +121,10 @@ const IMDBSearch: React.FC = () => {
     setSelectedProduction(null);
 
     try {
-      const details = await getProductionDetails(result);
+      const details = await getProductionDetails(result, sessionId);
       setSelectedProduction(details);
       logUserEvent(
+        sessionId,
         'IMDb Production Select',
         {
           action: 'search',
@@ -127,6 +135,7 @@ const IMDBSearch: React.FC = () => {
       );
     } catch (error) {
       logUserEvent(
+        sessionId,
         'Error: Failed to Load Production Details',
         {
           action: 'search',

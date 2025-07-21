@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
+import { SessionContext } from './context/sessionContext';
 import { Layout } from './components/ui';
 import { PDFManager, IMDBSearch, CWRConverter } from './pages';
 import CueSheetConverter from './pages/CueSheetConverter';
@@ -9,6 +10,17 @@ function App() {
   });
 
   const appName = 'TūlBOX';
+
+  const sessionId = useMemo(() => {
+    if (typeof window === 'undefined') return '';
+    const key = 'tulbox_session';
+    const existing = localStorage.getItem(key);
+    if (existing) return existing;
+
+    const newId = crypto.randomUUID?.() || Date.now().toString(36);
+    localStorage.setItem(key, newId);
+    return newId;
+  }, []);
 
   const handleToolChange = (tool: string) => {
     setCurrentTool(tool);
@@ -31,13 +43,15 @@ function App() {
   };
 
   return (
-    <Layout
-      appName={appName}
-      currentTool={currentTool}
-      onToolChange={handleToolChange}
-    >
-      {renderCurrentTool()}
-    </Layout>
+    <SessionContext.Provider value={sessionId}>
+      <Layout
+        appName={appName}
+        currentTool={currentTool}
+        onToolChange={handleToolChange}
+      >
+        {renderCurrentTool()}
+      </Layout>
+    </SessionContext.Provider>
   );
 }
 

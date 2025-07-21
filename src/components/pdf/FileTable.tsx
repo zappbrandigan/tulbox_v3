@@ -11,6 +11,7 @@ import {
 import { FileItem } from '@/types';
 import { logUserEvent } from '@/utils/general/logEvent';
 import { ensurePdfExtension } from '@/utils';
+import { useSessionId } from '@/context/sessionContext';
 
 interface FileTableProps {
   files: FileItem[];
@@ -26,8 +27,10 @@ const FileTable: React.FC<FileTableProps> = ({
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editValue, setEditValue] = useState('');
 
+  const sessionId = useSessionId();
+
   const startEditing = (file: FileItem) => {
-    logUserEvent('PDF Files Inline Edit', {
+    logUserEvent(sessionId, 'PDF Files Inline Edit', {
       action: 'ui-interaction',
       target: 'file-edit',
       value: file.currentName,

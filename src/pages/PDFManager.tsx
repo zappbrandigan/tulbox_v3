@@ -16,6 +16,7 @@ import {
 import { ToolHeader } from '@/components/ui';
 import { logUserEvent } from '@/utils/general/logEvent';
 import { PageMeta } from '@/PageMeta';
+import { useSessionId } from '@/context/sessionContext';
 
 const PDFManager: React.FC = () => {
   const [files, setFiles] = useState<FileItem[]>([]);
@@ -24,8 +25,11 @@ const PDFManager: React.FC = () => {
   >([]);
   const [isDownloading, setIsDownloading] = useState(false);
 
+  const sessionId = useSessionId();
+
   const handleFilesAdded = (newFiles: File[]) => {
     logUserEvent(
+      sessionId,
       'User added files',
       {
         action: 'file-upload',
@@ -72,6 +76,7 @@ const PDFManager: React.FC = () => {
 
   const handleApplySearchReplace = () => {
     logUserEvent(
+      sessionId,
       'Search and Replace Applied',
       {
         action: 'search-replace',
@@ -97,6 +102,7 @@ const PDFManager: React.FC = () => {
     try {
       await downloadRenamedFiles(downloadableFiles);
       logUserEvent(
+        sessionId,
         'PDF File Downloaded',
         {
           action: 'file-download',
@@ -107,6 +113,7 @@ const PDFManager: React.FC = () => {
       );
     } catch (error) {
       logUserEvent(
+        sessionId,
         'Error: PDF Download',
         {
           action: 'file-download',

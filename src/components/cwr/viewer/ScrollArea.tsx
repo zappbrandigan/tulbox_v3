@@ -5,6 +5,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useSearch } from '@/hooks/useSearch';
 import { CWRParsedRecord } from 'cwr-parser/types';
 import { logUserEvent } from '@/utils/general/logEvent';
+import { useSessionId } from '@/context/sessionContext';
 
 const ROW_HEIGHT = 24;
 const PAGE_SIZE = 50;
@@ -38,6 +39,8 @@ const ScrollArea: React.FC<Props> = ({
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
 
+  const sessionId = useSessionId();
+
   const handleSearchInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setSearchQuery(value);
@@ -56,6 +59,7 @@ const ScrollArea: React.FC<Props> = ({
         e.preventDefault();
         setIsFullScreen((prev) => !prev);
         logUserEvent(
+          sessionId,
           'Shortcut Key Used',
           {
             action: 'ui-interaction',
@@ -79,6 +83,7 @@ const ScrollArea: React.FC<Props> = ({
           return !show;
         });
         logUserEvent(
+          sessionId,
           'Shortcut Key Used',
           {
             action: 'ui-interaction',
@@ -95,6 +100,7 @@ const ScrollArea: React.FC<Props> = ({
         e.preventDefault();
         setIsTooltipEnabled((prev) => !prev);
         logUserEvent(
+          sessionId,
           'Shortcut Key Used',
           {
             action: 'ui-interaction',

@@ -13,6 +13,7 @@ import { CWRConverterRecord } from 'cwr-parser/types';
 import { CWRTemplate } from '@/types';
 import { logUserEvent } from '@/utils/general/logEvent';
 import { PageMeta } from '@/PageMeta';
+import { useSessionId } from '@/context/sessionContext';
 
 const CWRConverter: React.FC = () => {
   const [file, setFile] = useState<string>('');
@@ -32,6 +33,8 @@ const CWRConverter: React.FC = () => {
 
   const [isPending, startTransition] = useTransition();
 
+  const sessionId = useSessionId();
+
   const handleFileUpload = async (file: File) => {
     const maxSizeMB = 100; // limit in megabytes
     const maxSizeBytes = maxSizeMB * 1024 * 1024;
@@ -48,6 +51,7 @@ const CWRConverter: React.FC = () => {
       setIsProcessing(true);
       setShowMemoryError(false);
       logUserEvent(
+        sessionId,
         'CWR File Added',
         {
           action: 'file-upload',
@@ -61,6 +65,7 @@ const CWRConverter: React.FC = () => {
       alert('Error parsing CWR file. Please check the file format.');
       setIsProcessing(false);
       logUserEvent(
+        sessionId,
         'CWR File Added',
         {
           action: 'file-upload',
@@ -85,6 +90,7 @@ const CWRConverter: React.FC = () => {
       '_'
     )}`;
     logUserEvent(
+      sessionId,
       'CWR Template Selected',
       {
         action: 'report-view',
@@ -111,6 +117,7 @@ const CWRConverter: React.FC = () => {
     if (next === selectedTemplate) return;
 
     logUserEvent(
+      sessionId,
       'CWR Template Selected',
       {
         action: 'report-view',

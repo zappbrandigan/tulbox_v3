@@ -13,7 +13,6 @@ import {
 import { transliterate } from 'transliteration';
 import PosterPlaceHolder from '@/static/imdb.jpg';
 import languageArticles from '@/utils/imdb/articles';
-import { getOrCreateSessionId } from '../general/logEvent';
 import axios from 'axios';
 
 const uniqueByTitle = (arr: { text: string }[]): { text: string }[] => {
@@ -63,7 +62,8 @@ const seperateAticle = (akaTitle: string, languageCode: string) => {
 
 const searchIMDB = async (
   query: string,
-  type: productionType
+  type: productionType,
+  sessionId: string
 ): Promise<IMDBSearchResult[]> => {
   const options = {
     method: 'GET',
@@ -71,7 +71,7 @@ const searchIMDB = async (
       import.meta.env.VITE_REQUEST_URL
     }/api/external/imdbMain/api/autocomplete`,
     params: { q: query },
-    headers: { 'x-session-id': getOrCreateSessionId() },
+    headers: { 'x-session-id': sessionId },
   };
 
   const results: ApiTitleSearchResponse = await axios.request(options);
@@ -96,14 +96,15 @@ const searchIMDB = async (
 };
 
 const getProductionDetails = async (
-  production: IMDBSearchResult
+  production: IMDBSearchResult,
+  sessionId: string
 ): Promise<IMDBProduction> => {
   const productionDetailOptions = {
     method: 'GET',
     url: `${
       import.meta.env.VITE_REQUEST_URL
     }/api/external/imdbDetails/api/imdb/${production.id}`,
-    headers: { 'x-session-id': getOrCreateSessionId() },
+    headers: { 'x-session-id': sessionId },
   };
 
   const results: ApiProductionDetails = await axios.request(
@@ -139,7 +140,10 @@ const getProductionDetails = async (
   return productionDetails;
 };
 
-const getAkas = async (result: IMDBSearchResult): Promise<AKATitle[]> => {
+const getAkas = async (
+  result: IMDBSearchResult,
+  sessionId: string
+): Promise<AKATitle[]> => {
   const productionAkaOptions = {
     method: 'GET',
     url: `${
@@ -149,7 +153,7 @@ const getAkas = async (result: IMDBSearchResult): Promise<AKATitle[]> => {
       tt: result.id,
       limit: '30',
     },
-    headers: { 'x-session-id': getOrCreateSessionId() },
+    headers: { 'x-session-id': sessionId },
   };
 
   const akaResults: ApiAkaResponse = await axios.request(productionAkaOptions);
@@ -175,7 +179,7 @@ const getAkas = async (result: IMDBSearchResult): Promise<AKATitle[]> => {
     },
     {
       headers: {
-        'x-session-id': getOrCreateSessionId(),
+        'x-session-id': sessionId,
       },
     }
   );

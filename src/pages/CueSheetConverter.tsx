@@ -19,6 +19,7 @@ import { parseSoundmouseText } from '@/utils/cueSeet/transform';
 import { CueRow } from '@/utils/cueSeet/types';
 import React from 'react';
 import { exportCueSheetCSV } from '@/utils/cueSeet/exportCueSheetCSV';
+import { useSessionId } from '@/context/sessionContext';
 
 const CueSheetConverter: React.FC = () => {
   const [files, setFiles] = useState<FileItem[]>([]);
@@ -30,8 +31,11 @@ const CueSheetConverter: React.FC = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [isError, setIsError] = useState(false);
 
+  const sessionId = useSessionId();
+
   const handleFilesAdded = (newFiles: File[]) => {
     logUserEvent(
+      sessionId,
       'User added files',
       {
         action: 'file-upload',
@@ -67,6 +71,7 @@ const CueSheetConverter: React.FC = () => {
     try {
       exportCueSheetCSV(cueRows, currentTemplate, `${currentTemplate.id}.csv`);
       logUserEvent(
+        sessionId,
         'Cue Sheet CSV Downloaded',
         {
           action: 'file-download',
@@ -77,6 +82,7 @@ const CueSheetConverter: React.FC = () => {
       );
     } catch (error) {
       logUserEvent(
+        sessionId,
         'Error: Cue Sheet CSV Downloaded',
         {
           action: 'file-download',
@@ -107,6 +113,7 @@ const CueSheetConverter: React.FC = () => {
     setWarnings(allWarnings);
     setIsProcessing(false);
     logUserEvent(
+      sessionId,
       'Cue Sheet Converted',
       {
         action: 'cue-sheet-conversion',

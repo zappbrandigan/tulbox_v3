@@ -5,6 +5,7 @@ import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
 import { trackEvent } from '@/utils';
 import { logUserEvent } from '@/utils/general/logEvent';
 import { LogSource } from '@/types/logging';
+import { useSessionId } from '@/context/sessionContext';
 
 interface NavProps {
   currentTool: string;
@@ -12,9 +13,11 @@ interface NavProps {
 }
 
 const Nav: React.FC<NavProps> = ({ currentTool, onToolChange }) => {
+  const sessionId = useSessionId();
   function DocsLink() {
     const handleClick = () => {
       logUserEvent(
+        sessionId,
         'User viewed Docs',
         {
           action: 'link-click',
