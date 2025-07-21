@@ -19,10 +19,11 @@ import axios from 'axios';
 const uniqueByTitle = (arr: { text: string }[]): { text: string }[] => {
   const seen = new Set();
   return arr.filter((item) => {
-    if (seen.has(item.text)) {
+    const trimmed = item.text.trim();
+    if (!trimmed || seen.has(trimmed)) {
       return false;
     }
-    seen.add(item.text);
+    seen.add(trimmed);
     return true;
   });
 };
