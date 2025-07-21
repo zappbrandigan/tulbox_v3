@@ -225,6 +225,7 @@ function dotifyTitleGeneric(
   }
 
   const finalTitle = buildTitle(finalParts);
+  if (status === 'valid' && finalTitle !== cleanTitle) status = 'modified';
 
   return { title: finalTitle, status };
 }
