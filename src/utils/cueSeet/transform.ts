@@ -64,7 +64,7 @@ export function parseSoundmouseText(
       )
       .map((line) => {
         const composerMatch = line.match(
-          /^(C|CA|A|AR|PD)\s+(.*?)\s+(?:(non-affiliated|[a-zA-Z]{2,7})(?:\s+\[(\d+.?\d+%)\])?)?$/
+          /^(C|CA|A|AR|PD)\s+(.*?)\s+(?:(unknown|non-affiliated|[a-zA-Z]{2,7})(?:\s+\[(\d+.?\d+%)\])?)?$/
         );
         // Handle fallback case if name ends with PRO-like word
         if (!composerMatch) return null;
@@ -82,12 +82,13 @@ export function parseSoundmouseText(
         (line) =>
           line.startsWith('E') ||
           line.startsWith('SE') ||
-          line.startsWith('A') ||
-          line.startsWith('AR')
+          line.startsWith('AM') ||
+          line.startsWith('RL') ||
+          line.startsWith('PF')
       )
       .map((line) => {
         const pubMatch = line.match(
-          /^E\s{3}(.+?)\s+([a-zA-Z]{2,7})(?:\s+\[(\d+%)\])/
+          /^(?:E|SE|AM|RL|PF)\s{3}(.+?)\s+([a-zA-Z]{2,7})(?:\s+\[(\d+%)\])/
         );
 
         // Handle fallback case if name ends with PRO-like word
@@ -159,7 +160,7 @@ export function parseSoundmouseText(
         return acc + (pct ?? 0);
       }, 0);
 
-      if (composerTotal !== 100) {
+      if (100 - composerTotal > 1e-6) {
         warnings.push(
           `<span class="text-yellow-700 font-semibold">[WARN]</span> 
           Composer percentages for seq 
@@ -183,7 +184,7 @@ export function parseSoundmouseText(
         return acc + (pct ?? 0);
       }, 0);
 
-      if (publisherTotal !== 100) {
+      if (100 - publisherTotal > 1e-6) {
         warnings.push(
           `<span class="text-yellow-700 font-semibold">[WARN]</span> 
           Publisher percentages for seq 
