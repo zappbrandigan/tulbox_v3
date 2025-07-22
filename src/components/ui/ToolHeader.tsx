@@ -4,14 +4,17 @@ import React from 'react';
 interface ToolHeaderProps {
   primaryText: string;
   secondaryText: string;
+  isVisible?: boolean;
   isBeta?: boolean;
 }
 
 const ToolHeader: React.FC<ToolHeaderProps> = ({
   primaryText,
   secondaryText,
+  isVisible,
   isBeta = false,
 }) => {
+  if (!isVisible) return null;
   return isBeta ? (
     <div className="text-center">
       <h1 className="flex items-center justify-center gap-2 text-3xl font-bold text-gray-900 dark:text-gray-100 mb-4">

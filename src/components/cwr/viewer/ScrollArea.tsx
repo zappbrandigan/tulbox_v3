@@ -151,7 +151,7 @@ const ScrollArea: React.FC<Props> = ({
 
   return (
     <div
-      className={`bg-gray-900 text-gray-100 overflow-hidden transition-all duration-500 ease ${
+      className={`bg-slate-800 text-gray-100 dark:bg-gray-900 overflow-hidden transition-all duration-500 ease ${
         isFullScreen ? 'absolute top-0 left-0 right-0 bottom-0 z-50' : ''
       }`}
     >

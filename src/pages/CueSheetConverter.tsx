@@ -5,14 +5,7 @@ import { FileItem } from '@/types';
 import { useState } from 'react';
 import { DragDropZone } from '@/components/pdf';
 import { checkForDuplicates, generateFileId } from '@/utils';
-import {
-  AlertCircle,
-  CheckCircle,
-  Download,
-  Settings,
-  Table,
-  Trash,
-} from 'lucide-react';
+import { AlertCircle, Table } from 'lucide-react';
 import CUE_SHEET_FORMATS from '@/utils/cueSeet/templates';
 import { extractTextFromPDF } from '@/utils/cueSeet/extract';
 import { parseSoundmouseText } from '@/utils/cueSeet/transform';
@@ -20,6 +13,10 @@ import { CueRow } from '@/utils/cueSeet/types';
 import React from 'react';
 import { exportCueSheetCSV } from '@/utils/cueSeet/exportCueSheetCSV';
 import { useSessionId } from '@/context/sessionContext';
+import WarningModal from '@/components/ui/WarningModal';
+import Controller from '@/components/cue/Controller';
+import { Summary } from '@/components/cue';
+import ResultHeader from '@/components/ui/ResultHeader';
 
 const CueSheetConverter: React.FC = () => {
   const [files, setFiles] = useState<FileItem[]>([]);
@@ -125,13 +122,12 @@ const CueSheetConverter: React.FC = () => {
   };
 
   const template = CUE_SHEET_FORMATS.find((f) => f.id === selectedTemplate);
-  const uniqueWorks = new Set(
+  const uniqueWorkCount = new Set(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     cueRows.map(({ fileName: _f, sequenceNumber: _s, duration: _d, ...rest }) =>
       JSON.stringify(rest)
     )
-  );
-  const uniqueWorkCount = uniqueWorks.size;
+  ).size;
 
   return (
     <>
@@ -139,167 +135,41 @@ const CueSheetConverter: React.FC = () => {
         title="Cue Sheet Converter | TūlBOX"
         description="Convert cue sheets from PDF files to CSV."
       />
-      {files.length === 0 && (
-        <ToolHeader
-          primaryText="Cue Sheet Converter"
-          secondaryText={`
+      <ToolHeader
+        primaryText="Cue Sheet Converter"
+        secondaryText={`
             Upload cue sheet PDF files, and export the work data as a CSV.`}
-          isBeta={true}
-        />
-      )}
+        isVisible={files.length === 0}
+        isBeta={true}
+      />
 
-      {files.length > 0 && (
-        <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 transition-colors duration-300">
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center space-x-3">
-              <CheckCircle className="w-6 h-6 text-emerald-500" />
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-                Results
-              </h3>
-            </div>
-            <div className="text-sm text-gray-500 dark:text-gray-400">
-              Parsed on {new Date().toDateString()}
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-6 mb-6">
-            <div className="flex flex-col justify-center items-center text-center p-4 bg-gray-50 dark:bg-gray-900/30 rounded-lg">
-              <div
-                className="text-sm font-bold text-gray-600 dark:text-gray-300 truncate overflow-hidden whitespace-nowrap w-full max-w-[180px] sm:max-w-none"
-                title={template?.name}
-              >
-                {template?.name}
-              </div>
-              <div className="text-sm text-gray-800 dark:text-gray-400">
-                Format
-              </div>
-            </div>
-
-            <div className="flex flex-col justify-center items-center text-center p-4 bg-blue-50 dark:bg-blue-900/30 rounded-lg">
-              <div className="text-2xl font-bold text-blue-600 dark:text-blue-300">
-                {files.length}
-              </div>
-              <div className="text-sm text-blue-800 dark:text-blue-400">
-                File Count
-              </div>
-            </div>
-
-            <div className="flex flex-col justify-center items-center text-center p-4 bg-emerald-50 dark:bg-emerald-900/30 rounded-lg">
-              <div className="text-2xl font-bold text-emerald-600 dark:text-emerald-300">
-                {cueRows.length}
-              </div>
-              <div className="text-sm text-emerald-800 dark:text-emerald-400">
-                Rows
-              </div>
-            </div>
-
-            <div className="flex flex-col justify-center items-center text-center p-4 bg-purple-50 dark:bg-purple-900/30 rounded-lg">
-              <div className="text-2xl font-bold text-purple-600 dark:text-purple-300">
-                {uniqueWorkCount}
-              </div>
-              <div className="text-sm text-purlpe-800 dark:text-purple-400">
-                Unique Rows
-              </div>
-            </div>
-
-            <div
-              onClick={() => setShowWarnings(true)}
-              className="flex flex-col justify-center items-center text-center p-4 bg-amber-50 dark:bg-amber-900/30 rounded-lg hover:cursor-pointer"
-            >
-              <div className="text-2xl font-bold text-amber-600 dark:text-amber-300">
-                {warnings.length}
-              </div>
-              <div className="text-sm text-amber-800 dark:text-amber-400">
-                Warnings
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      <Summary
+        template={template?.name ?? ''}
+        fileCount={files.length}
+        rowCount={cueRows.length}
+        uniqueCount={uniqueWorkCount}
+        warningCount={warnings.length}
+        setShowWarnings={setShowWarnings}
+      />
 
       {files.length === 0 && <DragDropZone onFilesAdded={handleFilesAdded} />}
 
-      {files.length > 0 && (
-        <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 transition-colors duration-300">
-          <div className="flex flex-col sm:flex-row items-start lg:items-center justify-between space-y-4 lg:space-y-0">
-            {/* Settings & Template Dropdown */}
-            <div className="flex items-center space-x-4">
-              <Settings className="w-5 h-5 text-gray-600 dark:text-gray-300" />
-              <div>
-                <label
-                  htmlFor="template-menu"
-                  className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1"
-                >
-                  Cue Sheet Format
-                </label>
-                <select
-                  id="template-menu"
-                  value={selectedTemplate}
-                  onChange={(e) => setSelectedTemplate(e.target.value)}
-                  className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
-                >
-                  {CUE_SHEET_FORMATS.map((template) => (
-                    <option key={template.id} value={template.id}>
-                      {template.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
+      <Controller
+        selectedTemplate={selectedTemplate}
+        setSelectedTemplate={setSelectedTemplate}
+        isProcessing={isProcessing}
+        cueRows={cueRows}
+        handleClearAll={handleClearAll}
+        handleExport={handleExport}
+        convertCueSheet={convertCueSheet}
+        isVisible={files.length > 0}
+      />
 
-            {/* Action Buttons */}
-            <div className="flex items-center space-x-3">
-              <button
-                disabled={isProcessing}
-                onClick={handleClearAll}
-                className="inline-flex items-center px-4 py-2 bg-gray-600 dark:bg-gray-700 text-white font-medium rounded-lg hover:bg-gray-700 dark:hover:bg-gray-600 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
-              >
-                <Trash className="w-4 h-4 mr-2" />
-                Clear
-              </button>
-              {cueRows.length === 0 && (
-                <button
-                  disabled={isProcessing}
-                  onClick={() => convertCueSheet()}
-                  className="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600 text-white font-medium rounded-lg transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
-                >
-                  Convert
-                </button>
-              )}
-              {cueRows.length > 0 && (
-                <button
-                  disabled={isProcessing}
-                  onClick={() => handleExport()}
-                  className="inline-flex items-center px-4 py-2 bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-700 dark:hover:bg-emerald-600 text-white font-medium rounded-lg transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
-                >
-                  <Download className="w-4 h-4 mr-2" />
-                  Export CSV
-                </button>
-              )}
-            </div>
-          </div>
-
-          {/* Template Description */}
-          {(() => {
-            return template ? (
-              <div className="mt-4 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg transition-colors">
-                <p className="text-sm text-gray-700 dark:text-gray-300">
-                  {template.description}
-                </p>
-              </div>
-            ) : null;
-          })()}
-        </div>
-      )}
-
-      {cueRows.length > 0 && (
-        <div className="flex items-center space-x-2 mb-4">
-          <Table className="w-5 h-5 text-gray-600 dark:text-gray-300" />
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-            Data Preview
-          </h3>
-        </div>
-      )}
+      <ResultHeader
+        icon={Table}
+        text="Data Preview"
+        isVisible={cueRows.length > 0}
+      />
 
       {isProcessing && (
         <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 text-center">
@@ -429,26 +299,11 @@ const CueSheetConverter: React.FC = () => {
             </>
           );
         })()}
-      {showWarnings && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 !mt-0">
-          <div className="bg-white dark:bg-gray-900 w-auto max-w-[80vw] p-6 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-lg font-semibold text-amber-700">Warnings</h2>
-              <button
-                onClick={() => setShowWarnings(false)}
-                className="text-sm text-amber-600 hover:underline"
-              >
-                Close
-              </button>
-            </div>
-            <ul className="list-disc list-inside text-sm text-gray-800 dark:text-gray-200 space-y-1 max-h-64 overflow-auto">
-              {warnings.map((w, i) => (
-                <li key={i} dangerouslySetInnerHTML={{ __html: w }} />
-              ))}
-            </ul>
-          </div>
-        </div>
-      )}
+      <WarningModal
+        warnings={warnings}
+        showWarnings={showWarnings}
+        setShowWarnings={setShowWarnings}
+      />
 
       {!isProcessing && files.length > 0 && isError && (
         <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700 text-red-800 dark:text-red-300 rounded-xl shadow-sm p-6">

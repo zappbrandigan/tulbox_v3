@@ -382,6 +382,7 @@ export interface CueSheetTemplate {
       width: number;
     }[];
   };
+  disabled?: boolean;
 }
 
 /**

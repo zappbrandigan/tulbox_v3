@@ -187,71 +187,70 @@ const IMDBSearch: React.FC = () => {
         title="IMDb Search | TūlBOX"
         description="Search movies, TV, and games, and view detailed metadata instantly with TūlBOX."
       />
-      <div className="space-y-8">
-        <ToolHeader
-          primaryText="IMDb Production Search"
-          secondaryText={`
+      <ToolHeader
+        primaryText="IMDb Production Search"
+        secondaryText={`
           Search for movies, TV shows, games and more.
           Get detailed production information including cast, crew, and international titles.
         `}
+        isVisible={true}
+      />
+
+      {/* Search Section */}
+      <SearchContainer>
+        <SearchFilter searchType={searchType} setSearchType={setSearchType} />
+        <SearchInput
+          searchQuery={searchQuery}
+          handleSearch={handleSearch}
+          isSearching={isSearching}
+          setSearchQuery={setSearchQuery}
         />
+      </SearchContainer>
 
-        {/* Search Section */}
-        <SearchContainer>
-          <SearchFilter searchType={searchType} setSearchType={setSearchType} />
-          <SearchInput
-            searchQuery={searchQuery}
-            handleSearch={handleSearch}
-            isSearching={isSearching}
-            setSearchQuery={setSearchQuery}
-          />
-        </SearchContainer>
+      {/* Search Results */}
+      {!isLoadingDetails && !selectedProduction && (
+        <SearchResult
+          searchType={searchType}
+          searchResults={searchResults}
+          handleSelectProduction={handleSelectProduction}
+          getTypeIcon={getTypeIcon}
+        />
+      )}
 
-        {/* Search Results */}
-        {!isLoadingDetails && !selectedProduction && (
-          <SearchResult
-            searchType={searchType}
-            searchResults={searchResults}
-            handleSelectProduction={handleSelectProduction}
-            getTypeIcon={getTypeIcon}
-          />
-        )}
+      {/* Loading Details */}
+      {isLoadingDetails && (
+        <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-12 text-center">
+          <LoadingOverlay message="Loading production details" />
+        </div>
+      )}
 
-        {/* Loading Details */}
-        {isLoadingDetails && (
+      {/* Production Details */}
+      {selectedProduction && (
+        <ProductionDetails
+          selectedProduction={selectedProduction}
+          isLoadingAkas={isLoadingAkas}
+          akaTitles={akaTitles}
+          getTypeIcon={getTypeIcon}
+        />
+      )}
+
+      {/* Empty State */}
+      {!isSearching &&
+        !isLoadingDetails &&
+        searchResults.length === 0 &&
+        !selectedProduction &&
+        searchQuery &&
+        error && (
           <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-12 text-center">
-            <LoadingOverlay message="Loading production details" />
+            <Search className="w-12 h-12 mx-auto mb-4 text-gray-300 dark:text-gray-500" />
+            <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
+              No results found
+            </h3>
+            <p className="text-gray-600 dark:text-gray-400">
+              Try adjusting your search terms or filters
+            </p>
           </div>
         )}
-
-        {/* Production Details */}
-        {selectedProduction && (
-          <ProductionDetails
-            selectedProduction={selectedProduction}
-            isLoadingAkas={isLoadingAkas}
-            akaTitles={akaTitles}
-            getTypeIcon={getTypeIcon}
-          />
-        )}
-
-        {/* Empty State */}
-        {!isSearching &&
-          !isLoadingDetails &&
-          searchResults.length === 0 &&
-          !selectedProduction &&
-          searchQuery &&
-          error && (
-            <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-12 text-center">
-              <Search className="w-12 h-12 mx-auto mb-4 text-gray-300 dark:text-gray-500" />
-              <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
-                No results found
-              </h3>
-              <p className="text-gray-600 dark:text-gray-400">
-                Try adjusting your search terms or filters
-              </p>
-            </div>
-          )}
-      </div>
     </>
   );
 };

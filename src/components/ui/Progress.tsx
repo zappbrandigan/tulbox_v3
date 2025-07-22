@@ -6,7 +6,7 @@ interface Props {
 const Progress: React.FC<Props> = ({ progress, message }) => {
   return (
     <div
-      className="flex flex-col items-center justify-center gap-4 rounded-2xl shadow-md 
+      className="flex flex-col items-center justify-center gap-4 rounded-2xl 
   bg-white dark:bg-gray-900 p-8 min-h-[235px] text-center transition-all duration-300"
     >
       {/* Label */}

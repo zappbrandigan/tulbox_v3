@@ -147,44 +147,41 @@ const PDFManager: React.FC = () => {
         title="PDF Manager | TūlBOX"
         description="Batch rename PDF files using RegEx and quick templates."
       />
-      <div className="space-y-8">
-        {files.length === 0 && (
-          <ToolHeader
-            primaryText="PDF File Manager"
-            secondaryText={`
+      <ToolHeader
+        primaryText="PDF File Manager"
+        secondaryText={`
             Upload PDF files, rename them individually or in batches using search & replace rules, 
             then download your organized files.`}
-          />
-        )}
+        isVisible={files.length === 0}
+      />
 
-        {files.length === 0 && <DragDropZone onFilesAdded={handleFilesAdded} />}
+      {files.length === 0 && <DragDropZone onFilesAdded={handleFilesAdded} />}
 
-        {/* Stats & Actions */}
-        {files.length > 0 && (
-          <Summary
-            files={files}
-            isDownloading={isDownloading}
-            handleClearAll={handleClearAll}
-            handleDownloadAll={handleDownloadAll}
-          />
-        )}
-
-        {/* Search & Replace */}
-        {files.length > 0 && (
-          <SearchReplace
-            rules={searchReplaceRules}
-            onRulesChange={setSearchReplaceRules}
-            onApply={handleApplySearchReplace}
-          />
-        )}
-
-        {/* File Table */}
-        <FileTable
+      {/* Stats & Actions */}
+      {files.length > 0 && (
+        <Summary
           files={files}
-          onFileUpdate={handleFileUpdate}
-          onFileRemove={handleFileRemove}
+          isDownloading={isDownloading}
+          handleClearAll={handleClearAll}
+          handleDownloadAll={handleDownloadAll}
         />
-      </div>
+      )}
+
+      {/* Search & Replace */}
+      {files.length > 0 && (
+        <SearchReplace
+          rules={searchReplaceRules}
+          onRulesChange={setSearchReplaceRules}
+          onApply={handleApplySearchReplace}
+        />
+      )}
+
+      {/* File Table */}
+      <FileTable
+        files={files}
+        onFileUpdate={handleFileUpdate}
+        onFileRemove={handleFileRemove}
+      />
     </>
   );
 };
