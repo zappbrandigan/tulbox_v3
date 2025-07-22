@@ -59,7 +59,7 @@ const Header: React.FC<PanelHeaderProps> = ({
 );
 
 const Body: React.FC<PanelBodyProps> = ({ children, className }) => (
-  <div className={clsx('mb-1', className)}>{children}</div>
+  <div className={className}>{children}</div>
 );
 
 // Attach subcomponents

@@ -14,11 +14,7 @@ const AkaTitlesTable: React.FC<AkaTitlesTableProps> = ({
 }) => {
   const { showToast } = useToast();
   if (isLoadingAkas) {
-    return (
-      <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-12 text-center">
-        <LoadingOverlay message="Detecting AKA Languages..." />
-      </div>
-    );
+    return <LoadingOverlay message="Detecting AKA Languages..." />;
   }
 
   if (akaTitles.length === 0 || !akaTitles) {

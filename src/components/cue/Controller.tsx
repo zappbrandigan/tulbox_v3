@@ -1,8 +1,8 @@
 import { Download, Settings, Trash } from 'lucide-react';
 import { Panel } from '../ui';
 import { DropdownSelector } from '../ui/DropDownSelector';
-import CUE_SHEET_FORMATS from '@/utils/cueSeet/templates';
-import { CueRow } from '@/utils/cueSeet/types';
+import CUE_SHEET_FORMATS from '@/utils/cue/templates';
+import { CueRow } from '@/utils/cue/types';
 
 interface Props {
   selectedTemplate: string;

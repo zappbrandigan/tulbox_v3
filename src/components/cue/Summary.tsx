@@ -1,4 +1,4 @@
-import { CheckCircle } from 'lucide-react';
+import { CheckCircle, Gauge } from 'lucide-react';
 import { StatCard, Panel } from '../ui';
 
 interface Props {
@@ -23,9 +23,15 @@ const Summary: React.FC<Props> = ({
   return (
     <Panel>
       <Panel.Header
-        icon={<CheckCircle className="w-6 h-6 text-emerald-500" />}
-        title="Results"
-        subtitle={`Parsed on ${new Date().toDateString()}`}
+        icon={
+          rowCount > 0 ? (
+            <CheckCircle className="w-6 h-6 text-emerald-500" />
+          ) : (
+            <Gauge className="w-6 h-6 text-gray-500" />
+          )
+        }
+        title={rowCount > 0 ? 'Result' : 'Pending'}
+        subtitle={rowCount > 0 ? `Parsed on ${new Date().toDateString()}` : ''}
       />
       <Panel.Body className="grid grid-cols-1 md:grid-cols-5 gap-6">
         <StatCard

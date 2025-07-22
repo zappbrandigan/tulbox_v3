@@ -1,4 +1,3 @@
-export { default as DragDropZone } from './DragDropZone';
 export { default as CodeView } from './viewer/CodeView';
 export { default as Summary } from './Summary';
 export { default as RecordLine } from './viewer/RecordLine';

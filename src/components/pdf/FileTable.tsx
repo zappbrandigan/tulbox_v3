@@ -148,16 +148,7 @@ const FileTable: React.FC<FileTableProps> = ({
     URL.revokeObjectURL(url);
   };
 
-  if (files.length === 0) {
-    return (
-      <div className="text-center py-12 text-gray-500 dark:text-gray-400">
-        <p>
-          All data is processed locally in your browser. It is neither stored
-          nor transmitted, and is discarded when you refresh or exit the page.
-        </p>
-      </div>
-    );
-  }
+  if (files.length === 0) return null;
 
   return (
     <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">

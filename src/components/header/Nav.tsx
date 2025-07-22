@@ -2,7 +2,6 @@ import React from 'react';
 import { ExternalLink, MenuIcon } from 'lucide-react';
 import { TOOLS } from '@/constants/appTools';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
-import { trackEvent } from '@/utils';
 import { logUserEvent } from '@/utils/general/logEvent';
 import { LogSource } from '@/types/logging';
 import { useSessionId } from '@/context/sessionContext';
@@ -13,8 +12,9 @@ interface NavProps {
 }
 
 const Nav: React.FC<NavProps> = ({ currentTool, onToolChange }) => {
-  const sessionId = useSessionId();
   function DocsLink() {
+    const sessionId = useSessionId();
+
     const handleClick = () => {
       logUserEvent(
         sessionId,
@@ -25,10 +25,6 @@ const Nav: React.FC<NavProps> = ({ currentTool, onToolChange }) => {
         },
         currentTool as LogSource
       );
-      trackEvent('docs_link_click', {
-        destination: 'https://docs.tulbox.app/tulbox/intro',
-        label: 'Documentation',
-      });
     };
 
     return (
@@ -37,42 +33,48 @@ const Nav: React.FC<NavProps> = ({ currentTool, onToolChange }) => {
         target="_blank"
         rel="noopener noreferrer"
         onClick={handleClick}
-        className="flex items-center px-4 rounded-lg text-sm transition-all duration-200 whitespace-nowrap text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+        className="w-full flex items-center px-4 py-2 text-sm rounded-lg transition text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
       >
-        <ExternalLink className="inline pr-2" />
-        Docs
+        <ExternalLink className="w-4 h-4 mr-2" />
+        <span className="pl-2">Docs</span>
       </a>
     );
   }
+
   return (
     <div className="flex items-center justify-between">
       {/* Mobile Nav (Dropdown) */}
       <div className="lg:hidden relative">
         <Menu>
-          <MenuButton className="px-4 py-2 rounded-lg bg-gray-100 dark:bg-slate-500 text-sm dark:text-gray-300">
-            <MenuIcon />
+          <MenuButton className="flex items-center px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm font-medium text-gray-700 dark:text-gray-200 shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+            <MenuIcon className="w-4 h-4 mr-2" />
+            {TOOLS.find((t) => t.id === currentTool)?.title ?? 'Select Tool'}
           </MenuButton>
-          <MenuItems className="absolute right-0 mt-2 w-64 bg-white dark:bg-gray-900 border dark:border-gray-700 rounded-lg shadow-lg z-50">
-            {TOOLS.map((tool) => (
-              <MenuItem key={tool.id}>
-                {({ active }) => (
-                  <button
-                    onClick={() => onToolChange(tool.id)}
-                    disabled={tool.id === 'coming-soon'}
-                    className={`w-full text-left px-4 text-sm rounded transition-all ${
-                      active
-                        ? 'bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white'
-                        : 'text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700'
-                    }`}
-                  >
-                    {tool.icon} {tool.title}
-                  </button>
-                )}
+
+          <MenuItems className="absolute right-0 mt-2 p-1 w-72 rounded-lg shadow-lg bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 z-50 focus:outline-none overflow-hidden">
+            <div className="py-1">
+              {TOOLS.map((tool) => (
+                <MenuItem key={tool.id}>
+                  {({ active }) => (
+                    <button
+                      onClick={() => onToolChange(tool.id)}
+                      disabled={tool.id === 'coming-soon'}
+                      className={`w-full flex items-center px-4 py-2 text-sm text-left rounded transition ${
+                        active
+                          ? 'bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white'
+                          : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+                      } ${tool.id === currentTool ? 'font-semibold' : ''}`}
+                    >
+                      <span className="mr-2">{tool.icon}</span> {tool.title}
+                    </button>
+                  )}
+                </MenuItem>
+              ))}
+
+              <MenuItem>
+                <DocsLink />
               </MenuItem>
-            ))}
-            <MenuItem>
-              <DocsLink />
-            </MenuItem>
+            </div>
           </MenuItems>
         </Menu>
       </div>

@@ -1,14 +1,14 @@
 import React, { useEffect, useState, useTransition } from 'react';
 import { CircleXIcon, FileText } from 'lucide-react';
 import { exportFile, getTemplateById, trackEvent } from '@/utils';
+import { Summary, Controller, CodeView, TableView } from '@/components/cwr';
 import {
+  Panel,
+  Progress,
+  ToolHeader,
   DragDropZone,
-  Summary,
-  Controller,
-  CodeView,
-  TableView,
-} from '@/components/cwr';
-import { Panel, Progress, ToolHeader } from '@/components/ui';
+  Disclaimer,
+} from '@/components/ui';
 import { CWRConverterRecord } from 'cwr-parser/types';
 import { CWRTemplate } from '@/types';
 import { logUserEvent } from '@/utils/general/logEvent';
@@ -35,7 +35,8 @@ const CWRConverter: React.FC = () => {
 
   const sessionId = useSessionId();
 
-  const handleFileUpload = async (file: File) => {
+  const handleFileUpload = async (files: File[] | File) => {
+    const file = Array.isArray(files) ? files[0] : files;
     const maxSizeMB = 100; // limit in megabytes
     const maxSizeBytes = maxSizeMB * 1024 * 1024;
 
@@ -158,7 +159,20 @@ const CWRConverter: React.FC = () => {
         isBeta={true}
       />
 
-      {!file && <DragDropZone onFilesAdded={handleFileUpload} />}
+      <DragDropZone
+        onFilesAdded={handleFileUpload}
+        accept=".v21,.v22"
+        maxFiles={1}
+        allowMultiple={false}
+        validateFile={(file) =>
+          file.name.toLowerCase().endsWith('.v21') ||
+          file.name.toLowerCase().endsWith('.v22')
+        }
+        title="Upload CWR File"
+        description="Drag and drop your CWR file here, or click to browse"
+        note="1 file max • 100MB Limit • .v21/.v22 format only"
+        isVisible={!file}
+      />
 
       {file && !parseResult && (
         <Panel>
@@ -254,14 +268,7 @@ const CWRConverter: React.FC = () => {
           </div>
         )}
 
-      {!fileContent && (
-        <div className="text-center py-12 text-gray-500 dark:text-gray-400">
-          <p>
-            All data is processed locally in your browser. It is neither stored
-            nor transmitted, and is discarded when you refresh or exit the page.
-          </p>
-        </div>
-      )}
+      <Disclaimer isVisible={!fileContent} />
     </>
   );
 };

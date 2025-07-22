@@ -1,22 +1,25 @@
-import { LoadingOverlay, ToolHeader } from '@/components/ui';
+import React, { useState } from 'react';
 import { logUserEvent } from '@/utils/general/logEvent';
 import { PageMeta } from '@/PageMeta';
 import { FileItem } from '@/types';
-import { useState } from 'react';
-import { DragDropZone } from '@/components/pdf';
 import { checkForDuplicates, generateFileId } from '@/utils';
-import { AlertCircle, Table } from 'lucide-react';
-import CUE_SHEET_FORMATS from '@/utils/cueSeet/templates';
-import { extractTextFromPDF } from '@/utils/cueSeet/extract';
-import { parseSoundmouseText } from '@/utils/cueSeet/transform';
-import { CueRow } from '@/utils/cueSeet/types';
-import React from 'react';
-import { exportCueSheetCSV } from '@/utils/cueSeet/exportCueSheetCSV';
+import { AlertCircle, MousePointer2, Table } from 'lucide-react';
+import CUE_SHEET_FORMATS from '@/utils/cue/templates';
+import { extractTextFromPDF } from '@/utils/cue/extract';
+import { parseSoundmouseText } from '@/utils/cue/transform';
+import { CueRow } from '@/utils/cue/types';
+import { exportCueSheetCSV } from '@/utils/cue/exportCueSheetCSV';
 import { useSessionId } from '@/context/sessionContext';
-import WarningModal from '@/components/ui/WarningModal';
-import Controller from '@/components/cue/Controller';
-import { Summary } from '@/components/cue';
-import ResultHeader from '@/components/ui/ResultHeader';
+import { Summary, Controller } from '@/components/cue';
+import {
+  ResultHeader,
+  WarningModal,
+  ToolHeader,
+  LoadingOverlay,
+  DragDropZone,
+  Disclaimer,
+  Panel,
+} from '@/components/ui';
 
 const CueSheetConverter: React.FC = () => {
   const [files, setFiles] = useState<FileItem[]>([]);
@@ -30,19 +33,20 @@ const CueSheetConverter: React.FC = () => {
 
   const sessionId = useSessionId();
 
-  const handleFilesAdded = (newFiles: File[]) => {
+  const handleFilesAdded = (newFiles: File[] | File) => {
+    const files = Array.isArray(newFiles) ? newFiles : [newFiles];
     logUserEvent(
       sessionId,
       'User added files',
       {
         action: 'file-upload',
         target: 'cue-sheet-converter',
-        value: newFiles.length,
+        value: files.length,
       },
       'cue-sheet-converter'
     );
 
-    const fileItems: FileItem[] = newFiles.map((file) => ({
+    const fileItems: FileItem[] = files.map((file) => ({
       id: generateFileId(),
       originalName: file.name,
       currentName: file.name.replace(/\.pdf$/i, ''),
@@ -152,7 +156,20 @@ const CueSheetConverter: React.FC = () => {
         setShowWarnings={setShowWarnings}
       />
 
-      {files.length === 0 && <DragDropZone onFilesAdded={handleFilesAdded} />}
+      <DragDropZone
+        onFilesAdded={handleFilesAdded}
+        accept=".pdf"
+        maxFiles={25}
+        allowMultiple={true}
+        validateFile={(file) =>
+          file.type === 'application/pdf' ||
+          file.name.toLowerCase().endsWith('.pdf')
+        }
+        title="Upload PDF Files"
+        description="Drag and drop your PDF files here, or click to browse"
+        note="Maximum 25 files • PDF format only"
+        isVisible={files.length === 0}
+      />
 
       <Controller
         selectedTemplate={selectedTemplate}
@@ -171,10 +188,20 @@ const CueSheetConverter: React.FC = () => {
         isVisible={cueRows.length > 0}
       />
 
-      {isProcessing && (
-        <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 text-center">
-          <LoadingOverlay message="Processing..." />
-        </div>
+      {isProcessing && <LoadingOverlay message="Processing..." />}
+
+      {files.length > 0 && cueRows.length === 0 && !isProcessing && (
+        <Panel>
+          <div className="flex flex-col items-center justify-center text-center px-6 py-16  text-gray-500 dark:text-gray-400">
+            <MousePointer2 className="text-gray-500 dark:text-gray-400 size-10 mb-6 font-normal" />
+            <p className="text-lg font-medium mb-2">
+              Select a Cue Sheet Format
+            </p>
+            <p className="text-sm max-w-md">
+              Choose a parsing template to begin converting your cue sheet.
+            </p>
+          </div>
+        </Panel>
       )}
 
       {cueRows.length > 0 &&
@@ -317,6 +344,8 @@ const CueSheetConverter: React.FC = () => {
           </p>
         </div>
       )}
+
+      <Disclaimer isVisible={files.length === 0} />
     </>
   );
 };

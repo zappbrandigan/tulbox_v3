@@ -1,4 +1,4 @@
-import { FileText, Search, AudioLines } from 'lucide-react';
+import { FileText, Search, AudioLines, Music2 } from 'lucide-react';
 
 export type Tool = {
   id: string;
@@ -30,6 +30,6 @@ export const TOOLS: Tool[] = [
     id: 'cue-sheet-converter',
     title: 'Cue Sheet Converter',
     description: 'Converts PDF Cue Sheets to CSV',
-    icon: <AudioLines className="inline pr-2" />,
+    icon: <Music2 className="inline pr-2" />,
   },
 ];

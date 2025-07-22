@@ -1,10 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import {
-  DragDropZone,
-  Summary,
-  SearchReplace,
-  FileTable,
-} from '@/components/pdf';
+import { Summary, SearchReplace, FileTable } from '@/components/pdf';
 import { FileItem, SearchReplaceRule } from '@/types';
 import {
   generateFileId,
@@ -13,7 +8,7 @@ import {
   downloadRenamedFiles,
   trackEvent,
 } from '@/utils';
-import { ToolHeader } from '@/components/ui';
+import { ToolHeader, DragDropZone, Disclaimer } from '@/components/ui';
 import { logUserEvent } from '@/utils/general/logEvent';
 import { PageMeta } from '@/PageMeta';
 import { useSessionId } from '@/context/sessionContext';
@@ -27,19 +22,20 @@ const PDFManager: React.FC = () => {
 
   const sessionId = useSessionId();
 
-  const handleFilesAdded = (newFiles: File[]) => {
+  const handleFilesAdded = (files: File[] | File) => {
+    const actualFiles = Array.isArray(files) ? files : [files];
     logUserEvent(
       sessionId,
       'User added files',
       {
         action: 'file-upload',
         target: 'pdf-manager',
-        value: newFiles.length,
+        value: actualFiles.length,
       },
       'pdf-manager'
     );
 
-    const fileItems: FileItem[] = newFiles.map((file) => ({
+    const fileItems: FileItem[] = actualFiles.map((file) => ({
       id: generateFileId(),
       originalName: file.name,
       currentName: file.name.replace(/\.pdf$/i, ''),
@@ -155,7 +151,20 @@ const PDFManager: React.FC = () => {
         isVisible={files.length === 0}
       />
 
-      {files.length === 0 && <DragDropZone onFilesAdded={handleFilesAdded} />}
+      <DragDropZone
+        onFilesAdded={handleFilesAdded}
+        accept=".pdf"
+        maxFiles={100}
+        allowMultiple={true}
+        validateFile={(file) =>
+          file.type === 'application/pdf' ||
+          file.name.toLowerCase().endsWith('.pdf')
+        }
+        title="Upload PDF Files"
+        description="Drag and drop your PDF files here, or click to browse"
+        note="Maximum 100 files • PDF format only"
+        isVisible={files.length === 0}
+      />
 
       {/* Stats & Actions */}
       {files.length > 0 && (
@@ -182,6 +191,8 @@ const PDFManager: React.FC = () => {
         onFileUpdate={handleFileUpdate}
         onFileRemove={handleFileRemove}
       />
+
+      <Disclaimer isVisible={files.length === 0} />
     </>
   );
 };
