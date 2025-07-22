@@ -33,7 +33,7 @@ const Nav: React.FC<NavProps> = ({ currentTool, onToolChange }) => {
         target="_blank"
         rel="noopener noreferrer"
         onClick={handleClick}
-        className="w-full flex items-center px-4 py-2 text-sm rounded-lg transition text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+        className="w-full flex items-center px-4 py-2 text-sm rounded transition text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
       >
         <ExternalLink className="w-4 h-4 mr-2" />
         <span className="pl-2">Docs</span>
@@ -55,13 +55,13 @@ const Nav: React.FC<NavProps> = ({ currentTool, onToolChange }) => {
             <div className="py-1">
               {TOOLS.map((tool) => (
                 <MenuItem key={tool.id}>
-                  {({ active }) => (
+                  {({ focus }) => (
                     <button
                       onClick={() => onToolChange(tool.id)}
                       disabled={tool.id === 'coming-soon'}
                       className={`w-full flex items-center px-4 py-2 text-sm text-left rounded transition ${
-                        active
-                          ? 'bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white'
+                        focus
+                          ? 'bg-gray-100 dark:bg-gray-700 text-blue-700 dark:text-blue-300'
                           : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
                       } ${tool.id === currentTool ? 'font-semibold' : ''}`}
                     >
@@ -85,7 +85,7 @@ const Nav: React.FC<NavProps> = ({ currentTool, onToolChange }) => {
           <button
             key={tool.id}
             onClick={() => onToolChange(tool.id)}
-            className={`flex items-center md:px-2 lg:px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 whitespace-nowrap ${
+            className={`flex items-center md:px-2 lg:px-4 py-2 rounded text-sm font-medium transition-all duration-200 whitespace-nowrap ${
               currentTool === tool.id
                 ? 'bg-blue-100 text-blue-700 dark:bg-blue-800/30 dark:text-blue-300 shadow-sm'
                 : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700'
