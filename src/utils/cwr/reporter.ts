@@ -702,7 +702,6 @@ class CWRReporter {
             publisher.fields.recordType === 'SPU' ? 'Y' : 'N'
           );
 
-          // This was previously duplicated — pick the correct field
           row.set(
             'affiliation',
             publisher.fields.prAffiliationSocietyNumber ?? ''

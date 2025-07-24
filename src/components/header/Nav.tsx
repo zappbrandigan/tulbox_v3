@@ -1,10 +1,11 @@
 import React from 'react';
-import { ExternalLink, MenuIcon } from 'lucide-react';
+import { MenuIcon } from 'lucide-react';
 import { TOOLS } from '@/constants/appTools';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
 import { logUserEvent } from '@/utils/general/logEvent';
 import { LogSource } from '@/types/logging';
 import { useSessionId } from '@/context/sessionContext';
+import { DocsLink } from '../ui';
 
 interface NavProps {
   currentTool: string;
@@ -12,34 +13,7 @@ interface NavProps {
 }
 
 const Nav: React.FC<NavProps> = ({ currentTool, onToolChange }) => {
-  function DocsLink() {
-    const sessionId = useSessionId();
-
-    const handleClick = () => {
-      logUserEvent(
-        sessionId,
-        'User viewed Docs',
-        {
-          action: 'link-click',
-          target: 'docs-link',
-        },
-        currentTool as LogSource
-      );
-    };
-
-    return (
-      <a
-        href="https://docs.tulbox.app/tulbox/intro"
-        target="_blank"
-        rel="noopener noreferrer"
-        onClick={handleClick}
-        className="w-full flex items-center px-4 py-2 text-sm rounded transition text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
-      >
-        <ExternalLink className="w-4 h-4 mr-2" />
-        <span className="pl-2">Docs</span>
-      </a>
-    );
-  }
+  const sessionId = useSessionId();
 
   return (
     <div className="flex items-center justify-between">
@@ -58,7 +32,6 @@ const Nav: React.FC<NavProps> = ({ currentTool, onToolChange }) => {
                   {({ focus }) => (
                     <button
                       onClick={() => onToolChange(tool.id)}
-                      disabled={tool.id === 'coming-soon'}
                       className={`w-full flex items-center px-4 py-2 text-sm text-left rounded transition ${
                         focus
                           ? 'bg-gray-100 dark:bg-gray-700 text-blue-700 dark:text-blue-300'
@@ -72,7 +45,19 @@ const Nav: React.FC<NavProps> = ({ currentTool, onToolChange }) => {
               ))}
 
               <MenuItem>
-                <DocsLink />
+                <DocsLink
+                  onClick={() => {
+                    logUserEvent(
+                      sessionId,
+                      'User viewed Docs',
+                      {
+                        action: 'link-click',
+                        target: 'docs-link',
+                      },
+                      currentTool as LogSource
+                    );
+                  }}
+                />
               </MenuItem>
             </div>
           </MenuItems>

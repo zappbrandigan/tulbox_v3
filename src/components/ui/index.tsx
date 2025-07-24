@@ -9,3 +9,4 @@ export { default as DragDropZone } from './DragDropZone';
 export { default as WarningModal } from './WarningModal';
 export { default as ResultHeader } from './ResultHeader';
 export { default as Disclaimer } from './Disclaimer';
+export { default as DocsLink } from './DocsLink';
