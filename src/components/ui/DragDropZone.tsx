@@ -101,6 +101,7 @@ const DragDropZone: React.FC<Props> = ({
       >
         <input
           type="file"
+          title=""
           accept={accept}
           multiple={allowMultiple}
           onChange={handleFileSelect}

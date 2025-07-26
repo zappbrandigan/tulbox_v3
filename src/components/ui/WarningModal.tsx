@@ -1,3 +1,5 @@
+import { useShortcut } from '@/hooks';
+
 interface Props {
   warnings: string[];
   showWarnings: boolean;
@@ -10,6 +12,10 @@ const WarningModal: React.FC<Props> = ({
   setShowWarnings,
 }) => {
   if (warnings.length === 0 || !showWarnings) return null;
+  useShortcut({
+    escape: () => setShowWarnings(false),
+  });
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 !mt-0">
       <div className="bg-white dark:bg-gray-900 w-auto max-w-[80vw] p-6 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700">

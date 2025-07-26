@@ -1,8 +1,8 @@
 import { Minimize } from 'lucide-react';
 import RecordLine from './RecordLine';
 import Search from './Search';
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { useSearch } from '@/hooks/useSearch';
+import { useEffect, useRef, useState } from 'react';
+import { useSearch, useShortcut } from '@/hooks';
 import { CWRParsedRecord } from 'cwr-parser/types';
 import { logUserEvent } from '@/utils/general/logEvent';
 import { useSessionId } from '@/context/sessionContext';
@@ -47,96 +47,6 @@ const ScrollArea: React.FC<Props> = ({
     runSearch(value);
   };
 
-  const isCmdOrCtrl = (e: KeyboardEvent) =>
-    (e.ctrlKey && !e.metaKey) || (e.metaKey && !e.ctrlKey);
-
-  const key = (e: KeyboardEvent) => e.key.toLowerCase(); // case-insensitive
-
-  const handleKeyDown = useCallback(
-    (e: KeyboardEvent) => {
-      /* 1. Full-screen (Cmd/Ctrl + E) ------------------------------ */
-      if (isCmdOrCtrl(e) && key(e) === 'e') {
-        e.preventDefault();
-        setIsFullScreen((prev) => !prev);
-        logUserEvent(
-          sessionId,
-          'Shortcut Key Used',
-          {
-            action: 'ui-interaction',
-            target: 'kb-shortcut',
-            value: 'Full Screen',
-          },
-          'cwr-converter'
-        );
-        return;
-      }
-
-      /* 2. Toggle search bar (Cmd/Ctrl + F) ------------------------ */
-      if (isCmdOrCtrl(e) && key(e) === 'f') {
-        e.preventDefault();
-        setShowSearch((show) => {
-          if (show) {
-            setSearchQuery('');
-            setHitRows([]);
-            setCurrentMatchIndex(-1);
-          }
-          return !show;
-        });
-        logUserEvent(
-          sessionId,
-          'Shortcut Key Used',
-          {
-            action: 'ui-interaction',
-            target: 'kb-shortcut',
-            value: 'Search Bar',
-          },
-          'cwr-converter'
-        );
-        return;
-      }
-
-      /* 3. Toggle tooltips (Cmd/Ctrl + K) -------------------------- */
-      if (isCmdOrCtrl(e) && key(e) === 'k') {
-        e.preventDefault();
-        setIsTooltipEnabled((prev) => !prev);
-        logUserEvent(
-          sessionId,
-          'Shortcut Key Used',
-          {
-            action: 'ui-interaction',
-            target: 'kb-shortcut',
-            value: 'Toggle Tooltips',
-          },
-          'cwr-converter'
-        );
-        return;
-      }
-
-      /* 4. Escape exits full-screen or close search bar------------- */
-      if (e.key === 'Escape') {
-        setIsFullScreen(false);
-        setShowSearch(false);
-        setSearchQuery('');
-        setHitRows([]);
-        setCurrentMatchIndex(-1);
-        return;
-      }
-    },
-    [
-      setIsFullScreen,
-      setShowSearch,
-      setIsTooltipEnabled,
-      setSearchQuery,
-      setHitRows,
-      setCurrentMatchIndex,
-    ]
-  );
-
-  useEffect(() => {
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [handleKeyDown]);
-
   useEffect(() => {
     if (showSearch && searchInputRef.current) {
       searchInputRef.current.focus();
@@ -148,6 +58,62 @@ const ScrollArea: React.FC<Props> = ({
     setHitRows(rows);
     setCurrentMatchIndex(rows.length ? 0 : -1);
   }, [matchLines]);
+
+  useShortcut({
+    'mod+e': () => {
+      setIsFullScreen((prev) => !prev);
+      logUserEvent(
+        sessionId,
+        'Shortcut Key Used',
+        {
+          action: 'ui-interaction',
+          target: 'kb-shortcut',
+          value: 'Full Screen',
+        },
+        'cwr-converter'
+      );
+    },
+    'mod+f': () => {
+      setShowSearch((show) => {
+        if (show) {
+          setSearchQuery('');
+          setHitRows([]);
+          setCurrentMatchIndex(-1);
+        }
+        return !show;
+      });
+      logUserEvent(
+        sessionId,
+        'Shortcut Key Used',
+        {
+          action: 'ui-interaction',
+          target: 'kb-shortcut',
+          value: 'Search Bar',
+        },
+        'cwr-converter'
+      );
+    },
+    'mod+k': () => {
+      setIsTooltipEnabled((prev) => !prev);
+      logUserEvent(
+        sessionId,
+        'Shortcut Key Used',
+        {
+          action: 'ui-interaction',
+          target: 'kb-shortcut',
+          value: 'Toggle Tooltips',
+        },
+        'cwr-converter'
+      );
+    },
+    escape: () => {
+      setIsFullScreen(false);
+      setShowSearch(false);
+      setSearchQuery('');
+      setHitRows([]);
+      setCurrentMatchIndex(-1);
+    },
+  });
 
   return (
     <div
