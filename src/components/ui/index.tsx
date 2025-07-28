@@ -7,6 +7,7 @@ export { default as Panel } from './Panel';
 export { default as StatCard } from './StatCard';
 export { default as DragDropZone } from './DragDropZone';
 export { default as WarningModal } from './WarningModal';
+export { default as ShortcutModal } from './ShortcutModal';
 export { default as ResultHeader } from './ResultHeader';
 export { default as Disclaimer } from './Disclaimer';
 export { default as DocsLink } from './DocsLink';

@@ -4,9 +4,10 @@ import React from 'react';
 
 interface FooterProps {
   appName: string;
+  setShowShortcut: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const Footer: React.FC<FooterProps> = ({ appName }) => {
+const Footer: React.FC<FooterProps> = ({ appName, setShowShortcut }) => {
   const version = __APP_VERSION__;
   const updated = new Date(__APP_UPDATED__).toLocaleDateString('en-US', {
     month: 'short',
@@ -128,6 +129,8 @@ Thanks!
         >
           Requests
         </a>
+        <span className="text-gray-300 dark:text-gray-600">|</span>
+        <button onClick={() => setShowShortcut(true)}>Shortcuts</button>
       </div>
     </footer>
   );
