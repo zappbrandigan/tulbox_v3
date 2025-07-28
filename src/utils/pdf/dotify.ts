@@ -59,7 +59,6 @@ function normalizeParts(
   if (newProd !== prodTitle || newEp !== epTitle || newNum !== epNum) {
     track('modified');
   }
-  console.log(newEp, epTitle);
 
   prodTitle = newProd!;
   epTitle = newEp;
