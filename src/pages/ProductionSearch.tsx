@@ -28,7 +28,7 @@ import { logUserEvent } from '@/utils/general/logEvent';
 import { PageMeta } from '@/PageMeta';
 import { useSessionId } from '@/context/sessionContext';
 
-const IMDBSearch: React.FC = () => {
+const ProductionSearch: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<IMDBSearchResult[]>([]);
   const [selectedProduction, setSelectedProduction] =
@@ -184,11 +184,11 @@ const IMDBSearch: React.FC = () => {
   return (
     <>
       <PageMeta
-        title="IMDb Search | TūlBOX"
+        title="Production Search | TūlBOX"
         description="Search movies, TV, and games, and view detailed metadata instantly with TūlBOX."
       />
       <ToolHeader
-        primaryText="IMDb Production Search"
+        primaryText="Production Search"
         secondaryText={`
           Search for movies, TV shows, games and more.
           Get detailed production information including cast, crew, and international titles.
@@ -219,9 +219,7 @@ const IMDBSearch: React.FC = () => {
 
       {/* Loading Details */}
       {isLoadingDetails && (
-        <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-12 text-center">
-          <LoadingOverlay message="Loading production details" />
-        </div>
+        <LoadingOverlay message="Loading production details" />
       )}
 
       {/* Production Details */}
@@ -255,4 +253,4 @@ const IMDBSearch: React.FC = () => {
   );
 };
 
-export default IMDBSearch;
+export default ProductionSearch;

@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { SessionContext } from './context/sessionContext';
 import { Layout } from './components/ui';
-import { PDFManager, IMDBSearch, CWRConverter } from './pages';
+import { PDFManager, ProductionSearch, CWRConverter } from './pages';
 import CueSheetConverter from './pages/CueSheetConverter';
 
 function App() {
@@ -31,8 +31,8 @@ function App() {
     switch (currentTool) {
       case 'pdf-manager':
         return <PDFManager />;
-      case 'imdb-search':
-        return <IMDBSearch />;
+      case 'production-search':
+        return <ProductionSearch />;
       case 'cwr-converter':
         return <CWRConverter />;
       case 'cue-sheet-converter':

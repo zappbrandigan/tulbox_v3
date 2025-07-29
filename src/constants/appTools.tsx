@@ -15,8 +15,8 @@ export const TOOLS: Tool[] = [
     icon: <FileText className="inline pr-2" />,
   },
   {
-    id: 'imdb-search',
-    title: 'IMDB Search',
+    id: 'production-search',
+    title: 'Production Search',
     description: 'Search movies, TV shows, and games',
     icon: <Search className="inline pr-2" />,
   },
