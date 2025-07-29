@@ -11,3 +11,4 @@ export { default as ShortcutModal } from './ShortcutModal';
 export { default as ResultHeader } from './ResultHeader';
 export { default as Disclaimer } from './Disclaimer';
 export { default as DocsLink } from './DocsLink';
+export { default as ModKey } from './ModKey';

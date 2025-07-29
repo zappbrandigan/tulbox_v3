@@ -1,17 +1,7 @@
+import { Keyboard } from 'lucide-react';
 import { useShortcut } from '@/hooks';
-
-const availableShortcuts = {
-  General: ['<kbd>Esc</kbd>: Close modal'],
-  'CWR Converter': [
-    '<kbd>^</kbd> / <kbd>⌘</kbd> + <kbd>f</kbd>: Search',
-    '<kbd>^</kbd> / <kbd>⌘</kbd> + <kbd>e</kbd>: Full screen (Raw View)',
-    '<kbd>^</kbd> / <kbd>⌘</kbd> +  <kbd>k</kbd>: Toggle tooltips',
-    '<kbd>Esc</kbd>: Exit full screen',
-  ],
-  'PDF Manager': [
-    '<kbd>^</kbd> / <kbd>⌘</kbd> + <kbd>0-9</kbd>: Add specific template',
-  ],
-};
+import React from 'react';
+import getAvailableShortcuts from '@/constants/shortcuts';
 
 const ShortcutModal = ({
   showShortcuts,
@@ -20,30 +10,19 @@ const ShortcutModal = ({
   showShortcuts: boolean;
   setShowShortcuts: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
-  if (!showShortcuts) return null;
   useShortcut({
     escape: () => setShowShortcuts(false),
   });
+  const availableShortcuts = getAvailableShortcuts();
+
+  if (!showShortcuts) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 !mt-0">
-      <div className="bg-white dark:bg-gray-900 w-full max-w-3xl p-6 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 max-h-[80vh] overflow-auto">
+      <div className="bg-white dark:bg-gray-900 min-w-[400px] max-w-3xl p-6 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 max-h-[80vh] overflow-auto">
         <div className="flex justify-between items-center mb-6 border-b border-gray-200 dark:border-gray-700 pb-3">
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white flex items-center space-x-2">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-6 w-6 text-sky-600 dark:text-sky-400"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M9.75 17L6 12.25L7.41 10.84L9.75 13.17L16.59 6.34L18 7.75L9.75 17Z"
-              />
-            </svg>
+            <Keyboard className="h-6 w-6 text-sky-600 dark:text-sky-400" />
             <span>Available Shortcuts</span>
           </h2>
           <button
@@ -64,9 +43,17 @@ const ShortcutModal = ({
                 {shortcuts.map((shortcut, i) => (
                   <li
                     key={i}
-                    className="text-sm leading-relaxed"
-                    dangerouslySetInnerHTML={{ __html: shortcut }}
-                  />
+                    className="text-sm leading-relaxed flex flex-wrap items-center gap-1"
+                  >
+                    <span className="flex gap-1 flex-wrap items-center">
+                      {shortcut.keys.map((el, j) => (
+                        <React.Fragment key={j}>{el}</React.Fragment>
+                      ))}
+                    </span>
+                    <span className="ml-2 text-gray-500 dark:text-gray-400">
+                      {shortcut.description}
+                    </span>
+                  </li>
                 ))}
               </ul>
             </div>
