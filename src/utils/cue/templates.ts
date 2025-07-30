@@ -17,6 +17,7 @@ const CUE_SHEET_FORMATS: CueSheetTemplate[] = [
       key: 'writers',
       countKey: 'maxWriters',
       subfields: [
+        { key: 'role', label: 'Role', width: 100 },
         { key: 'name', label: 'Writer', width: 250 },
         { key: 'pro', label: 'PRO', width: 100 },
         { key: 'contribution', label: 'Share', width: 100 },
@@ -40,6 +41,7 @@ const CUE_SHEET_FORMATS: CueSheetTemplate[] = [
       key: 'writers',
       countKey: 'maxWriters',
       subfields: [
+        { key: 'role', label: 'Role', width: 100 },
         { key: 'name', label: 'Writer', width: 250 },
         { key: 'pro', label: 'PRO', width: 100 },
         { key: 'contribution', label: 'Share', width: 100 },
@@ -64,6 +66,7 @@ const CUE_SHEET_FORMATS: CueSheetTemplate[] = [
       key: 'writers',
       countKey: 'maxWriters',
       subfields: [
+        { key: 'role', label: 'Role', width: 100 },
         { key: 'name', label: 'Writer', width: 250 },
         { key: 'pro', label: 'PRO', width: 100 },
         { key: 'contribution', label: 'Share', width: 100 },
