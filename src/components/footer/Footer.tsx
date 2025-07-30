@@ -9,11 +9,11 @@ interface FooterProps {
 
 const Footer: React.FC<FooterProps> = ({ appName, setShowShortcut }) => {
   const version = __APP_VERSION__;
-  const updated = new Date(__APP_UPDATED__).toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-  });
+  // const updated = new Date(__APP_UPDATED__).toLocaleDateString('en-US', {
+  //   month: 'short',
+  //   day: 'numeric',
+  //   year: 'numeric',
+  // });
   const commit = __APP_COMMIT__.substring(0, 7);
   const note = `
 Note to sender: You can use Markdown formatting in the template above if you know it — for example:
@@ -103,7 +103,7 @@ Thanks!
         <span>{commit}</span>
       </div>
 
-      <div className="text-gray-400 dark:text-gray-500">Updated {updated}</div>
+      {/* <div className="text-gray-400 dark:text-gray-500">Updated {updated}</div> */}
 
       <div className="flex gap-2 items-center text-blue-500">
         <a
