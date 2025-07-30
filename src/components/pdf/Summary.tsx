@@ -16,6 +16,7 @@ const Summary: React.FC<SummaryProps> = ({
   handleClearAll,
   handleDownloadAll,
 }) => {
+  if (files.length === 0) return null;
   const validFiles = files.filter((file) =>
     ['valid', 'modified', 'dotified'].includes(file.status)
   ).length;

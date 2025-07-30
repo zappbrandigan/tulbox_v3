@@ -166,15 +166,12 @@ const PDFManager: React.FC = () => {
         isVisible={files.length === 0}
       />
 
-      {/* Stats & Actions */}
-      {files.length > 0 && (
-        <Summary
-          files={files}
-          isDownloading={isDownloading}
-          handleClearAll={handleClearAll}
-          handleDownloadAll={handleDownloadAll}
-        />
-      )}
+      <Summary
+        files={files}
+        isDownloading={isDownloading}
+        handleClearAll={handleClearAll}
+        handleDownloadAll={handleDownloadAll}
+      />
 
       {/* Search & Replace */}
       {files.length > 0 && (

@@ -48,8 +48,8 @@ const commonReplacements = [
     replace: '0$1',
     regex: true,
   },
-  { name: 'Replace Dashes', search: '-', replace: '_', regex: false },
-  { name: 'Replace Spaces', search: ' ', replace: '-', regex: false },
+  { name: 'Replace Dashes', desc: '', search: '-', replace: '_', regex: false },
+  { name: 'Replace Spaces', desc: '', search: ' ', replace: '-', regex: false },
 ];
 
 export default commonReplacements;

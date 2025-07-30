@@ -15,11 +15,11 @@ function getAvailableShortcuts() {
     'CWR Converter': [
       {
         keys: [<ModKey key="mod" />, '+', <kbd key="f">f</kbd>],
-        description: 'Search (Raw View)',
+        description: 'Toggle Search (Raw View)',
       },
       {
         keys: [<ModKey key="mod" />, '+', <kbd key="e">e</kbd>],
-        description: 'Full screen (Raw View)',
+        description: 'Toggle Full screen (Raw View)',
       },
       {
         keys: [<ModKey key="mod" />, '+', <kbd key="k">k</kbd>],
@@ -27,7 +27,7 @@ function getAvailableShortcuts() {
       },
       {
         keys: [<kbd key="esc">Esc</kbd>],
-        description: 'Exit Full Screen (Raw View)',
+        description: 'Exit Full Screen, Exit Search (Raw View)',
       },
     ],
     'PDF Manager': [
@@ -36,8 +36,16 @@ function getAvailableShortcuts() {
         description: 'Show/Hide Templates',
       },
       {
-        keys: [<ModKey key="mod" />, '+', <kbd key="0-9">0-9</kbd>],
+        keys: [<ModKey key="mod" />, '+', <kbd key=".">.</kbd>],
+        description: 'Add Rule',
+      },
+      {
+        keys: [<ModKey key="mod" />, '+', <kbd key="1-9">1-9</kbd>],
         description: 'Add Specific Template',
+      },
+      {
+        keys: [<ModKey key="mod" />, '+', <kbd key="j">j</kbd>],
+        description: 'Clear Rules',
       },
     ],
   };

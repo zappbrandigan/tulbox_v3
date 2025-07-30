@@ -7,6 +7,7 @@ import {
   ToggleRight,
   AlertCircle,
   Regex,
+  Trash,
 } from 'lucide-react';
 import { SearchReplaceRule } from '@/types';
 import { useToast, useShortcut } from '@/hooks';
@@ -31,27 +32,14 @@ const Header = ({
   setShowAdvanced,
   onRulesChange,
   rules,
+  addRule,
 }: {
   showAdvanced: boolean;
   setShowAdvanced: React.Dispatch<React.SetStateAction<boolean>>;
   onRulesChange: (rules: SearchReplaceRule[]) => void;
   rules: SearchReplaceRule[];
+  addRule: () => void;
 }) => {
-  const addRule = () => {
-    const newRule: SearchReplaceRule = {
-      id: Date.now().toString(),
-      searchPattern: '',
-      replaceWith: '',
-      isRegex: false,
-      isEnabled: true,
-    };
-    onRulesChange([...rules, newRule]);
-  };
-
-  useShortcut({
-    'mod+h': () => setShowAdvanced((prev) => !prev),
-  });
-
   return (
     <div className="flex items-center justify-between">
       <div className="flex items-center space-x-2">
@@ -66,6 +54,14 @@ const Header = ({
           className="text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors"
         >
           {showAdvanced ? 'Hide Templates' : 'Show Templates'}
+        </button>
+        <button
+          onClick={() => onRulesChange([])}
+          disabled={rules.length === 0}
+          className="inline-flex items-center px-3 py-1.5 bg-amber-600 text-white text-sm font-medium rounded-lg hover:bg-amber-700 transition-colors disabled:bg-gray-300"
+        >
+          <Trash className="w-4 h-4 mr-1" />
+          Clear Rules
         </button>
         <button
           onClick={addRule}
@@ -96,7 +92,7 @@ const TemplateGrid = ({
         {commonReplacements.map((template, index) => (
           <button
             key={index}
-            title={`${template.desc} (ctrl+${index + 1})`}
+            title={`${template.desc} (#${index + 1})`}
             onClick={() => {
               const newRule = createRuleFromTemplate(template, index);
               onRulesChange([...rules, newRule]);
@@ -280,27 +276,17 @@ const RuleCard = ({
 
 const FooterButton = ({
   rules,
-  onApply,
+  applyRules,
 }: {
   rules: SearchReplaceRule[];
-  onApply: () => void;
+  applyRules: () => void;
 }) => {
   if (rules.length === 0) return null;
-
-  const { showToast } = useToast();
 
   return (
     <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700 flex justify-end">
       <button
-        onClick={() => {
-          onApply();
-          showToast({
-            message: 'Rule(s) applied!',
-            icon: (
-              <Regex className="w-4 h-4 text-blue-500 dark:text-blue-300" />
-            ),
-          });
-        }}
+        onClick={applyRules}
         disabled={
           rules.filter((r) => r.isEnabled && r.searchPattern).length === 0
         }
@@ -323,16 +309,45 @@ const SearchReplace = ({
   onApply: () => void;
 }) => {
   const [showAdvanced, setShowAdvanced] = useState(false);
+  const { showToast } = useToast();
+
+  const applyRules = () => {
+    onApply();
+    showToast({
+      message: 'Rule(s) applied!',
+      icon: <Regex className="w-4 h-4 text-blue-500 dark:text-blue-300" />,
+    });
+  };
+
+  const addRule = () => {
+    const newRule: SearchReplaceRule = {
+      id: Date.now().toString(),
+      searchPattern: '',
+      replaceWith: '',
+      isRegex: false,
+      isEnabled: true,
+    };
+    onRulesChange([...rules, newRule]);
+  };
 
   useShortcut(
-    commonReplacements.reduce((acc, template, index) => {
-      acc[`mod+${index + 1}`] = (e: KeyboardEvent) => {
-        e.preventDefault();
-        const newRule = createRuleFromTemplate(template, index);
-        onRulesChange([...rules, newRule]);
-      };
-      return acc;
-    }, {} as { [combo: string]: (e: KeyboardEvent) => void }),
+    {
+      'mod+h': () => setShowAdvanced((prev) => !prev),
+      'mod+.': () => addRule(),
+      'mod+j': () => onRulesChange([]),
+      'mod+shift+enter': () => {
+        if (rules.some((r) => r.isEnabled && r.searchPattern)) {
+          applyRules();
+        }
+      },
+      ...commonReplacements.reduce((acc, template, index) => {
+        acc[`mod+${index + 1}`] = () => {
+          const newRule = createRuleFromTemplate(template, index);
+          onRulesChange([...rules, newRule]);
+        };
+        return acc;
+      }, {} as { [combo: string]: (e: KeyboardEvent) => void }),
+    },
     [rules]
   );
 
@@ -343,6 +358,7 @@ const SearchReplace = ({
         setShowAdvanced={setShowAdvanced}
         rules={rules}
         onRulesChange={onRulesChange}
+        addRule={addRule}
       />
 
       <TemplateGrid
@@ -353,7 +369,7 @@ const SearchReplace = ({
 
       <RuleCard rules={rules} onRulesChange={onRulesChange} />
 
-      <FooterButton rules={rules} onApply={onApply} />
+      <FooterButton rules={rules} applyRules={applyRules} />
     </Panel>
   );
 };

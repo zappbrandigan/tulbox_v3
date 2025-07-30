@@ -20,9 +20,12 @@ const Layout: React.FC<LayoutProps> = ({
 }) => {
   const [showShortcuts, setShowShortcuts] = useState(false);
 
-  useShortcut({
-    'mod+/': () => setShowShortcuts(true),
-  });
+  useShortcut(
+    {
+      'mod+/': () => setShowShortcuts(true),
+    },
+    []
+  );
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-200 dark:from-slate-900 dark:via-gray-900 dark:to-black transition-color duration-300">
       <Header
