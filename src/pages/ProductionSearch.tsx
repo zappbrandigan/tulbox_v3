@@ -8,6 +8,7 @@ import {
   Tv,
   Gamepad2,
   CircleUser,
+  CircleXIcon,
 } from 'lucide-react';
 import {
   AKATitle,
@@ -49,6 +50,7 @@ const ProductionSearch: React.FC = () => {
     setSearchResults([]);
     setSelectedProduction(null);
     setAkaTitles([]);
+    setError(false);
 
     try {
       const results = await searchIMDB(searchQuery, searchType, sessionId);
@@ -145,13 +147,24 @@ const ProductionSearch: React.FC = () => {
         'imdb-search',
         'error'
       );
-      console.error('Failed to load production details:', error);
+      setError(true);
+      console.warn('Failed to load production details:', error);
     } finally {
       setIsLoadingDetails(false);
       setSearchQuery('');
       setSearchResults([]);
       handleGetAkas(result);
     }
+  };
+
+  const handleClearAll = () => {
+    setIsSearching(false);
+    setIsLoadingAkas(false);
+    setIsLoadingDetails(false);
+    setSearchResults([]);
+    setSelectedProduction(null);
+    setAkaTitles([]);
+    setError(false);
   };
 
   const iconMap: Record<productionType, JSX.Element> = {
@@ -249,6 +262,20 @@ const ProductionSearch: React.FC = () => {
             </p>
           </div>
         )}
+      {/* TODO: update error handling and display */}
+      {error && (
+        <div className="flex items-start gap-4 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-500/50 text-red-700 dark:text-red-300 p-4 rounded-lg transition-colors">
+          <span className="flex-1">
+            Details are not currently available for the selected production.
+          </span>
+          <button
+            onClick={handleClearAll}
+            className="ml-auto text-red-700 dark:text-red-300 hover:text-red-500 dark:hover:text-red-200"
+          >
+            <CircleXIcon />
+          </button>
+        </div>
+      )}
     </>
   );
 };
