@@ -1,4 +1,4 @@
-import { ModKey } from '@/components/ui';
+import { ModKey, ReturnKey, ShiftKey } from '@/components/ui';
 
 function getAvailableShortcuts() {
   return {
@@ -14,6 +14,10 @@ function getAvailableShortcuts() {
     ],
     'CWR Converter': [
       {
+        keys: [<kbd key="esc">Esc</kbd>],
+        description: 'Exit Full Screen, Exit Search (Raw View)',
+      },
+      {
         keys: [<ModKey key="mod" />, '+', <kbd key="f">f</kbd>],
         description: 'Toggle Search (Raw View)',
       },
@@ -24,10 +28,6 @@ function getAvailableShortcuts() {
       {
         keys: [<ModKey key="mod" />, '+', <kbd key="k">k</kbd>],
         description: 'Toggle Tooltips (Raw View)',
-      },
-      {
-        keys: [<kbd key="esc">Esc</kbd>],
-        description: 'Exit Full Screen, Exit Search (Raw View)',
       },
     ],
     'PDF Manager': [
@@ -40,12 +40,16 @@ function getAvailableShortcuts() {
         description: 'Add Rule',
       },
       {
-        keys: [<ModKey key="mod" />, '+', <kbd key="1-9">1-9</kbd>],
-        description: 'Add Specific Template',
-      },
-      {
         keys: [<ModKey key="mod" />, '+', <kbd key="j">j</kbd>],
         description: 'Clear Rules',
+      },
+      {
+        keys: [<ModKey key="mod" />, '+', <kbd key="1-9">1-9</kbd>],
+        description: 'Add Rule Template',
+      },
+      {
+        keys: [<ModKey key="mod" />, '+', <ShiftKey />, '+', <ReturnKey />],
+        description: 'Apply Rules',
       },
     ],
   };
