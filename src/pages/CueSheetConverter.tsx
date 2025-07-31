@@ -190,19 +190,22 @@ const CueSheetConverter: React.FC = () => {
 
       {isProcessing && <LoadingOverlay message="Processing..." />}
 
-      {files.length > 0 && cueRows.length === 0 && !isProcessing && (
-        <Panel>
-          <div className="flex flex-col items-center justify-center text-center px-6 py-16  text-gray-500 dark:text-gray-400">
-            <MousePointer2 className="text-gray-500 dark:text-gray-400 size-10 mb-6 font-normal" />
-            <p className="text-lg font-medium mb-2">
-              Select a Cue Sheet Format
-            </p>
-            <p className="text-sm max-w-md">
-              Choose a parsing template to begin converting your cue sheet.
-            </p>
-          </div>
-        </Panel>
-      )}
+      {files.length > 0 &&
+        cueRows.length === 0 &&
+        !isProcessing &&
+        !isError && (
+          <Panel>
+            <div className="flex flex-col items-center justify-center text-center px-6 py-16  text-gray-500 dark:text-gray-400">
+              <MousePointer2 className="text-gray-500 dark:text-gray-400 size-10 mb-6 font-normal" />
+              <p className="text-lg font-medium mb-2">
+                Select a Cue Sheet Format
+              </p>
+              <p className="text-sm max-w-md">
+                Choose a parsing template to begin converting your cue sheet.
+              </p>
+            </div>
+          </Panel>
+        )}
 
       <CueTable
         cueRows={cueRows}
