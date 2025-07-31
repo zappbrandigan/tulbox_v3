@@ -63,6 +63,7 @@ const CueSheetConverter: React.FC = () => {
     setFiles([]);
     setCueRows([]);
     setWarnings([]);
+    setIsError(false);
   };
 
   const handleExport = () => {
