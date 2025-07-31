@@ -12,6 +12,8 @@ import { FileItem } from '@/types';
 import { logUserEvent } from '@/utils/general/logEvent';
 import { ensurePdfExtension } from '@/utils';
 import { useSessionId } from '@/context/sessionContext';
+import SortableHeader from '../ui/SortableHeader';
+import { useSortableData } from '@/hooks';
 
 interface FileTableProps {
   files: FileItem[];
@@ -26,6 +28,13 @@ const FileTable: React.FC<FileTableProps> = ({
 }) => {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editValue, setEditValue] = useState('');
+  const {
+    sortedItems: sortedFiles,
+    sortConfig,
+    requestSort,
+  } = useSortableData<FileItem, 'currentName' | 'characterCount' | 'status'>(
+    files
+  );
 
   const sessionId = useSessionId();
 
@@ -156,22 +165,32 @@ const FileTable: React.FC<FileTableProps> = ({
         <table className="w-full">
           <thead className="bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
             <tr>
-              <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wide">
-                Current Name
-              </th>
-              <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wide">
-                Characters
-              </th>
-              <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wide">
-                Status
-              </th>
+              <SortableHeader
+                label="Current Name"
+                columnKey="currentName"
+                sortConfig={sortConfig}
+                onSort={requestSort}
+              />
+              <SortableHeader
+                label="Characters"
+                columnKey="characterCount"
+                sortConfig={sortConfig}
+                onSort={requestSort}
+              />
+              <SortableHeader
+                label="Status"
+                columnKey="status"
+                sortConfig={sortConfig}
+                onSort={requestSort}
+              />
               <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wide">
                 Actions
               </th>
             </tr>
           </thead>
+
           <tbody>
-            {files.map((file) => (
+            {sortedFiles.map((file) => (
               <tr key={file.id} className={getRowClassName(file.status)}>
                 <td className="px-6 py-4 text-sm">
                   {editingId === file.id ? (

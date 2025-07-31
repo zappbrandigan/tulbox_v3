@@ -93,14 +93,8 @@ const downloadRenamedFiles = async (files: FileItem[]): Promise<void> => {
     if (!['valid', 'modified', 'dotified'].includes(fileItem.status)) continue;
 
     try {
-      // Create a new blob with the original file data
       const blob = new Blob([fileItem.file], { type: fileItem.file.type });
-
-      // Add file to zip
       zip.file(ensurePdfExtension(fileItem.currentName), blob);
-
-      // Small delay between processing files to avoid browser blocking
-      await new Promise((resolve) => setTimeout(resolve, 100));
     } catch (error) {
       console.error('Error downloading file:', fileItem.currentName, error);
     }
@@ -125,8 +119,6 @@ export {
   ensurePdfExtension,
   downloadRenamedFiles,
   escapeRegExp,
-  // applyCueSheetConventionOne,
-  // applyCueSheetConventionTwo,
   applySearchReplace,
   checkForDuplicates,
   validateFileName,

@@ -154,7 +154,7 @@ const PDFManager: React.FC = () => {
       <DragDropZone
         onFilesAdded={handleFilesAdded}
         accept=".pdf"
-        maxFiles={100}
+        maxFiles={200}
         allowMultiple={true}
         validateFile={(file) =>
           file.type === 'application/pdf' ||
@@ -162,7 +162,7 @@ const PDFManager: React.FC = () => {
         }
         title="Upload PDF Files"
         description="Drag and drop your PDF files here, or click to browse"
-        note="Maximum 100 files • PDF format only"
+        note="Maximum 200 files • PDF format only"
         isVisible={files.length === 0}
       />
 

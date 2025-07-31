@@ -83,6 +83,13 @@ export interface IMDBSearchResult {
   stars: string;
 }
 
+export type SortDirection = 'asc' | 'desc';
+
+export interface SortConfig<TKey> {
+  key: TKey;
+  direction: SortDirection;
+}
+
 // For future use
 // export interface IMDbSearchResponse {
 //   data: {
