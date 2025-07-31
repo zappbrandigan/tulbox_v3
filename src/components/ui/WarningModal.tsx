@@ -11,10 +11,10 @@ const WarningModal: React.FC<Props> = ({
   showWarnings,
   setShowWarnings,
 }) => {
-  if (warnings.length === 0 || !showWarnings) return null;
   useShortcut({
     escape: () => setShowWarnings(false),
   });
+  if (warnings.length === 0 || !showWarnings) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 !mt-0">
@@ -28,7 +28,7 @@ const WarningModal: React.FC<Props> = ({
             Close
           </button>
         </div>
-        <ul className="list-disc list-inside text-sm text-gray-800 dark:text-gray-200 space-y-1 max-h-64 overflow-auto">
+        <ul className="list-none list-inside text-sm text-gray-800 dark:text-gray-200 space-y-1 max-h-64 overflow-auto">
           {warnings.map((w, i) => (
             <li key={i} dangerouslySetInnerHTML={{ __html: w }} />
           ))}
