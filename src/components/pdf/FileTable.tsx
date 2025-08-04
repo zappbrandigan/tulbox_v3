@@ -202,7 +202,10 @@ const FileTable: React.FC<FileTableProps> = ({
                         className="flex-1 px-3 py-1 border border-gray-300 dark:border-gray-600 rounded-md text-sm dark:bg-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                         onKeyDown={(e) => {
                           if (e.key === 'Enter') saveEdit();
-                          if (e.key === 'Escape') cancelEdit();
+                          if (e.key === 'Escape') {
+                            e.preventDefault();
+                            cancelEdit();
+                          }
                         }}
                         autoFocus
                       />
