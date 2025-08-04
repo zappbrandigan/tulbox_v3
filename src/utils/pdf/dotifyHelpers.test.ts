@@ -35,7 +35,7 @@ describe('dotifyHelpers', () => {
     });
 
     it('preserves spacing between words (normalized)', () => {
-      expect(titleCase('  the   long  night  ')).toBe('The Long Night');
+      expect(titleCase('  the   long  night  ')).toBe('The   Long  Night');
     });
 
     it('handles punctuation in words', () => {

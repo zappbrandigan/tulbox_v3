@@ -38,19 +38,18 @@ export const articles = [
 ];
 
 export const titleCase = (input: string): string => {
-  const words = input.trim().split(/\s+/);
-  const len = words.length;
+  const trimmed = input.trim();
+  return trimmed.replace(/\b[\p{L}\p{N}']+\b/gu, (word, offset, fullString) => {
+    const lower = word.toLowerCase();
 
-  return words
-    .map((word, index) => {
-      const lower = word.toLowerCase();
+    const isStart = offset === 0;
+    const isEnd = offset + word.length === fullString.length;
+    const isFirstOrLast = isStart || isEnd;
 
-      const isFirstOrLast = index === 0 || index === len - 1;
-      const needsCap = isFirstOrLast || !SMALL_WORDS.has(lower);
+    const needsCap = isFirstOrLast || !SMALL_WORDS.has(lower);
 
-      return needsCap ? lower.charAt(0).toUpperCase() + lower.slice(1) : lower;
-    })
-    .join(' ');
+    return needsCap ? lower.charAt(0).toUpperCase() + lower.slice(1) : lower;
+  });
 };
 
 export const removeExtension = (title: string) => {
