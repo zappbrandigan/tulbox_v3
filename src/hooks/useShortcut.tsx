@@ -5,13 +5,33 @@ import {
 } from '@/utils/general/shortcutManager';
 
 export const useShortcut = (
-  bindings: { [combo: string]: (e: KeyboardEvent) => void },
+  bindings: {
+    [combo: string]:
+      | ((e: KeyboardEvent) => void)
+      | { callback: (e: KeyboardEvent) => void; allowInInput?: boolean };
+  },
   deps: any[] = []
 ) => {
   const idRef = useRef<symbol>(Symbol());
 
   useEffect(() => {
-    registerShortcuts(idRef.current, bindings);
+    const map = new Map<
+      string,
+      { callback: (e: KeyboardEvent) => void; allowInInput?: boolean }
+    >();
+
+    for (const [key, val] of Object.entries(bindings)) {
+      if (typeof val === 'function') {
+        map.set(key, { callback: val, allowInInput: false });
+      } else {
+        map.set(key, {
+          callback: val.callback,
+          allowInInput: !!val.allowInInput,
+        });
+      }
+    }
+
+    registerShortcuts(idRef.current, map);
     return () => unregisterShortcuts(idRef.current);
   }, deps);
 };

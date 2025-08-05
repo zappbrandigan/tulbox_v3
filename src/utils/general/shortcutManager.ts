@@ -1,5 +1,11 @@
 type ShortcutCallback = (e: KeyboardEvent) => void;
-type BindingMap = Record<string, ShortcutCallback>;
+
+interface ShortcutOptions {
+  callback: ShortcutCallback;
+  allowInInput?: boolean;
+}
+
+type BindingMap = Map<string, ShortcutOptions>;
 
 const bindingsMap = new Map<symbol, BindingMap>();
 
@@ -29,15 +35,17 @@ const isTypingTarget = (el: EventTarget | null): boolean => {
 };
 
 const globalHandler = (e: KeyboardEvent) => {
-  if (isTypingTarget(e.target)) return;
-
   const combo = getCombo(e);
-  for (const binding of bindingsMap.values()) {
-    const fn = binding[combo];
-    if (fn) {
-      e.preventDefault();
-      fn(e);
-    }
+  const isTyping = isTypingTarget(e.target);
+
+  for (const bindings of bindingsMap.values()) {
+    const match = bindings.get(combo);
+    if (!match) continue;
+
+    if (!match.allowInInput && isTyping) return;
+
+    e.preventDefault();
+    match.callback(e);
   }
 };
 

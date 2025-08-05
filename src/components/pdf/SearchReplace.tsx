@@ -145,7 +145,7 @@ const Inputs = ({
           onChange={(e) =>
             updateRule(rule.id, { searchPattern: e.target.value })
           }
-          autoFocus={rule ? true : false}
+          autoFocus={!rule.searchPattern ? true : false}
           autoComplete="off"
           placeholder="Enter search pattern..."
           className={`w-full px-3 py-2 text-sm rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
@@ -334,12 +334,21 @@ const SearchReplace = ({
   useShortcut(
     {
       'mod+h': () => setShowAdvanced((prev) => !prev),
-      'mod+.': () => addRule(),
-      'mod+j': () => onRulesChange([]),
-      'mod+shift+enter': () => {
-        if (rules.some((r) => r.isEnabled && r.searchPattern)) {
-          applyRules();
-        }
+      'mod+.': {
+        callback: () => addRule(),
+        allowInInput: true,
+      },
+      'mod+j': {
+        callback: () => onRulesChange([]),
+        allowInInput: true,
+      },
+      'mod+shift+enter': {
+        callback: () => {
+          if (rules.some((r) => r.isEnabled && r.searchPattern)) {
+            applyRules();
+          }
+        },
+        allowInInput: true,
       },
       ...commonReplacements.reduce((acc, template, index) => {
         acc[`mod+${index + 1}`] = () => {
