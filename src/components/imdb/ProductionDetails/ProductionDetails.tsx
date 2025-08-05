@@ -7,6 +7,7 @@ import Cast from './Cast';
 import Director from './Director';
 import ProductionCompanies from './ProductionCompanies';
 import AkaTitlesTable from './AkaTitlesTable';
+import { Panel } from '@/components/ui';
 
 interface ProductionDetailsProps {
   selectedProduction: IMDBProduction;
@@ -22,7 +23,7 @@ const ProductionDetails: React.FC<ProductionDetailsProps> = ({
   getTypeIcon,
 }) => {
   return (
-    <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+    <Panel className="p-0 overflow-hidden">
       <ProductionHeader
         selectedProduction={selectedProduction}
         getTypeIcon={getTypeIcon}
@@ -43,7 +44,7 @@ const ProductionDetails: React.FC<ProductionDetailsProps> = ({
 
         <AkaTitlesTable akaTitles={akaTitles} isLoadingAkas={isLoadingAkas} />
       </div>
-    </div>
+    </Panel>
   );
 };
 

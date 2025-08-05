@@ -1,5 +1,5 @@
 import React from 'react';
-import { ExternalLink } from 'lucide-react';
+import { ExternalLink, Copy } from 'lucide-react';
 import { useToast } from '@/hooks/useToast';
 
 interface IMDBCodeProps {
@@ -17,14 +17,17 @@ const IMDBCode: React.FC<IMDBCodeProps> = ({ imdbCode }) => {
           navigator.clipboard.writeText(code);
           showToast();
         }}
-        className="flex items-center space-x-2"
+        className="flex items-center space-x-2 group"
       >
         <span className="font-medium text-gray-900 dark:text-gray-100">
-          IMDB Code:
+          IMDb Code:
         </span>
         <code className="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-sm font-mono hover:cursor-pointer text-gray-800 dark:text-gray-100">
           {imdbCode}
         </code>
+        <button className="opacity-0 group-hover:opacity-100 p-1 text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-all focus:opacity-100">
+          <Copy className="size-4" />
+        </button>
       </div>
       <a
         href={`https://www.imdb.com/title/${imdbCode}/`}

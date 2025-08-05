@@ -1,7 +1,7 @@
 import { LoadingOverlay } from '@/components/ui';
 import { AKATitle } from '@/types';
 import { useToast } from '@/hooks/useToast';
-import { Globe } from 'lucide-react';
+import { Copy, Globe } from 'lucide-react';
 
 interface AkaTitlesTableProps {
   akaTitles: AKATitle[];
@@ -63,7 +63,7 @@ const AkaTitlesTable: React.FC<AkaTitlesTableProps> = ({
                   );
                   showToast();
                 }}
-                className="hover:bg-gray-50 dark:hover:bg-gray-700 hover:cursor-pointer transition-colors"
+                className="group hover:bg-gray-50 dark:hover:bg-gray-700 hover:cursor-pointer transition-colors"
               >
                 <td className="px-4 py-2 text-sm text-gray-700 dark:text-gray-200 font-mono">
                   {aka.transliterated}
@@ -74,8 +74,11 @@ const AkaTitlesTable: React.FC<AkaTitlesTableProps> = ({
                 <td className="px-4 py-2 text-sm text-gray-700 dark:text-gray-200">
                   {aka.language}
                 </td>
-                <td className="px-4 py-2 text-sm text-gray-700 dark:text-gray-200">
-                  {aka.type}
+                <td className="flex px-4 py-2 text-sm text-gray-700 dark:text-gray-200">
+                  <span>{aka.type}</span>
+                  <button className="opacity-0 ml-auto group-hover:opacity-100 p-1 text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-all focus:opacity-100">
+                    <Copy className="size-4" />
+                  </button>
                 </td>
               </tr>
             ))}
