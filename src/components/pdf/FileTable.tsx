@@ -220,7 +220,10 @@ const FileTable: React.FC<FileTableProps> = ({
                       </button>
                     </div>
                   ) : (
-                    <div className="flex items-center space-x-2 group">
+                    <div
+                      onClick={() => startEditing(file)}
+                      className="flex items-center space-x-2 hover:cursor-pointer group"
+                    >
                       <span className="flex-1 font-medium text-gray-900 dark:text-white whitespace-pre">
                         {file.currentName}
                       </span>
