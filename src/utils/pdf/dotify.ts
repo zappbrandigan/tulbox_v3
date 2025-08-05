@@ -52,8 +52,8 @@ function normalizeParts(
     return s.trim();
   };
 
-  const newProd = trim(prodTitle);
-  const newEp = trim(epTitle);
+  const newProd = trim(prodTitle)?.toUpperCase();
+  const newEp = epTitle ? titleCase(trim(epTitle)!) : epTitle;
   const newNum = trim(epNum);
 
   if (newProd !== prodTitle || newEp !== epTitle || newNum !== epNum) {
@@ -106,10 +106,7 @@ function sanitizeDotification(
   parts: TitleParts,
   track: (s: DotifyStatus | null) => void
 ): TitleParts {
-  const dotVariants = [
-    /\.{3,}/g, // "..."
-    /\s?\.\s?\.\s?\./g, // " . . ." or " . . ." or even ". . ."
-  ];
+  const dotVariants = [/\.{3,}/g, /\s?\.\s?\.\s?\./g];
 
   const clean = (text: string) =>
     dotVariants.reduce((acc, rx) => acc.replace(rx, '. . .'), text);
@@ -197,8 +194,8 @@ function dotifyIfOverflow(parts: TitleParts): TitleParts {
 
 function buildTitle({ prodTitle, epTitle, epNum }: TitleParts): string {
   return epTitle
-    ? `${prodTitle.toUpperCase()}   ${titleCase(epTitle)}  ${epNum}`
-    : `${prodTitle.toUpperCase()}   ${epNum}`;
+    ? `${prodTitle}   ${epTitle}  ${epNum}`
+    : `${prodTitle}   ${epNum}`;
 }
 
 function dotifyTitleGeneric(

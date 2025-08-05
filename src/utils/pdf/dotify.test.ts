@@ -196,7 +196,7 @@ describe('normalizeParts', () => {
 
     expect(result).toEqual({
       prodTitle: 'SHOW, THE',
-      epTitle: 'ep title, the',
+      epTitle: 'Ep Title, The',
       epNum: 'Ep No. 123',
     });
 
@@ -206,7 +206,7 @@ describe('normalizeParts', () => {
   it('does not modify already clean values', () => {
     const parts = {
       prodTitle: 'SHOW, THE',
-      epTitle: 'EP, A',
+      epTitle: 'Ep, A',
       epNum: 'Ep No. 123',
     };
     const track = vi.fn();
