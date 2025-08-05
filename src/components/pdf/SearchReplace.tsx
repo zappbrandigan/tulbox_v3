@@ -145,6 +145,7 @@ const Inputs = ({
           onChange={(e) =>
             updateRule(rule.id, { searchPattern: e.target.value })
           }
+          autoFocus={rule ? true : false}
           autoComplete="off"
           placeholder="Enter search pattern..."
           className={`w-full px-3 py-2 text-sm rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${

@@ -22,7 +22,15 @@ const getCombo = (e: KeyboardEvent): string => {
   return parts.join('+');
 };
 
+const isTypingTarget = (el: EventTarget | null): boolean => {
+  if (!(el instanceof HTMLElement)) return false;
+  const tag = el.tagName.toLowerCase();
+  return tag === 'input' || tag === 'textarea' || el.isContentEditable;
+};
+
 const globalHandler = (e: KeyboardEvent) => {
+  if (isTypingTarget(e.target)) return;
+
   const combo = getCombo(e);
   for (const binding of bindingsMap.values()) {
     const fn = binding[combo];
