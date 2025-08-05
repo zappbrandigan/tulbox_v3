@@ -334,21 +334,12 @@ const SearchReplace = ({
   useShortcut(
     {
       'mod+h': () => setShowAdvanced((prev) => !prev),
-      'mod+.': {
-        callback: () => addRule(),
-        allowInInput: true,
-      },
-      'mod+j': {
-        callback: () => onRulesChange([]),
-        allowInInput: true,
-      },
-      'mod+shift+enter': {
-        callback: () => {
-          if (rules.some((r) => r.isEnabled && r.searchPattern)) {
-            applyRules();
-          }
-        },
-        allowInInput: true,
+      'mod+.': () => addRule(),
+      'mod+j': () => onRulesChange([]),
+      'mod+shift+enter': () => {
+        if (rules.some((r) => r.isEnabled && r.searchPattern)) {
+          applyRules();
+        }
       },
       ...commonReplacements.reduce((acc, template, index) => {
         acc[`mod+${index + 1}`] = () => {

@@ -22,7 +22,7 @@ export const useShortcut = (
 
     for (const [key, val] of Object.entries(bindings)) {
       if (typeof val === 'function') {
-        map.set(key, { callback: val, allowInInput: false });
+        map.set(key, { callback: val, allowInInput: true });
       } else {
         map.set(key, {
           callback: val.callback,
