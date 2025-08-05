@@ -229,7 +229,7 @@ const FileTable: React.FC<FileTableProps> = ({
                       </span>
                       <button
                         onClick={() => startEditing(file)}
-                        className="opacity-0 group-hover:opacity-100 p-1 text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-all"
+                        className="opacity-0 group-hover:opacity-100 p-1 text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-all focus:opacity-100"
                       >
                         <Edit3 className="w-4 h-4" />
                       </button>
