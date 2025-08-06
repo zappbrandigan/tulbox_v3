@@ -1,4 +1,4 @@
-import { analytics } from '../../firebase.js';
+import { analytics } from '@/firebase.js';
 import { logEvent } from 'firebase/analytics';
 
 const isDev = import.meta.env.MODE === 'development';
