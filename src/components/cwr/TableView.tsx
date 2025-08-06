@@ -3,7 +3,7 @@ import { getTemplateById } from '@/utils';
 import { CWRTemplateField } from '@/types';
 import { Table } from 'lucide-react';
 import ReportWorker from '@/workers/reportWorker?worker';
-import { Progress } from '@/components/ui';
+import { LoadingOverlay } from '@/components/ui';
 
 const ROW_HEIGHT = 36;
 const PAGE_SIZE = 50;
@@ -18,7 +18,6 @@ interface Props {
   >;
   isProcessing: boolean;
   progress: number;
-  onProgress: (pct: number) => void;
   onReady: () => void;
 }
 
@@ -29,8 +28,6 @@ const TableView: React.FC<Props> = ({
   reportData,
   setReportData,
   isProcessing,
-  progress,
-  onProgress,
   onReady,
 }) => {
   const [startIndex, setStartIndex] = useState(0);
@@ -45,24 +42,22 @@ const TableView: React.FC<Props> = ({
     const MIN_DURATION = 500;
     const start = Date.now();
 
-    onProgress(0);
+    // onProgress(0);
     setReportData([]); // clear old rows
 
     const worker = new ReportWorker();
     worker.postMessage({
       type: 'generate',
       fileContent,
-      fileName,
       selectedTemplate,
-      chunk: 4_000,
     });
 
     worker.onmessage = (e) => {
       const { type } = e.data as { type: string };
-      if (type === 'progress') {
-        onProgress(Math.min(e.data.pct, 0.99));
-        return;
-      }
+      // if (type === 'progress') {
+      //   onProgress(Math.min(e.data.pct, 0.99));
+      //   return;
+      // }
 
       if (type === 'error') {
         console.error('Worker Error:', e.data.error);
@@ -80,7 +75,7 @@ const TableView: React.FC<Props> = ({
         });
 
         setTimeout(() => {
-          onProgress(100);
+          // onProgress(100);
           onReady();
           worker.terminate();
         }, remaining);
@@ -112,13 +107,15 @@ const TableView: React.FC<Props> = ({
 
       <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
         {isProcessing ? (
-          <Progress
-            progress={progress}
-            message={progress > 0.95 ? 'Loading Table' : 'Generating Report'}
-          />
-        ) : isPending ? (
-          <Progress progress={1} message="Rendering" />
-        ) : !template || reportData.length === 0 ? (
+          <LoadingOverlay />
+        ) : // <Progress
+        //   progress={progress}
+        //   message={progress > 0.95 ? 'Loading Table' : 'Generating Report'}
+        // />
+        isPending ? (
+          <LoadingOverlay />
+        ) : // <Progress progress={1} message="Rendering" />
+        !template || reportData.length === 0 ? (
           <div className="py-12 text-center text-sm text-gray-500 dark:text-gray-400">
             No data to display. Try selecting a different template or uploading
             a file.

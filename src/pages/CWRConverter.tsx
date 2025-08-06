@@ -246,7 +246,6 @@ const CWRConverter: React.FC = () => {
           setReportData={setReportData}
           isProcessing={isProcessing}
           progress={progress}
-          onProgress={setProgress}
           onReady={() => setIsProcessing(false)}
         />
       )}
