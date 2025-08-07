@@ -192,7 +192,7 @@ const FileTable: React.FC<FileTableProps> = ({
           <tbody>
             {sortedFiles.map((file) => (
               <tr key={file.id} className={getRowClassName(file.status)}>
-                <td className="px-6 py-4 text-sm">
+                <td className="px-6 py-4 text-sm w-[60%]">
                   {editingId === file.id ? (
                     <div className="flex items-center space-x-2">
                       <input
