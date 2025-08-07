@@ -198,7 +198,7 @@ const ScrollArea: React.FC<Props> = ({
                   }`}
                   style={{ height: `${ROW_HEIGHT}px` }}
                 >
-                  <div className="flex-shrink-0 w-12 px-3 py-1 text-gray-500 text-right border-r border-gray-700 bg-gray-800 select-none">
+                  <div className="flex-shrink-0 min-w-12 px-3 py-1 text-gray-400 text-right border-r border-gray-700 select-none">
                     {actualIndex + 1}
                   </div>
                   <div className="flex-1 px-3 py-1 whitespace-nowrap">

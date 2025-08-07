@@ -1,4 +1,13 @@
+import { transliterate } from 'transliteration';
 import { CueRow } from './types';
+
+function inferWorkType(usage: string) {
+  const ogUsage = ['vv', 'vi', 'ot', 'ct', 'mt', 'et'];
+  for (const og of ogUsage) {
+    if (usage.toLowerCase().includes(og)) return 'OG';
+  }
+  return 'CU';
+}
 
 export function parseSoundmouseText(
   rawText: string,
@@ -118,8 +127,9 @@ export function parseSoundmouseText(
     rows.push({
       fileName,
       sequenceNumber: block.sequenceNumber,
-      workTitle: block.workTitle,
+      workTitle: transliterate(block.workTitle),
       usage: block.usage,
+      type: inferWorkType(block.usage),
       duration: block.duration,
       publishers: publishers.join(', '),
       writers: composers,

@@ -10,6 +10,7 @@ export interface CueRow {
   sequenceNumber: string;
   workTitle: string;
   usage: string;
+  type: string;
   duration: string;
   publishers: string;
   writers: WriterInfo[];
