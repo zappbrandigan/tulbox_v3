@@ -28,7 +28,7 @@ const WarningModal: React.FC<Props> = ({
             Close
           </button>
         </div>
-        <ul className="list-none list-inside text-sm text-gray-800 dark:text-gray-200 space-y-1 max-h-64 overflow-auto">
+        <ul className="list-none list-inside text-sm text-gray-800 dark:text-gray-200 space-y-1 max-h-64 overflow-auto scrollbar-none hover:scrollbar-thin scrollbar-thumb-gray-400 dark:scrollbar-thumb-gray-600 scrollbar-track-gray-100 dark:scrollbar-track-gray-800">
           {warnings.map((w, i) => (
             <li key={i} dangerouslySetInnerHTML={{ __html: w }} />
           ))}

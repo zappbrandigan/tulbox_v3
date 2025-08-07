@@ -19,9 +19,8 @@ const ProductionCompanies: React.FC<ProductionCompaniesProps> = ({
       </h3>
       <div className="flex flex-wrap gap-2">
         {productionCompanies.map((company, index) => (
-          <div className="group">
+          <div key={index} className="group">
             <span
-              key={index}
               onClick={() => {
                 navigator.clipboard.writeText(`${company}`);
                 showToast();

@@ -143,10 +143,10 @@ export function parseSoundmouseText(
       const expectedSeq = String(i + 1);
       if (row.sequenceNumber !== expectedSeq) {
         warnings.push(
-          `<span class="text-red-700 dark:text-red-300 font-semibold">[Seq: ${row.sequenceNumber}]</span>
-     <span class="text-amber-600 dark:text-amber-300 font-semibold">(File: ${row.fileName})</span>
+          `<span class="text-rose-600 dark:text-rose-300 font-semibold">[Seq: ${row.sequenceNumber}]</span>
+     <span class="text-gray-500 dark:text-gray-400 font-medium">(File: ${row.fileName})</span>
      Expected sequence number 
-     <span class="text-blue-700 dark:text-blue-300 font-semibold">${expectedSeq}</span>`
+     <span class="text-blue-600 dark:text-blue-300 font-medium">${expectedSeq}</span>`
         );
       }
 
@@ -159,9 +159,9 @@ export function parseSoundmouseText(
         const pct = parsePct(w.contribution);
         if (pct === null) {
           warnings.push(
-            `<span class="text-red-700 dark:text-red-300 font-semibold">[Seq: ${row.sequenceNumber}]</span>
-       <span class="text-amber-600 dark:text-amber-300 font-semibold">(File: ${row.fileName})</span>
-       <span class="text-blue-700 dark:text-blue-300 font-semibold">
+            `<span class="text-rose-600 dark:text-rose-300 font-semibold">[Seq: ${row.sequenceNumber}]</span>
+       <span class="text-gray-500 dark:text-gray-400 font-medium">(File: ${row.fileName})</span>
+       <span class="text-blue-600 dark:text-blue-300 font-medium">
        Missing composer percentage
        </span>`
           );
@@ -171,9 +171,9 @@ export function parseSoundmouseText(
 
       if (100 - composerTotal > 1e-6) {
         warnings.push(
-          `<span class="text-red-700 dark:text-red-300 font-semibold">[Seq: ${row.sequenceNumber}]</span> 
-     <span class="text-amber-600 dark:text-amber-300 font-semibold">(File: ${row.fileName})</span>
-     <span class="text-blue-700 dark:text-blue-300 font-semibold">
+          `<span class="text-rose-600 dark:text-rose-300 font-semibold">[Seq: ${row.sequenceNumber}]</span> 
+     <span class="text-gray-500 dark:text-gray-400 font-medium">(File: ${row.fileName})</span>
+     <span class="text-blue-600 dark:text-blue-300 font-medium">
      Composer percentages do not sum to 100%
      </span>`
         );
@@ -183,9 +183,9 @@ export function parseSoundmouseText(
         const pct = parsePct(pubStr);
         if (pct === null) {
           warnings.push(
-            `<span class="text-red-700 dark:text-red-300 font-semibold">[Seq: ${row.sequenceNumber}]</span> 
-       <span class="text-amber-600 dark:text-amber-300 font-semibold">(File: ${row.fileName})</span>
-       <span class="text-blue-700 dark:text-blue-300 font-semibold">
+            `<span class="text-rose-600 dark:text-rose-300 font-semibold">[Seq: ${row.sequenceNumber}]</span> 
+       <span class="text-gray-500 dark:text-gray-400 font-medium">(File: ${row.fileName})</span>
+       <span class="text-blue-600 dark:text-blue-300 font-medium">
        Missing publisher percentage
        </span>`
           );
@@ -195,9 +195,9 @@ export function parseSoundmouseText(
 
       if (100 - publisherTotal > 1e-6) {
         warnings.push(
-          `<span class="text-red-700 dark:text-red-300 font-semibold">[Seq: ${row.sequenceNumber}]</span> 
-     <span class="text-amber-600 dark:text-amber-300 font-semibold">(File: ${row.fileName})</span>
-     <span class="text-blue-700 dark:text-blue-300 font-semibold">
+          `<span class="text-rose-600 dark:text-rose-300 font-semibold">[Seq: ${row.sequenceNumber}]</span> 
+     <span class="text-gray-500 dark:text-gray-400 font-medium">(File: ${row.fileName})</span>
+     <span class="text-blue-600 dark:text-blue-300 font-medium">
      Publisher percentages do not sum to 100%
      </span>`
         );

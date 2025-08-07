@@ -23,7 +23,7 @@ const ProductionDetails: React.FC<ProductionDetailsProps> = ({
   getTypeIcon,
 }) => {
   return (
-    <Panel className="p-0 overflow-hidden">
+    <Panel className="!p-0 overflow-hidden">
       <ProductionHeader
         selectedProduction={selectedProduction}
         getTypeIcon={getTypeIcon}

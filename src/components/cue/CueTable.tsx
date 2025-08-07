@@ -21,7 +21,7 @@ const CueTable: React.FC<Props> = ({
   return (
     <>
       <div className="text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
-        <div className="overflow-auto max-h-[82vh] rounded-t-xl">
+        <div className="overflow-auto max-h-[82vh] rounded-t-xl  scrollbar-none hover:scrollbar-thin scrollbar-thumb-gray-400 dark:scrollbar-thumb-gray-600 scrollbar-track-gray-100 dark:scrollbar-track-gray-800">
           <table className="min-w-full table-fixed text-sm text-left">
             <thead className="sticky top-0 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 text-xs uppercase font-semibold">
               <tr>

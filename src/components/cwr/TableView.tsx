@@ -3,7 +3,7 @@ import { getTemplateById } from '@/utils';
 import { CWRTemplateField } from '@/types';
 import { Table } from 'lucide-react';
 import ReportWorker from '@/workers/reportWorker?worker';
-import { LoadingOverlay } from '@/components/ui';
+import { LoadingOverlay, Panel } from '@/components/ui';
 
 const ROW_HEIGHT = 36;
 const PAGE_SIZE = 50;
@@ -105,106 +105,99 @@ const TableView: React.FC<Props> = ({
         </h3>
       </div>
 
-      <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
-        {isProcessing ? (
-          <LoadingOverlay />
-        ) : // <Progress
-        //   progress={progress}
-        //   message={progress > 0.95 ? 'Loading Table' : 'Generating Report'}
-        // />
-        isPending ? (
-          <LoadingOverlay />
-        ) : // <Progress progress={1} message="Rendering" />
-        !template || reportData.length === 0 ? (
-          <div className="py-12 text-center text-sm text-gray-500 dark:text-gray-400">
-            No data to display. Try selecting a different template or uploading
-            a file.
-          </div>
-        ) : (
-          <>
-            <div
-              className="overflow-auto max-h-[82vh]"
-              ref={scrollRef}
-              onScroll={handleScroll}
-            >
-              <table className="min-w-full table-fixed">
-                <thead className="sticky top-0 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
-                  <tr>
-                    {template.fields.map((field: CWRTemplateField) => (
-                      <th
+      {isProcessing ? (
+        <LoadingOverlay />
+      ) : isPending ? (
+        <LoadingOverlay />
+      ) : !template || reportData.length === 0 ? (
+        <div className="py-12 text-center text-sm text-gray-500 dark:text-gray-400">
+          No data to display. Try selecting a different template or uploading a
+          file.
+        </div>
+      ) : (
+        <Panel className="!p-0 overflow-hidden">
+          <div
+            className="overflow-auto max-h-[82vh] scrollbar-none hover:scrollbar-thin scrollbar-thumb-gray-400 dark:scrollbar-thumb-gray-600 scrollbar-track-gray-100 dark:scrollbar-track-gray-800"
+            ref={scrollRef}
+            onScroll={handleScroll}
+          >
+            <table className="min-w-full table-fixed">
+              <thead className="sticky top-0 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+                <tr>
+                  {template.fields.map((field: CWRTemplateField) => (
+                    <th
+                      key={field.label}
+                      style={{ minWidth: field.width, maxWidth: field.width }}
+                      className="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wide"
+                    >
+                      {field.label}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+
+              <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+                {startIndex > 0 && (
+                  <tr style={{ height: `${startIndex * ROW_HEIGHT}px` }}>
+                    <td colSpan={template.fields.length}></td>
+                  </tr>
+                )}
+
+                {visibleData.map((record, index) => (
+                  <tr
+                    key={startIndex + index}
+                    className="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                    style={{ height: `${ROW_HEIGHT}px` }}
+                  >
+                    {template.fields.map((field) => (
+                      <td
                         key={field.label}
-                        style={{ minWidth: field.width, maxWidth: field.width }}
-                        className="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wide"
+                        style={{
+                          minWidth: field.width,
+                          maxWidth: field.width,
+                        }}
+                        className="px-6 py-2 text-sm text-gray-900 dark:text-gray-100 truncate"
                       >
-                        {field.label}
-                      </th>
+                        {record.get(field.key)}
+                      </td>
                     ))}
                   </tr>
-                </thead>
+                ))}
 
-                <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                  {startIndex > 0 && (
-                    <tr style={{ height: `${startIndex * ROW_HEIGHT}px` }}>
-                      <td colSpan={template.fields.length}></td>
-                    </tr>
-                  )}
+                {startIndex + PAGE_SIZE < reportData.length && (
+                  <tr
+                    style={{
+                      height: `${
+                        (reportData.length - startIndex - PAGE_SIZE) *
+                        ROW_HEIGHT
+                      }px`,
+                    }}
+                  >
+                    <td colSpan={template.fields.length}></td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
 
-                  {visibleData.map((record, index) => (
-                    <tr
-                      key={startIndex + index}
-                      className="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
-                      style={{ height: `${ROW_HEIGHT}px` }}
-                    >
-                      {template.fields.map((field) => (
-                        <td
-                          key={field.label}
-                          style={{
-                            minWidth: field.width,
-                            maxWidth: field.width,
-                          }}
-                          className="px-6 py-2 text-sm text-gray-900 dark:text-gray-100 truncate"
-                        >
-                          {record.get(field.key)}
-                        </td>
-                      ))}
-                    </tr>
-                  ))}
-
-                  {startIndex + PAGE_SIZE < reportData.length && (
-                    <tr
-                      style={{
-                        height: `${
-                          (reportData.length - startIndex - PAGE_SIZE) *
-                          ROW_HEIGHT
-                        }px`,
-                      }}
-                    >
-                      <td colSpan={template.fields.length}></td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
+          <div className="bg-gray-50 dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 px-4 py-2">
+            <div className="flex items-center justify-between text-xs text-gray-600 dark:text-gray-300">
+              <span>
+                <span className="text-emerald-500">{reportData.length}</span>
+                {` rows • `}
+                <span className="text-red-500">{0}</span>
+                {` errors • `}
+                <span className="text-amber-500">{0}</span>
+                {` warnings`}
+              </span>
+              <span>
+                <span>{template.name}</span>{' '}
+                <span className="text-blue-500">v{template.version}</span>
+              </span>
             </div>
-
-            <div className="bg-gray-50 dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 px-4 py-2">
-              <div className="flex items-center justify-between text-xs text-gray-600 dark:text-gray-300">
-                <span>
-                  <span className="text-emerald-500">{reportData.length}</span>
-                  {` rows • `}
-                  <span className="text-red-500">{0}</span>
-                  {` errors • `}
-                  <span className="text-amber-500">{0}</span>
-                  {` warnings`}
-                </span>
-                <span>
-                  <span>{template.name}</span>{' '}
-                  <span className="text-blue-500">v{template.version}</span>
-                </span>
-              </div>
-            </div>
-          </>
-        )}
-      </div>
+          </div>
+        </Panel>
+      )}
     </>
   );
 };

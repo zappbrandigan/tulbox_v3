@@ -156,7 +156,7 @@ const ScrollArea: React.FC<Props> = ({
       <div
         className={`min-h-[600px] ${
           isFullScreen ? 'h-[100vh]' : 'h-[73vh]'
-        } overflow-auto`}
+        } overflow-auto scrollbar-none hover:scrollbar-thin scrollbar-thumb-gray-400 dark:scrollbar-thumb-gray-600 scrollbar-track-gray-100 dark:scrollbar-track-gray-800`}
         ref={scrollContainerRef}
         onScroll={() => {
           const scrollTop = scrollContainerRef.current?.scrollTop || 0;
