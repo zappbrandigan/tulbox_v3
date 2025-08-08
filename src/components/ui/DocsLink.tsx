@@ -6,7 +6,7 @@ const DocsLink = React.forwardRef<HTMLAnchorElement, { onClick?: () => void }>(
     return (
       <a
         ref={ref}
-        href="https://docs.tulbox.app/tulbox/intro"
+        href="https://docs.tulbox.app"
         target="_blank"
         rel="noopener noreferrer"
         onClick={onClick}
