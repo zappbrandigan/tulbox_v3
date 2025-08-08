@@ -42,7 +42,6 @@ const FileTable: React.FC<FileTableProps> = ({
     logUserEvent(sessionId, 'PDF Files Inline Edit', {
       action: 'ui-interaction',
       target: 'file-edit',
-      value: file.currentName,
     });
     setEditingId(file.id);
     setEditValue(file.currentName);
