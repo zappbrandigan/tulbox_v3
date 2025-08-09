@@ -147,8 +147,11 @@ const Inputs = ({
           }
           autoFocus={!rule.searchPattern ? true : false}
           autoComplete="off"
+          autoCorrect="off"
+          autoCapitalize="off"
+          spellCheck={false}
           placeholder="Enter search pattern..."
-          className={`w-full px-3 py-2 text-sm rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+          className={`w-full px-3 py-2 text-sm rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 read-only:focus:ring-transparent ${
             rule.isRegex &&
             rule.searchPattern &&
             !validateRegex(rule.searchPattern)
@@ -156,6 +159,10 @@ const Inputs = ({
               : 'border border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white'
           }`}
           disabled={!rule.isEnabled}
+          readOnly={
+            rule.replaceWith === 'CUE_SHEET' ||
+            rule.replaceWith === 'CUE_SHEET_NO_EP'
+          }
         />
         {rule.isRegex &&
           rule.searchPattern &&
@@ -180,9 +187,16 @@ const Inputs = ({
           value={rule.replaceWith}
           onChange={(e) => updateRule(rule.id, { replaceWith: e.target.value })}
           autoComplete="off"
+          autoCorrect="off"
+          autoCapitalize="off"
+          spellCheck={false}
           placeholder="Enter replacement..."
-          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white"
+          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white read-only:focus:ring-transparent"
           disabled={!rule.isEnabled}
+          readOnly={
+            rule.replaceWith === 'CUE_SHEET' ||
+            rule.replaceWith === 'CUE_SHEET_NO_EP'
+          }
         />
       </div>
     </div>
@@ -262,7 +276,11 @@ const RuleCard = ({
                   updateRule(rule.id, { isRegex: e.target.checked })
                 }
                 className="w-4 h-4 text-blue-600 border-gray-300 dark:border-gray-600 rounded focus:ring-blue-500"
-                disabled={!rule.isEnabled}
+                disabled={
+                  !rule.isEnabled ||
+                  rule.replaceWith === 'CUE_SHEET' ||
+                  rule.replaceWith === 'CUE_SHEET_NO_EP'
+                }
               />
               <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">
                 Use Regular Expression
