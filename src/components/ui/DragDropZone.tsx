@@ -102,6 +102,7 @@ const DragDropZone: React.FC<Props> = ({
         <input
           type="file"
           title=""
+          aria-label={allowMultiple ? 'Upload files' : 'Upload a file'}
           accept={accept}
           multiple={allowMultiple}
           onChange={handleFileSelect}
@@ -127,11 +128,15 @@ const DragDropZone: React.FC<Props> = ({
           </div>
 
           <div>
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
+            <div
+              role="heading"
+              aria-level={2}
+              className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2"
+            >
               {isDragOver
                 ? `Drop your file${allowMultiple ? 's' : ''} here`
                 : title}
-            </h3>
+            </div>
             <p className="text-gray-600 dark:text-gray-300 mb-1">
               {description}
             </p>

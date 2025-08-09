@@ -97,7 +97,7 @@ Thanks!
     flex flex-wrap justify-center items-center gap-x-4 gap-y-1
     bg-gray-50 dark:bg-gray-900 border-t dark:border-gray-700 transition-colors"
     >
-      <div className="flex items-center gap-1 text-gray-400 dark:text-gray-500">
+      <div className="flex items-center gap-1 text-gray-500 dark:text-gray-500">
         <span>v{version}</span>
         <GitCommitHorizontal className="inline h-3 w-3 opacity-70" />
         <span>{commit}</span>
@@ -105,7 +105,7 @@ Thanks!
 
       {/* <div className="text-gray-400 dark:text-gray-500">Updated {updated}</div> */}
 
-      <div className="flex gap-2 items-center text-blue-500">
+      <div className="flex gap-2 items-center text-blue-600">
         <a
           href={`mailto:brandon@tulbox.app?subject=Bug/Feedback:%20v${version}-${commit}&body=${encodeURIComponent(
             emailTemplate
@@ -117,7 +117,7 @@ Thanks!
         >
           Feedback
         </a>
-        <span className="text-gray-300 dark:text-gray-600">|</span>
+        <span className="text-gray-400 dark:text-gray-600">|</span>
         <a
           href={`mailto:brandon@tulbox.app?subject=Request:%20v${version}-${commit}&body=${encodeURIComponent(
             requestTemplate
@@ -129,7 +129,7 @@ Thanks!
         >
           Requests
         </a>
-        <span className="text-gray-300 dark:text-gray-600">|</span>
+        <span className="text-gray-400 dark:text-gray-600">|</span>
         <button onClick={() => setShowShortcut(true)}>Shortcuts</button>
       </div>
     </footer>
