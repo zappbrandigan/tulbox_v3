@@ -195,6 +195,7 @@ const FileTable: React.FC<FileTableProps> = ({
                   {editingId === file.id ? (
                     <div className="flex items-center space-x-2">
                       <input
+                        id={file.originalName}
                         type="text"
                         value={editValue}
                         onChange={(e) => setEditValue(e.target.value)}

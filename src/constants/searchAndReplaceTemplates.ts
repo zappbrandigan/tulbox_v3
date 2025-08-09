@@ -5,6 +5,7 @@ const commonReplacements = [
     search: '.*',
     replace: 'CUE_SHEET',
     regex: true,
+    ignoreCase: false,
   },
   {
     name: 'Cue Sheet T2',
@@ -12,6 +13,7 @@ const commonReplacements = [
     search: '.*',
     replace: 'CUE_SHEET_NO_EP',
     regex: true,
+    ignoreCase: false,
   },
   {
     name: 'Date Conversion 1',
@@ -19,6 +21,7 @@ const commonReplacements = [
     search: '(\\d{2})(\\d{2})(\\d{2})',
     replace: '$2$120$3',
     regex: true,
+    ignoreCase: false,
   },
   {
     name: 'Date Conversion 2',
@@ -26,6 +29,7 @@ const commonReplacements = [
     search: '(\\d{2})(\\d{2})(\\d{4})',
     replace: '$2$1$3',
     regex: true,
+    ignoreCase: false,
   },
   {
     name: 'Add "Ep No."',
@@ -33,6 +37,7 @@ const commonReplacements = [
     search: '(\\d+)$',
     replace: 'Ep No. $1',
     regex: true,
+    ignoreCase: false,
   },
   {
     name: 'Reorder Tokens',
@@ -40,6 +45,7 @@ const commonReplacements = [
     search: '^(.+)\\s-\\s(\\d+)\\s-\\s(.+)$',
     replace: '$1   $3  Ep No. $2',
     regex: true,
+    ignoreCase: false,
   },
   {
     name: 'Zero Pad Episode Suffix',
@@ -47,9 +53,24 @@ const commonReplacements = [
     search: '(\\d{2}$)',
     replace: '0$1',
     regex: true,
+    ignoreCase: false,
   },
-  { name: 'Replace Dashes', desc: '', search: '-', replace: '_', regex: false },
-  { name: 'Replace Spaces', desc: '', search: ' ', replace: '-', regex: false },
+  {
+    name: 'Replace Dashes',
+    desc: '',
+    search: '-',
+    replace: '_',
+    regex: false,
+    ignoreCase: false,
+  },
+  {
+    name: 'Replace Spaces',
+    desc: '',
+    search: ' ',
+    replace: '-',
+    regex: false,
+    ignoreCase: false,
+  },
 ];
 
 export default commonReplacements;

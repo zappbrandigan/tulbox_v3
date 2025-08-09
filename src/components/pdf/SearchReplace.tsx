@@ -24,6 +24,7 @@ const createRuleFromTemplate = (
   searchPattern: template.search,
   replaceWith: template.replace,
   isRegex: template.regex,
+  isCaseInsensitive: template.ignoreCase,
   isEnabled: true,
 });
 
@@ -266,7 +267,7 @@ const RuleCard = ({
 
           <Inputs rule={rule} updateRule={updateRule} />
 
-          <div className="mt-3 flex items-center">
+          <div className="mt-3 flex items-center space-x-5">
             <label className="flex items-center">
               <input
                 type="checkbox"
@@ -283,7 +284,26 @@ const RuleCard = ({
                 }
               />
               <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">
-                Use Regular Expression
+                Use Regex
+              </span>
+            </label>
+            <label className="flex items-center">
+              <input
+                type="checkbox"
+                name="caseInsensitve"
+                checked={rule.isCaseInsensitive}
+                onChange={(e) =>
+                  updateRule(rule.id, { isCaseInsensitive: e.target.checked })
+                }
+                className="w-4 h-4 text-blue-600 border-gray-300 dark:border-gray-600 rounded focus:ring-blue-500"
+                disabled={
+                  !rule.isEnabled ||
+                  rule.replaceWith === 'CUE_SHEET' ||
+                  rule.replaceWith === 'CUE_SHEET_NO_EP'
+                }
+              />
+              <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">
+                Case Insensitive
               </span>
             </label>
           </div>
@@ -344,6 +364,7 @@ const SearchReplace = ({
       searchPattern: '',
       replaceWith: '',
       isRegex: false,
+      isCaseInsensitive: false,
       isEnabled: true,
     };
     onRulesChange([...rules, newRule]);

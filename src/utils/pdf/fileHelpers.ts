@@ -59,12 +59,13 @@ const applySearchReplace = (
       }
 
       try {
+        const flags = rule.isCaseInsensitive ? 'gi' : 'g';
         if (rule.isRegex) {
-          const regex = new RegExp(rule.searchPattern, 'g');
+          const regex = new RegExp(rule.searchPattern, flags);
           newName = newName.replace(regex, rule.replaceWith);
         } else {
           newName = newName.replace(
-            new RegExp(escapeRegExp(rule.searchPattern), 'g'),
+            new RegExp(escapeRegExp(rule.searchPattern), flags),
             rule.replaceWith
           );
         }
