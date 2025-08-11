@@ -151,7 +151,7 @@ const getAkas = async (
     }/api/external/imdbMain/api/title/get-akas`,
     params: {
       tt: result.id,
-      limit: '30',
+      limit: '100',
     },
     headers: { 'x-session-id': sessionId },
   };
