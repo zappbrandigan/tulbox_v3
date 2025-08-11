@@ -60,6 +60,13 @@ const SearchResult: React.FC<SearchResultProps> = ({
             <div
               key={result.id}
               onClick={() => handleSelectProduction(result)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  handleSelectProduction(result);
+                }
+              }}
+              tabIndex={0}
+              role="button"
               className="flex p-4 rounded-xl border border-gray-200 hover:shadow-sm hover:border-blue-400 transition-all bg-white dark:bg-gray-900 dark:border-gray-700 space-x-4 cursor-pointer"
             >
               {/* Poster */}
