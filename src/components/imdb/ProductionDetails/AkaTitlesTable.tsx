@@ -2,10 +2,19 @@ import { LoadingOverlay } from '@/components/ui';
 import { AKATitle } from '@/types';
 import { useToast } from '@/hooks/useToast';
 import { Copy, Globe } from 'lucide-react';
+import { useSortableData } from '@/hooks';
+import SortableHeader from '@/components/ui/SortableHeader';
 
 interface AkaTitlesTableProps {
   akaTitles: AKATitle[];
   isLoadingAkas: boolean;
+}
+
+interface AkaTableItem {
+  transliterated: string;
+  article: string;
+  type: string;
+  language: string;
 }
 
 const AkaTitlesTable: React.FC<AkaTitlesTableProps> = ({
@@ -13,6 +22,14 @@ const AkaTitlesTable: React.FC<AkaTitlesTableProps> = ({
   isLoadingAkas,
 }) => {
   const { showToast } = useToast();
+  const {
+    sortedItems: sortedAkas,
+    sortConfig,
+    requestSort,
+  } = useSortableData<
+    AkaTableItem,
+    'transliterated' | 'article' | 'type' | 'language'
+  >(akaTitles);
   if (isLoadingAkas) {
     return <LoadingOverlay message="Detecting AKA Languages..." />;
   }
@@ -41,20 +58,34 @@ const AkaTitlesTable: React.FC<AkaTitlesTableProps> = ({
         <table className="w-full">
           <thead className="bg-gray-50 dark:bg-gray-800">
             <tr>
-              {['Transliterated Title', 'Article', 'Language', 'Type'].map(
-                (heading) => (
-                  <th
-                    key={heading}
-                    className="px-4 py-2 text-left text-sm font-medium text-gray-600 dark:text-gray-300"
-                  >
-                    {heading}
-                  </th>
-                )
-              )}
+              <SortableHeader
+                label="Transliterated Title"
+                columnKey="transliterated"
+                sortConfig={sortConfig}
+                onSort={requestSort}
+              />
+              <SortableHeader
+                label="Article"
+                columnKey="article"
+                sortConfig={sortConfig}
+                onSort={requestSort}
+              />
+              <SortableHeader
+                label="Language"
+                columnKey="language"
+                sortConfig={sortConfig}
+                onSort={requestSort}
+              />
+              <SortableHeader
+                label="Type"
+                columnKey="type"
+                sortConfig={sortConfig}
+                onSort={requestSort}
+              />
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-            {akaTitles?.map((aka, index) => (
+          <tbody className="divide-y divide-gray-200 dark:divide-gray-700 font-medium">
+            {sortedAkas?.map((aka, index) => (
               <tr
                 key={index}
                 onClick={() => {
@@ -65,16 +96,16 @@ const AkaTitlesTable: React.FC<AkaTitlesTableProps> = ({
                 }}
                 className="group hover:bg-gray-50 dark:hover:bg-gray-700 hover:cursor-pointer transition-colors"
               >
-                <td className="px-4 py-2 text-sm text-gray-700 dark:text-gray-200 font-mono">
+                <td className="px-6 py-2 text-xs text-gray-700 dark:text-gray-200">
                   {aka.transliterated}
                 </td>
-                <td className="px-4 py-2 text-sm text-gray-700 dark:text-gray-200">
+                <td className="px-6 py-2 text-xs text-gray-700 dark:text-gray-200">
                   {aka.article}
                 </td>
-                <td className="px-4 py-2 text-sm text-gray-700 dark:text-gray-200">
+                <td className="px-6 py-2 text-xs text-gray-700 dark:text-gray-200">
                   {aka.language}
                 </td>
-                <td className="flex px-4 py-2 text-sm text-gray-700 dark:text-gray-200">
+                <td className="flex px-6 py-2 text-xs text-gray-700 dark:text-gray-200">
                   <span>{aka.type}</span>
                   <button className="opacity-0 ml-auto group-hover:opacity-100 p-1 text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-all focus:opacity-100">
                     <Copy className="size-4" />

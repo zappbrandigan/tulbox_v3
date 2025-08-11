@@ -31,15 +31,15 @@ const SortableHeader = <T extends string>({
       }`}
     >
       <div className="inline-flex items-center space-x-1">
-        <span className={isActive ? 'font-bold' : ''}>{label}</span>
+        <span>{label}</span>
         {isActive ? (
           direction === 'asc' ? (
-            <ArrowUp className="w-4 h-4" />
+            <ArrowUp className="size-4" />
           ) : (
-            <ArrowDown className="w-4 h-4" />
+            <ArrowDown className="size-4" />
           )
         ) : (
-          <ArrowUpDown className="w-4 h-4 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity duration-150" />
+          <ArrowUpDown className="size-4 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity duration-150" />
         )}
       </div>
     </th>
