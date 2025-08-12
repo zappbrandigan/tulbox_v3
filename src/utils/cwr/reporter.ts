@@ -8,6 +8,71 @@ import {
 import { CWRTemplate, CWRTemplateField } from '@/types';
 import Decimal from 'decimal.js-light';
 
+/**
+ * Normalize a flat map of { ipn: percent } so the values sum to `target`
+ * (default 50), with each value in increments of `step` (default 0.01).
+ * Keeps proportions by scaling, then distributes the rounding remainder.
+ */
+function normalizeToTarget(
+  input: Record<string, number>,
+  target = 50,
+  step = 0.01
+): Record<string, number> {
+  const entries = Object.entries(input).filter(([, v]) => Number.isFinite(v));
+  const sum = entries.reduce((a, [, v]) => a + v, 0);
+
+  // Nothing to normalize
+  if (sum === 0) {
+    return Object.fromEntries(entries.map(([k]) => [k, 0]));
+  }
+
+  // Scale to the target first (preserves proportions)
+  const scaled = entries.map(([k, v]) => [k, (v * target) / sum] as const);
+
+  // Work in integer "units" of `step` to avoid float drift
+  const targetUnits = Math.round(target / step);
+  const rawUnits = scaled.map(([k, v]) => [k, v / step] as const);
+
+  // Floor first, then distribute the remainder by largest fractional parts
+  const floors = rawUnits.map(([k, u]) => {
+    const f = Math.floor(u);
+    return [k, f, u - f] as const; // [key, floor, fractional remainder]
+  });
+
+  let unitsSum = floors.reduce((a, [, f]) => a + f, 0);
+  let need = targetUnits - unitsSum;
+
+  const units = new Map<string, number>(floors.map(([k, f]) => [k, f]));
+
+  if (need !== 0) {
+    const order =
+      need > 0
+        ? [...floors].sort((a, b) => b[2] - a[2]).map(([k]) => k) // add to largest remainders
+        : [...floors].sort((a, b) => a[2] - b[2]).map(([k]) => k); // remove from smallest remainders
+
+    let i = 0;
+    while (need !== 0) {
+      const k = order[i % order.length];
+      const cur = units.get(k)!;
+      if (need > 0) {
+        units.set(k, cur + 1);
+        need -= 1;
+      } else if (cur > 0) {
+        units.set(k, cur - 1);
+        need += 1;
+      }
+      i += 1;
+    }
+  }
+
+  // Back to numbers; clamp minor FP noise to 2 decimals
+  const out = Object.fromEntries(
+    entries.map(([k]) => [k, Number(((units.get(k) ?? 0) * step).toFixed(2))])
+  );
+
+  return out;
+}
+
 class CWRReporter {
   static getPublisherInfo(
     {
@@ -695,6 +760,16 @@ class CWRReporter {
         const songTypeCode = 'OG';
 
         let totalContribution = 0;
+        const contributionLookup = Object.fromEntries(
+          [
+            ...(transaction.work?.swrs ?? []),
+            ...(transaction.work?.owrs ?? []),
+          ].map((w) => [
+            w.fields?.interestedPartyNumber,
+            getContribution(w, w.fields.recordType === 'SWR' ? true : false),
+          ]) ?? []
+        );
+        const normalizedContributions = normalizeToTarget(contributionLookup);
         for (const aka of transaction.work?.alts ?? [
           { fields: { alternativeTitle: '' } },
         ]) {
@@ -703,8 +778,11 @@ class CWRReporter {
             const row = new Map<string, string | number>(
               columnKeys.map((key: string) => [key, ''])
             );
-            totalContribution += getContribution(writer, true) * 2;
-            const contribution = (getContribution(writer, true) * 2)
+            totalContribution +=
+              normalizedContributions[writer.fields.interestedPartyNumber] * 2;
+            const contribution = (
+              normalizedContributions[writer.fields.interestedPartyNumber] * 2
+            )
               .toFixed(2) // ensures 2 decimal places
               .padStart(6, '0'); // pads total length to 6 (e.g. "005.00")
 

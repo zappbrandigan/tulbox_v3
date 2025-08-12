@@ -1,3 +1,4 @@
+import { transliterate } from 'transliteration';
 import {
   articles,
   removeExtension,
@@ -52,8 +53,8 @@ function normalizeParts(
     return s.trim();
   };
 
-  const newProd = trim(prodTitle)?.toUpperCase();
-  const newEp = epTitle ? titleCase(trim(epTitle)!) : epTitle;
+  const newProd = transliterate(trim(prodTitle)?.toUpperCase() ?? '');
+  const newEp = epTitle ? titleCase(transliterate(trim(epTitle)!)) : epTitle;
   const newNum = trim(epNum);
 
   if (newProd !== prodTitle || newEp !== epTitle || newNum !== epNum) {
