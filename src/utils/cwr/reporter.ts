@@ -786,6 +786,13 @@ class CWRReporter {
               .toFixed(2) // ensures 2 decimal places
               .padStart(6, '0'); // pads total length to 6 (e.g. "005.00")
 
+            const patchSociety = ['099', '000', '', null].includes(
+              writer.fields.prAffiliationSocietyNumber
+            )
+              ? 'NS'
+              : writer.fields.prAffiliationSocietyNumber;
+
+            console.log(writer.fields.prAffiliationSocietyNumber);
             row.set('iswc', iswc);
             row.set('workTitle', workTitle);
             row.set('songTypeCode', songTypeCode);
@@ -794,10 +801,7 @@ class CWRReporter {
             row.set('capacity', writer.fields.writerDesignationCode ?? '');
             row.set('contribution', contribution);
             row.set('controlled', 'Y');
-            row.set(
-              'affiliation',
-              writer.fields.prAffiliationSocietyNumber ?? ''
-            );
+            row.set('affiliation', patchSociety);
             row.set('ipiNameNumber', writer.fields.ipiNameNumber ?? '');
             row.set('aka', aka.fields.alternativeTitle);
             rowCollection.push(row);
@@ -811,6 +815,12 @@ class CWRReporter {
               .toFixed(2) // ensures 2 decimal places
               .padStart(6, '0'); // pads total length to 6 (e.g. "005.00")
 
+            const patchSociety = ['099', '000', '', null].includes(
+              writer.fields.prAffiliationSocietyNumber
+            )
+              ? 'NS'
+              : writer.fields.prAffiliationSocietyNumber;
+
             row.set('iswc', iswc);
             row.set('workTitle', workTitle);
             row.set('songTypeCode', songTypeCode);
@@ -819,10 +829,7 @@ class CWRReporter {
             row.set('capacity', writer.fields.writerDesignationCode ?? '');
             row.set('contribution', contribution);
             row.set('controlled', 'N');
-            row.set(
-              'affiliation',
-              writer.fields.prAffiliationSocietyNumber ?? 'NS'
-            );
+            row.set('affiliation', patchSociety);
             row.set('ipiNameNumber', writer.fields.ipiNameNumber ?? '');
             row.set('aka', aka.fields.alternativeTitle);
             rowCollection.push(row);
