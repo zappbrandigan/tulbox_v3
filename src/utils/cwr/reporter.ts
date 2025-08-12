@@ -478,6 +478,7 @@ class CWRReporter {
     transmission: ParsedTransmission,
     template: CWRTemplate
   ) {
+    const warnings: string[] = [];
     const rowCollection: Map<string, string | number>[] = [];
     const columns = template.fields.map(
       (field: CWRTemplateField) => [field.key, ''] as [string, string]
@@ -555,13 +556,14 @@ class CWRReporter {
         rowCollection.push(...rows);
       }
     }
-    return rowCollection;
+    return { rows: rowCollection, warnings };
   }
 
   static generateIsrcReport(
     transmission: ParsedTransmission,
     template: CWRTemplate
   ) {
+    const warnings: string[] = [];
     const rowCollection: Map<string, string | number>[] = [];
     const columns = template.fields.map(
       (field: CWRTemplateField) => [field.key, ''] as [string, string]
@@ -586,7 +588,7 @@ class CWRReporter {
         rowCollection.push(...rows);
       }
     }
-    return rowCollection;
+    return { rows: rowCollection, warnings };
   }
 
   static generateAkaReport(
@@ -609,6 +611,7 @@ class CWRReporter {
       );
     }
 
+    const warnings: string[] = [];
     const rowCollection: Map<string, string | number>[] = [];
     const columns = template.fields.map(
       (field: CWRTemplateField) => [field.key, ''] as [string, string]
@@ -637,7 +640,7 @@ class CWRReporter {
         rowCollection.push(...rows);
       }
     }
-    return rowCollection;
+    return { rows: rowCollection, warnings };
   }
 
   static generateCatImport(
@@ -645,11 +648,45 @@ class CWRReporter {
     template: CWRTemplate
   ) {
     const rowCollection: Map<string, string | number>[] = [];
+    const warnings: string[] = [];
 
     // Collect all expected column keys from the template
     const columnKeys = template.fields.map(
       (field: CWRTemplateField) => field.key
     );
+
+    function getContribution(
+      writer: ParsedSWR | ParsedOWR,
+      isControlled: boolean
+    ) {
+      if (isControlled) {
+        let collectionRecord = (writer as ParsedSWR).swts?.find(
+          (t) => t.fields.tisCode === '2136'
+        ); // world
+        if (!collectionRecord) {
+          collectionRecord = (writer as ParsedSWR).swts?.find(
+            (t) => t.fields.tisCode === '0840'
+          ); // U.S.
+        }
+        if (!collectionRecord) {
+          return (writer as ParsedSWR).fields.prOwnershipShare;
+        }
+        return collectionRecord?.fields.prCollectionShare ?? 0;
+      } else {
+        let collectionRecord = (writer as ParsedOWR).owts?.find(
+          (t) => t.fields.tisCode === '2136'
+        ); //world
+        if (!collectionRecord) {
+          collectionRecord = (writer as ParsedOWR).owts?.find(
+            (t) => t.fields.tisCode === '0840'
+          ); // U.S.
+        }
+        if (!collectionRecord) {
+          return (writer as ParsedOWR).fields.prOwnershipShare;
+        }
+        return collectionRecord?.fields.prCollectionShare ?? 0;
+      }
+    }
 
     for (const group of transmission.groups) {
       for (const transaction of group.transactions ?? []) {
@@ -657,68 +694,81 @@ class CWRReporter {
         const workTitle = transaction.work?.header.fields.workTitle ?? '';
         const songTypeCode = 'OG';
 
-        // Writer rows
-        for (const writer of transaction.work?.swrs ?? []) {
-          const row = new Map<string, string | number>(
-            columnKeys.map((key: string) => [key, ''])
-          );
-          const contribution = (writer.fields.prOwnershipShare * 2)
-            .toFixed(2) // ensures 2 decimal places
-            .padStart(6, '0'); // pads total length to 6 (e.g. "005.00")
+        let totalContribution = 0;
+        for (const aka of transaction.work?.alts ?? [
+          { fields: { alternativeTitle: '' } },
+        ]) {
+          totalContribution = 0;
+          for (const writer of transaction.work?.swrs ?? []) {
+            const row = new Map<string, string | number>(
+              columnKeys.map((key: string) => [key, ''])
+            );
+            totalContribution += getContribution(writer, true) * 2;
+            const contribution = (getContribution(writer, true) * 2)
+              .toFixed(2) // ensures 2 decimal places
+              .padStart(6, '0'); // pads total length to 6 (e.g. "005.00")
 
-          row.set('iswc', iswc);
-          row.set('workTitle', workTitle);
-          row.set('songTypeCode', songTypeCode);
-          row.set('lastName', writer.fields.writerLastName ?? '');
-          row.set('firstName', writer.fields.writerFirstName ?? '');
-          row.set('capacity', writer.fields.writerDesignationCode ?? '');
-          row.set('contribution', contribution);
-          row.set('controlled', writer.fields.recordType === 'SWR' ? 'Y' : 'N');
-          row.set(
-            'affiliation',
-            writer.fields.prAffiliationSocietyNumber ?? ''
-          );
-          row.set('ipiNameNumber', writer.fields.ipiNameNumber ?? '');
-          rowCollection.push(row);
+            row.set('iswc', iswc);
+            row.set('workTitle', workTitle);
+            row.set('songTypeCode', songTypeCode);
+            row.set('lastName', writer.fields.writerLastName ?? '');
+            row.set('firstName', writer.fields.writerFirstName ?? '');
+            row.set('capacity', writer.fields.writerDesignationCode ?? '');
+            row.set('contribution', contribution);
+            row.set('controlled', 'Y');
+            row.set(
+              'affiliation',
+              writer.fields.prAffiliationSocietyNumber ?? ''
+            );
+            row.set('ipiNameNumber', writer.fields.ipiNameNumber ?? '');
+            row.set('aka', aka.fields.alternativeTitle);
+            rowCollection.push(row);
+          }
+          for (const writer of transaction.work?.owrs ?? []) {
+            const row = new Map<string, string | number>(
+              columnKeys.map((key: string) => [key, ''])
+            );
+            totalContribution += getContribution(writer, false) * 2;
+            const contribution = (getContribution(writer, false) * 2)
+              .toFixed(2) // ensures 2 decimal places
+              .padStart(6, '0'); // pads total length to 6 (e.g. "005.00")
+
+            row.set('iswc', iswc);
+            row.set('workTitle', workTitle);
+            row.set('songTypeCode', songTypeCode);
+            row.set('lastName', writer.fields.writerLastName ?? '');
+            row.set('firstName', writer.fields.writerFirstName ?? '');
+            row.set('capacity', writer.fields.writerDesignationCode ?? '');
+            row.set('contribution', contribution);
+            row.set('controlled', 'N');
+            row.set(
+              'affiliation',
+              writer.fields.prAffiliationSocietyNumber ?? 'NS'
+            );
+            row.set('ipiNameNumber', writer.fields.ipiNameNumber ?? '');
+            row.set('aka', aka.fields.alternativeTitle);
+            rowCollection.push(row);
+          }
         }
-
-        // Publisher rows
-        for (const publisher of transaction.work?.spus ?? []) {
-          const row = new Map<string, string | number>(
-            columnKeys.map((key) => [key, ''])
+        if (totalContribution - 100 > 1e-6)
+          warnings.push(
+            `<span class="text-rose-600 dark:text-rose-300 font-semibold">[Contribution %]</span>
+            <span class="text-gray-500 dark:text-gray-400 font-medium">Title: ${workTitle}</span>
+            <span class="text-blue-600 dark:text-blue-300 font-medium">
+            Contribution percentage total: ${totalContribution.toFixed(2)}
+            </span>`
           );
-          const contribution = (publisher.fields.prOwnershipShare * 2)
-            .toFixed(2) // ensures 2 decimal places
-            .padStart(6, '0'); // pads total length to 6 (e.g. "005.00")
-          row.set('iswc', iswc);
-          row.set('workTitle', workTitle);
-          row.set('songTypeCode', songTypeCode);
-          row.set('lastName', publisher.fields.publisherName ?? '');
-          row.set('firstName', '');
-          row.set('capacity', publisher.fields.publisherType ?? '');
-          row.set('contribution', contribution);
-          row.set(
-            'controlled',
-            publisher.fields.recordType === 'SPU' ? 'Y' : 'N'
-          );
-
-          row.set(
-            'affiliation',
-            publisher.fields.prAffiliationSocietyNumber ?? ''
-          );
-          row.set('ipiNameNumber', publisher.fields.ipiNameNumber ?? '');
-          rowCollection.push(row);
-        }
       }
     }
 
-    return rowCollection;
+    return { rows: rowCollection, warnings };
   }
 
   static generateMsgReport(
     transmission: ParsedTransmission,
     template: CWRTemplate
   ) {
+    const warnings: string[] = [];
     const rowCollection: Map<string, string | number>[] = [];
     const columns = template.fields.map(
       (field: CWRTemplateField) => [field.key, ''] as [string, string]
@@ -741,7 +791,7 @@ class CWRReporter {
         rowCollection.push(...rows);
       }
     }
-    return rowCollection;
+    return { rows: rowCollection, warnings };
   }
 }
 

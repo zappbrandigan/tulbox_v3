@@ -1,8 +1,6 @@
 /// <reference lib="webworker" />
 import { CWRParser } from 'cwr-parser';
 import { templateReportGenerators } from '@/constants/templateRegistry';
-
-// import type { ParsedTransmission, ParseStatistics } from 'cwr-parser/types';
 import type { CWRTemplate } from '@/types';
 import { getTemplateById } from '@/utils';
 
@@ -20,27 +18,11 @@ type MsgOut =
       type: 'done';
       template: CWRTemplate;
       reportData: Map<string, string | number>[];
+      warnings: string[];
     }
   | { type: 'error'; error: string };
 
 const parser = new CWRParser({ convertCodes: true });
-
-/* -------------------------------------------------------------- */
-/*           merge helpers                                         */
-/* -------------------------------------------------------------- */
-// function mergeStats(a: ParseStatistics, b: ParseStatistics) {
-//   a.totalRecords += b.totalRecords;
-
-//   // recordCounts
-//   for (const k of Object.keys(b.recordCounts)) {
-//     a.recordCounts[k] = (a.recordCounts[k] ?? 0) + b.recordCounts[k];
-//   }
-
-//   a.errors.push(...b.errors);
-//   a.warnings.push(...b.warnings);
-//   a.hasErrors ||= b.hasErrors;
-//   a.hasWarnings ||= b.hasWarnings;
-// }
 
 self.onmessage = async (e: MessageEvent<MsgIn>) => {
   if (e.data.type !== 'generate') return;
@@ -58,51 +40,14 @@ self.onmessage = async (e: MessageEvent<MsgIn>) => {
   }
 
   try {
-    /* ---------------- split once ---------------- */
-    // const lines = fileContent.split(/\r?\n/);
-    // const total = lines.length;
-
-    /* ---------------- accumulators -------------- */
-    // let merged: ParsedTransmission | null = null;
-
-    /* ---------------- chunk loop ---------------- */
-    // for (let i = 0; i < total; i += chunk) {
-    //   const slice = lines.slice(i, i + chunk).join('\n');
-    //   const partial = parser.parseString(slice, fileName) as ParsedTransmission;
-
-    //   if (!merged) {
-    //     // first slice => shallow clone (will mutate groups/stats)
-    //     merged = { ...partial, groups: [...partial.groups] };
-    //   } else {
-    //     // append groups
-    //     merged.groups.push(...partial.groups);
-
-    //     // keep last TRL (it has correct totals for this slice)
-    //     merged.trl = partial.trl;
-
-    //     // merge statistics
-    //     mergeStats(merged.statistics!, partial.statistics!);
-    //   }
-
-    //   // progress
-    //   (self as DedicatedWorkerGlobalScope).postMessage({
-    //     type: 'progress',
-    //     pct: Math.min((i + chunk) / total, 1),
-    //   } satisfies MsgOut);
-
-    //   await 0;
-    // }
-
-    // if (!merged) throw new Error('Empty file');
-
-    /* ---------------- generate report once ---------------------- */
     const parsed = parser.parseString(fileContent);
-    const reportData = generator(parsed, template);
+    const { rows: reportData, warnings } = generator(parsed, template);
 
     (self as DedicatedWorkerGlobalScope).postMessage({
       type: 'done',
       template,
       reportData,
+      warnings,
     } satisfies MsgOut);
   } catch (err) {
     (self as DedicatedWorkerGlobalScope).postMessage({

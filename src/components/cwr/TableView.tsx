@@ -3,7 +3,7 @@ import { getTemplateById } from '@/utils';
 import { CWRTemplateField } from '@/types';
 import { Table } from 'lucide-react';
 import ReportWorker from '@/workers/reportWorker?worker';
-import { LoadingOverlay, Panel } from '@/components/ui';
+import { LoadingOverlay, Panel, WarningModal } from '@/components/ui';
 
 const ROW_HEIGHT = 36;
 const PAGE_SIZE = 50;
@@ -31,6 +31,8 @@ const TableView: React.FC<Props> = ({
   onReady,
 }) => {
   const [startIndex, setStartIndex] = useState(0);
+  const [warnings, setWarnings] = useState<string[]>([]);
+  const [showWarnings, setShowWarnings] = useState(false);
 
   const [isPending, startTransition] = useTransition();
 
@@ -54,10 +56,6 @@ const TableView: React.FC<Props> = ({
 
     worker.onmessage = (e) => {
       const { type } = e.data as { type: string };
-      // if (type === 'progress') {
-      //   onProgress(Math.min(e.data.pct, 0.99));
-      //   return;
-      // }
 
       if (type === 'error') {
         console.error('Worker Error:', e.data.error);
@@ -72,10 +70,10 @@ const TableView: React.FC<Props> = ({
 
         startTransition(() => {
           setReportData(e.data.reportData);
+          setWarnings(e.data.warnings);
         });
 
         setTimeout(() => {
-          // onProgress(100);
           onReady();
           worker.terminate();
         }, remaining);
@@ -184,11 +182,20 @@ const TableView: React.FC<Props> = ({
             <div className="flex items-center justify-between text-xs text-gray-600 dark:text-gray-300">
               <span>
                 <span className="text-emerald-500">{reportData.length}</span>
-                {` rows • `}
-                <span className="text-red-500">{0}</span>
-                {` errors • `}
-                <span className="text-amber-500">{0}</span>
-                {` warnings`}
+                {` rows`}
+                {warnings.length > 0 && (
+                  <>
+                    {` • `}
+                    <span
+                      onClick={() => setShowWarnings(true)}
+                      className="ml-1 px-1.5 py-0.5 text-amber-600 bg-amber-100 dark:bg-amber-900 dark:text-amber-300 rounded hover:text-amber-700 hover:underline cursor-pointer transition"
+                      title="Click to view warnings"
+                    >
+                      ⚠ {warnings.length} warning
+                      {warnings.length !== 1 ? 's' : ''}
+                    </span>
+                  </>
+                )}
               </span>
               <span>
                 <span>{template.name}</span>{' '}
@@ -198,6 +205,11 @@ const TableView: React.FC<Props> = ({
           </div>
         </Panel>
       )}
+      <WarningModal
+        warnings={warnings}
+        showWarnings={showWarnings}
+        setShowWarnings={setShowWarnings}
+      />
     </>
   );
 };

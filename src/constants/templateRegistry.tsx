@@ -5,7 +5,7 @@ import { ParsedTransmission } from 'cwr-parser/types';
 type ReportGenerator = (
   transmission: ParsedTransmission,
   template: CWRTemplate
-) => Map<string, string | number>[];
+) => { rows: Map<string, string | number>[]; warnings: string[] };
 
 export const templateReportGenerators: Record<string, ReportGenerator> = {
   'batch-report': CWRReporter.generateBatchReport.bind(CWRReporter),
