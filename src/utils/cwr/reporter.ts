@@ -734,7 +734,7 @@ class CWRReporter {
           ); // U.S.
         }
         if (!collectionRecord) {
-          return (writer as ParsedSWR).fields.prOwnershipShare;
+          return (writer as ParsedSWR).fields.prOwnershipShare ?? 0;
         }
         return collectionRecord?.fields.prCollectionShare ?? 0;
       } else {
@@ -747,7 +747,7 @@ class CWRReporter {
           ); // U.S.
         }
         if (!collectionRecord) {
-          return (writer as ParsedOWR).fields.prOwnershipShare;
+          return (writer as ParsedOWR).fields.prOwnershipShare ?? 0;
         }
         return collectionRecord?.fields.prCollectionShare ?? 0;
       }
@@ -792,7 +792,6 @@ class CWRReporter {
               ? 'NS'
               : writer.fields.prAffiliationSocietyNumber;
 
-            console.log(writer.fields.prAffiliationSocietyNumber);
             row.set('iswc', iswc);
             row.set('workTitle', workTitle);
             row.set('songTypeCode', songTypeCode);
@@ -835,7 +834,7 @@ class CWRReporter {
             rowCollection.push(row);
           }
         }
-        if (totalContribution - 100 > 1e-6)
+        if (Math.abs(totalContribution - 100) > 1e-6)
           warnings.push(
             `<span class="text-rose-600 dark:text-rose-300 font-semibold">[Contribution %]</span>
             <span class="text-gray-500 dark:text-gray-400 font-medium">Title: ${workTitle}</span>
