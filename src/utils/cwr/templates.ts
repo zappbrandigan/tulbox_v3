@@ -115,7 +115,7 @@ const CWR_TEMPLATES: CWRTemplate[] = [
   },
   {
     id: 'cat-import',
-    version: '0.0.1',
+    version: '0.2.3',
     name: 'Cat Import',
     description: 'CWR data formated for Cat Import.',
     fields: [
