@@ -14,7 +14,7 @@ import { logUserEvent } from '@/utils/general/logEvent';
 import { ensurePdfExtension } from '@/utils';
 import { useSessionId } from '@/context/sessionContext';
 import SortableHeader from '../ui/SortableHeader';
-import { useSortableData } from '@/hooks';
+import { useSortableData, useToast } from '@/hooks';
 
 interface FileTableProps {
   files: FileItem[];
@@ -37,6 +37,7 @@ const FileTable: React.FC<FileTableProps> = ({
     files
   );
 
+  const { showToast } = useToast();
   const sessionId = useSessionId();
 
   const startEditing = (file: FileItem) => {
@@ -262,9 +263,15 @@ const FileTable: React.FC<FileTableProps> = ({
                     <X className="size-5" />
                   </button>
                   <button
-                    onClick={() =>
-                      navigator.clipboard.writeText(file.currentName)
-                    }
+                    onClick={() => {
+                      navigator.clipboard.writeText(file.currentName);
+                      showToast({
+                        message: 'Copied to cliboard!',
+                        icon: (
+                          <ClipboardCopy className="w-4 h-4 text-blue-500 dark:text-blue-300" />
+                        ),
+                      });
+                    }}
                     className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 transition-colors"
                     title="Copy filename"
                   >

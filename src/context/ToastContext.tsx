@@ -33,7 +33,7 @@ export const ToastProvider: React.FC<{ children: ReactNode }> = ({
       {toast && (
         <div
           role="alert"
-          className="fixed bottom-6 right-4 z-50 max-w-xs sm:max-w-sm md:max-w-md px-4 py-3 bg-white dark:bg-gray-900 dark:text-gray-100 border-l-4 border-blue-500 shadow-xl rounded-lg text-sm flex items-start gap-3 transition-all duration-300"
+          className="fixed bottom-10 right-4 z-50 max-w-xs sm:max-w-sm md:max-w-md px-4 py-3 bg-white dark:bg-gray-900 dark:text-gray-100 border-l-4 border-blue-500 shadow-xl rounded-lg text-sm flex items-start gap-3 transition-all duration-300"
         >
           {toast.icon && (
             <div className="flex-shrink-0 mt-0.5 w-5 h-5">{toast.icon}</div>
