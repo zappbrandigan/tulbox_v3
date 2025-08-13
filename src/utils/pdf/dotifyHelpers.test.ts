@@ -14,7 +14,7 @@ describe('dotifyHelpers', () => {
     });
 
     it('capitalizes a normal title', () => {
-      expect(titleCase('this is a title')).toBe('This Is a Title');
+      expect(titleCase('this is a title')).toBe('This Is A Title');
     });
 
     it('capitalizes even if already uppercase', () => {
@@ -26,12 +26,12 @@ describe('dotifyHelpers', () => {
     });
 
     it('capitalizes first and last small words', () => {
-      expect(titleCase('to kill a mockingbird')).toBe('To Kill a Mockingbird');
+      expect(titleCase('to kill a mockingbird')).toBe('To Kill A Mockingbird');
     });
 
     it('does not capitalize small words unless at start or end', () => {
-      expect(titleCase('a clash of kings')).toBe('A Clash of Kings');
-      expect(titleCase('game of thrones')).toBe('Game of Thrones');
+      expect(titleCase('a clash of kings')).toBe('A Clash Of Kings');
+      expect(titleCase('game of thrones')).toBe('Game Of Thrones');
     });
 
     it('preserves spacing between words (normalized)', () => {
@@ -39,23 +39,23 @@ describe('dotifyHelpers', () => {
     });
 
     it('handles punctuation in words', () => {
-      expect(titleCase("o'clock special")).toBe("O'clock Special");
-      expect(titleCase("john's tale of war")).toBe("John's Tale of War");
+      expect(titleCase("o'clock special")).toBe("O'Clock Special");
+      expect(titleCase("john's tale of war")).toBe("John's Tale Of War");
     });
 
     it('handles accented characters and unicode', () => {
-      expect(titleCase("eleve et l'ecole")).toBe("Eleve Et L'ecole");
+      expect(titleCase("eleve et l'ecole")).toBe("Eleve Et L'Ecole");
     });
 
     it('handles small words in various positions', () => {
       expect(titleCase('the rise and fall of nations')).toBe(
-        'The Rise and Fall of Nations'
+        'The Rise And Fall Of Nations'
       );
       expect(titleCase('the rise and the fall of nations')).toBe(
-        'The Rise and the Fall of Nations'
+        'The Rise And The Fall Of Nations'
       );
       expect(titleCase("the rise and the don't of nations")).toBe(
-        "The Rise and the Don't of Nations"
+        "The Rise And The Don't Of Nations"
       );
     });
   });

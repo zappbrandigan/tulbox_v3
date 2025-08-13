@@ -3,34 +3,6 @@ import languageArticles from '../imdb/articles';
 
 type DotifyStatus = 'valid' | 'modified' | 'dotified' | 'error';
 
-const SMALL_WORDS = new Set([
-  'a',
-  'an',
-  'the',
-  'and',
-  'but',
-  'or',
-  'nor',
-  'for',
-  'so',
-  'yet',
-  'at',
-  'around',
-  'by',
-  'after',
-  'along',
-  'for',
-  'from',
-  'of',
-  'on',
-  'to',
-  'with',
-  'without',
-  'in',
-  'over',
-  'under',
-]);
-
 export const articles = [
   ...languageArticles['en'],
   ...languageArticles['es'],
@@ -38,18 +10,38 @@ export const articles = [
 ];
 
 export const titleCase = (input: string): string => {
-  const trimmed = input.trim();
-  return trimmed.replace(/\b[\p{L}\p{N}']+\b/gu, (word, offset, fullString) => {
-    const lower = word.toLowerCase();
+  if (!input) return input;
+  const trimmedInput = input.trim();
 
-    const isStart = offset === 0;
-    const isEnd = offset + word.length === fullString.length;
-    const isFirstOrLast = isStart || isEnd;
+  return trimmedInput
+    .split(/(\s+)/)
+    .map((token) => {
+      if (/^\s+$/.test(token)) return token;
 
-    const needsCap = isFirstOrLast || !SMALL_WORDS.has(lower);
+      const parts = token.split(/([-\u2010-\u2015])/);
 
-    return needsCap ? lower.charAt(0).toUpperCase() + lower.slice(1) : lower;
-  });
+      const capPart = (seg: string): string => {
+        if (!seg) return seg;
+
+        let s = seg.toLowerCase();
+
+        s = s.replace(/^([A-Za-zÀ-ÖØ-öø-ÿ])/, (m) => m.toUpperCase());
+        s = s.replace(
+          /^([A-Za-zÀ-ÖØ-öø-ÿ])([’'])([A-Za-zÀ-ÖØ-öø-ÿ])/,
+          (_, a: string, apo: string, b: string) =>
+            `${a}${apo}${b.toUpperCase()}`
+        );
+        return s;
+      };
+
+      for (let i = 0; i < parts.length; i++) {
+        if (!/^[-\u2010-\u2015]$/.test(parts[i])) {
+          parts[i] = capPart(parts[i]);
+        }
+      }
+      return parts.join('');
+    })
+    .join('');
 };
 
 export const removeExtension = (title: string) => {

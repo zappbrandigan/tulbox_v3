@@ -45,7 +45,7 @@ describe('dotifyTitleGeneric', () => {
   it('moves leading articles in both titles', () => {
     const input = ' The Fall   An End of Something  Ep No. 2';
     const { title } = run(input, true);
-    expect(title).toBe('FALL, THE   End of Something, An  Ep No. 2');
+    expect(title).toBe('FALL, THE   End Of Something, An  Ep No. 2');
   });
 
   it('normalizes malformed ellipses in ep title', () => {
@@ -126,7 +126,7 @@ describe('dotifyTitleGeneric', () => {
       'LEGENDARY TALES   Chapter One of the thing i, here and here  Ep No. 1';
     const { title, status } = run(input, true);
     expect(title).toBe(
-      'LEGENDARY TALES   Chapter One of the Thing I. . .  Ep No. 1'
+      'LEGENDARY TALES   Chapter One Of The Thing I. . .  Ep No. 1'
     );
     expect(status).toBe('dotified');
   });
