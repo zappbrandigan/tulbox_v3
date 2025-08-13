@@ -7,6 +7,7 @@ import {
   CheckCircle,
   Layers2,
   Download,
+  ClipboardCopy,
 } from 'lucide-react';
 import { FileItem } from '@/types';
 import { logUserEvent } from '@/utils/general/logEvent';
@@ -252,12 +253,22 @@ const FileTable: React.FC<FileTableProps> = ({
                     {GetStatusText(file.status)}
                   </div>
                 </td>
-                <td className="flex space-x-4 px-6 py-4 text-sm">
+                <td className="flex space-x-4 px-2 py-4 text-sm">
                   <button
                     onClick={() => onFileRemove(file.id)}
                     className="text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 transition-colors"
+                    title="Remove file"
                   >
                     <X className="size-5" />
+                  </button>
+                  <button
+                    onClick={() =>
+                      navigator.clipboard.writeText(file.currentName)
+                    }
+                    className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 transition-colors"
+                    title="Copy filename"
+                  >
+                    <ClipboardCopy className="size-5" />
                   </button>
                   <button
                     onClick={() => downloadFile(file)}
