@@ -93,7 +93,7 @@ const CWR_TEMPLATES: CWRTemplate[] = [
   {
     id: 'isrc-report',
     version: '1.0.0',
-    name: 'ISRC Report',
+    name: 'ISRCs',
     description: 'All ISRC records present',
     fields: [
       { key: 'prefCode', label: 'PREF Code', type: 'string', width: 9 },
@@ -104,13 +104,31 @@ const CWR_TEMPLATES: CWRTemplate[] = [
   {
     id: 'aka-report',
     version: '1.0.2',
-    name: 'AKA Titles Report',
+    name: 'AKA Titles',
     description: 'All AKAs (ALT record) present',
     fields: [
       { key: 'songCode', label: 'Song Code', type: 'string', width: 9 },
       { key: 'aka', label: 'AKAs', type: 'string', width: 30 },
       { key: 'languageCode', label: 'AKA Lang', type: 'string', width: 10 },
       { key: 'workTitle', label: 'Work Title', type: 'string', width: 30 },
+    ],
+  },
+  {
+    id: 'ip-report',
+    version: '1.0.0',
+    name: 'Interested Parties',
+    description: 'All interested parties present in the CWR file',
+    fields: [
+      {
+        key: 'ipNumber',
+        label: 'IP #',
+        type: 'string',
+        width: 100,
+      },
+      { key: 'type', label: 'IP Type', type: 'string', width: 100 },
+      { key: 'name', label: 'IP Name', type: 'string', width: 150 },
+      { key: 'ipiNumber', label: 'IPI #', type: 'string', width: 100 },
+      { key: 'pro', label: 'PRO', type: 'string', width: 100 },
     ],
   },
   {

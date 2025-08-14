@@ -708,6 +708,85 @@ class CWRReporter {
     return { rows: rowCollection, warnings };
   }
 
+  static generateIpReport(
+    transmission: ParsedTransmission,
+    template: CWRTemplate
+  ) {
+    const rowCollection: Map<string, string | number>[] = [];
+    const warnings: string[] = [];
+
+    const columnKeys = template.fields.map(
+      (field: CWRTemplateField) => field.key
+    );
+
+    const seenKeys = new Set<string>();
+
+    const addRowIfUnique = (row: Map<string, string | number>) => {
+      // Create a unique key — adjust if more fields need to be included
+      const uniqueKey = `${row.get('ipNumber')}|${row.get('name')}|${row.get(
+        'ipiNumber'
+      )}`;
+      if (!seenKeys.has(uniqueKey)) {
+        seenKeys.add(uniqueKey);
+        rowCollection.push(row);
+      }
+    };
+
+    for (const group of transmission.groups) {
+      for (const transaction of group.transactions ?? []) {
+        for (const publisher of [
+          ...(transaction.work?.spus ?? []),
+          ...(transaction.work?.opus ?? []),
+        ]) {
+          const row = new Map<string, string | number>(
+            columnKeys.map((key: string) => [key, ''])
+          );
+
+          row.set('ipNumber', publisher.fields.interestedPartyNumber ?? '');
+          row.set('type', 'Publisher');
+          row.set(
+            'name',
+            publisher.fields.publisherName
+              ? publisher.fields.publisherName
+              : 'Unknown Publisher'
+          );
+          row.set('ipiNumber', publisher.fields.ipiNameNumber ?? '');
+          row.set('pro', publisher.fields.prAffiliationSocietyNumber ?? 'NS');
+
+          addRowIfUnique(row);
+        }
+
+        for (const writer of [
+          ...(transaction.work?.swrs ?? []),
+          ...(transaction.work?.owrs ?? []),
+        ]) {
+          const row = new Map<string, string | number>(
+            columnKeys.map((key: string) => [key, ''])
+          );
+
+          row.set('ipNumber', writer.fields.interestedPartyNumber ?? '');
+          row.set('type', 'Writer');
+          row.set(
+            'name',
+            writer.fields.writerLastName
+              ? `${writer.fields.writerLastName}${
+                  writer.fields.writerFirstName
+                    ? `, ${writer.fields.writerFirstName}`
+                    : ''
+                }`
+              : 'Unknown Writer'
+          );
+          row.set('ipiNumber', writer.fields.ipiNameNumber ?? '');
+          row.set('pro', writer.fields.prAffiliationSocietyNumber ?? 'NS');
+
+          addRowIfUnique(row);
+        }
+      }
+    }
+
+    return { rows: rowCollection, warnings };
+  }
+
   static generateCatImport(
     transmission: ParsedTransmission,
     template: CWRTemplate
