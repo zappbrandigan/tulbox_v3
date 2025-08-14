@@ -15,7 +15,7 @@
     "@headlessui/react": "^2.2.4",
     "axios": "^1.9.0",
     "csv-stringify": "^6.6.0",
-    "cwr-parser": "^2.0.1",
+    "cwr-parser": "^2.0.5",
     "decimal.js-light": "^2.5.1",
     "file-saver": "^2.0.5",
     "firebase": "^11.9.1",
