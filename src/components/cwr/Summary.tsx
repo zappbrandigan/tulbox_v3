@@ -22,7 +22,7 @@ const Summary: React.FC<Props> = ({ parseResult }) => {
         />
         <Panel.Body className="grid grid-cols-1 md:grid-cols-5 gap-6">
           <StatCard
-            value={parseResult.lines[0].data.get('senderName')}
+            value={parseResult.lines[0].data.get('senderName') ?? 'Unknown'}
             label="Sender"
             bg="bg-gray-50 dark:bg-gray-900/30"
             text="text-gray-600 dark:text-gray-300 text-sm truncate overflow-hidden whitespace-nowrap max-w-[180px] sm:max-w-none"

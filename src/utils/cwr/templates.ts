@@ -10,29 +10,15 @@ const CWR_TEMPLATES: CWRTemplate[] = [
     fields: [],
   },
   {
-    id: 'batch-report',
-    name: 'Batch Report',
-    version: '1.0.0',
+    id: 'work-report',
+    name: 'Work Report',
+    version: '0.0.7',
     description: 'Detailed works information with roles and shares',
     fields: [
       { key: 'songCode', label: 'Song Code', type: 'string', width: 180 },
       { key: 'workType', label: 'New/Rev', type: 'string', width: 100 },
       { key: 'workTitle', label: 'Work Title', type: 'string', width: 300 },
-      { key: 'prefCode', label: 'PREF Code', type: 'string', width: 100 },
-      { key: 'akas', label: 'AKAs', type: 'string', width: 150 },
-      { key: 'iswc', label: 'ISWC', type: 'string', width: 150 },
-      { key: 'setupNote', label: 'Setup Note', type: 'string', width: 150 },
-      { key: 'titleNote', label: 'Title Note', type: 'string', width: 150 },
-      {
-        key: 'recordingTitle',
-        label: 'Rec. Title',
-        type: 'string',
-        width: 100,
-      },
-      { key: 'albumTitle', label: 'Album Title', type: 'string', width: 100 },
-      { key: 'catalogNum', label: 'Catalog #', type: 'string', width: 100 },
       { key: 'territoryCode', label: 'Terr. Code', type: 'string', width: 100 },
-      { key: 'ogTerritoryFlag', label: 'OG Terr.', type: 'string', width: 100 },
       {
         key: 'publisherSeqNum',
         label: 'Pub. Seq. #',
@@ -133,7 +119,7 @@ const CWR_TEMPLATES: CWRTemplate[] = [
   },
   {
     id: 'cat-import',
-    version: '0.2.3',
+    version: '0.3.7',
     name: 'Cat Import',
     description: 'CWR data formated for Cat Import.',
     fields: [
@@ -180,7 +166,7 @@ const CWR_TEMPLATES: CWRTemplate[] = [
   },
   {
     id: 'msg-report',
-    version: '0.0.2',
+    version: '1.0.0',
     name: 'Message Records',
     description: 'All message records present in the CWR file',
     fields: [
