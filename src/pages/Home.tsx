@@ -113,23 +113,23 @@ export default function RootHub() {
   const STAGES: RoadmapItem['stage'][] = ['Now', 'Next', 'Later'];
 
   return (
-    <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
-      {/* What's New */}
+    <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 sm:py-12 text-gray-900 dark:text-gray-100">
       <section className="mb-8">
         <div className="flex items-center justify-between mb-3">
           <h2 className="text-lg sm:text-xl font-bold flex items-center gap-2">
-            <span className="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-gray-100 dark:bg-gray-900 border border-gray-200 dark:border-gray-800">
+            <span className="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-800">
               <Bell className="h-4 w-4" />
             </span>
-            What's New
+            What&apos;s New
           </h2>
           <Link
             to="https://docs.tulbox.app/blog"
-            className="text-sm text-cyan-600 dark:text-cyan-400 hover:underline"
+            className="text-sm text-cyan-700 dark:text-cyan-300 hover:text-cyan-800 dark:hover:text-cyan-200 hover:underline underline-offset-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500/60 dark:focus-visible:ring-cyan-400/60 rounded"
           >
             View all
           </Link>
         </div>
+
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {changelog.map((item, i) => (
             <motion.article
@@ -138,20 +138,20 @@ export default function RootHub() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.4 }}
               transition={{ duration: 0.35, delay: i * 0.04 }}
-              className="rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-4 shadow-sm"
+              className="rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-4 shadow-sm transition-colors"
             >
               <div className="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400">
                 <Tag label={item.tag || 'Update'} />
                 <time dateTime={item.date}>{formatDate(item.date)}</time>
               </div>
               <h3 className="mt-2 font-semibold leading-snug">{item.title}</h3>
-              <p className="mt-1 text-sm text-gray-600 dark:text-gray-300">
+              <p className="mt-1 text-sm text-gray-700 dark:text-gray-300">
                 {item.summary}
               </p>
               <div className="mt-3">
                 <Link
                   to={item.link || '/changelog'}
-                  className="inline-flex items-center gap-1 text-sm text-cyan-600 dark:text-cyan-400 hover:underline"
+                  className="inline-flex items-center gap-1 text-sm text-cyan-700 dark:text-cyan-300 hover:text-cyan-800 dark:hover:text-cyan-200 hover:underline underline-offset-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500/60 dark:focus-visible:ring-cyan-400/60 rounded"
                 >
                   Learn more <ChevronRight className="h-4 w-4" />
                 </Link>
@@ -161,9 +161,8 @@ export default function RootHub() {
         </div>
       </section>
 
-      {/* Roadmap & Tips */}
       <section className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-8">
-        <div className="lg:col-span-3 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-4 shadow-sm">
+        <div className="lg:col-span-3 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-4 shadow-sm transition-colors">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
               <span className="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-gray-100 dark:bg-gray-800">
@@ -171,7 +170,7 @@ export default function RootHub() {
               </span>
               <h2 className="text-lg font-semibold">Roadmap</h2>
             </div>
-            <div className="text-xs text-gray-500 dark:text-gray-400">
+            <div className="text-xs text-gray-600 dark:text-gray-400">
               Updated{' '}
               {new Date().toLocaleDateString(undefined, {
                 month: 'short',
@@ -180,14 +179,14 @@ export default function RootHub() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
             {STAGES.map((stage) => {
               const items = roadmap.filter((r) => r.stage === stage);
               return (
                 <section
                   key={stage}
                   aria-labelledby={`roadmap-${stage}`}
-                  className="rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50/60 dark:bg-gray-950/40 p-3"
+                  className="rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50/70 dark:bg-gray-950/40 p-3 transition-colors"
                 >
                   <div className="mb-2 flex items-center justify-between">
                     <h3
@@ -214,7 +213,7 @@ export default function RootHub() {
                     {items.map((r) => {
                       return (
                         <li key={r.id}>
-                          <div className="group block rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-3 hover:shadow">
+                          <div className="group block rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-3 hover:bg-gray-50 dark:hover:bg-gray-800/60 hover:border-gray-300 dark:hover:border-gray-700 transition-colors focus-within:outline-none focus-within:ring-2 focus-within:ring-cyan-500/60 dark:focus-within:ring-cyan-400/60">
                             <div className="flex items-start gap-3">
                               <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gray-100 dark:bg-gray-800">
                                 {r.icon ?? <Rocket className="h-4 w-4" />}
@@ -223,17 +222,16 @@ export default function RootHub() {
                                 <p className="font-medium truncate">
                                   {r.title}
                                 </p>
-                                <p className="text-xs text-gray-600 dark:text-gray-300 line-clamp-2">
+                                <p className="text-xs text-gray-700 dark:text-gray-300 line-clamp-2">
                                   {r.summary}
                                 </p>
 
-                                {/* Progress (Now) / ETA (Next/Later) */}
                                 {r.stage === 'Now' &&
                                 typeof r.progress === 'number' ? (
                                   <div className="mt-2">
                                     <div className="h-1.5 w-full rounded-full bg-gray-200 dark:bg-gray-800 overflow-hidden">
                                       <span
-                                        className="block h-1.5 bg-cyan-500 dark:bg-cyan-400"
+                                        className="block h-1.5 bg-cyan-600 dark:bg-cyan-400"
                                         style={{
                                           width: `${Math.min(
                                             Math.max(r.progress, 0),
@@ -242,7 +240,7 @@ export default function RootHub() {
                                         }}
                                       />
                                     </div>
-                                    <div className="mt-1 flex items-center justify-between text-[10px] text-gray-500">
+                                    <div className="mt-1 flex items-center justify-between text-[10px] text-gray-600 dark:text-gray-400">
                                       <span>In progress</span>
                                       <span>
                                         {r.progress}% • ETA {r.eta ?? '—'}
@@ -250,7 +248,7 @@ export default function RootHub() {
                                     </div>
                                   </div>
                                 ) : (
-                                  <div className="mt-2 text-[10px] text-gray-500">
+                                  <div className="mt-2 text-[10px] text-gray-600 dark:text-gray-400">
                                     ETA {r.eta ?? 'TBD'}
                                   </div>
                                 )}
@@ -270,7 +268,7 @@ export default function RootHub() {
           <div className="mt-3 flex items-center justify-between">
             <a
               href="https://docs.tulbox.app/changelog"
-              className="text-xs text-blue-600 hover:underline underline-offset-2"
+              className="text-xs text-blue-700 dark:text-blue-300 hover:text-blue-800 dark:hover:text-blue-200 hover:underline underline-offset-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/60 dark:focus-visible:ring-blue-400/60 rounded"
             >
               View full changelog →
             </a>
