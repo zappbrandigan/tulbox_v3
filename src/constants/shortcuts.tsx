@@ -11,6 +11,26 @@ function getAvailableShortcuts() {
         keys: [<ModKey key="mod" />, '+', <kbd>/</kbd>],
         description: 'Show Shortcuts',
       },
+      {
+        keys: [<kbd key="p">p</kbd>],
+        description: 'Go to PDF Manager',
+      },
+      {
+        keys: [<kbd key="s">s</kbd>],
+        description: 'Go to Production Search',
+      },
+      {
+        keys: [<kbd key="c">c</kbd>],
+        description: 'Go to CWR Converter',
+      },
+      {
+        keys: [<kbd key="x">x</kbd>],
+        description: 'Go to Cue Sheet Converter',
+      },
+      {
+        keys: [<kbd key="h">h</kbd>],
+        description: 'Go to Home',
+      },
     ],
     'CWR Converter': [
       {

@@ -4,13 +4,16 @@ import App from './App.tsx';
 import './index.css';
 import { ToastProvider } from './context/ToastContext.tsx';
 import { HelmetProvider } from 'react-helmet-async';
+import { BrowserRouter } from 'react-router';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <HelmetProvider>
-      <ToastProvider>
-        <App />
-      </ToastProvider>
-    </HelmetProvider>
+    <BrowserRouter>
+      <HelmetProvider>
+        <ToastProvider>
+          <App />
+        </ToastProvider>
+      </HelmetProvider>
+    </BrowserRouter>
   </StrictMode>
 );

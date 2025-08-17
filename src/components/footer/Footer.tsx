@@ -1,19 +1,27 @@
 import { trackEvent } from '@/utils';
-import { GitCommitHorizontal } from 'lucide-react';
-import React from 'react';
+// import { GitCommitHorizontal } from 'lucide-react';
 
-interface FooterProps {
+import { useState } from 'react';
+import {
+  GitCommitHorizontal,
+  Copy,
+  Check,
+  MessageSquare,
+  BookOpen,
+  Activity,
+  Keyboard,
+} from 'lucide-react';
+
+export default function AppFooter({
+  appName,
+  setShowShortcut,
+}: {
   appName: string;
-  setShowShortcut: React.Dispatch<React.SetStateAction<boolean>>;
-}
+  setShowShortcut: (v: boolean) => void;
+}) {
+  const [copied, setCopied] = useState(false);
 
-const Footer: React.FC<FooterProps> = ({ appName, setShowShortcut }) => {
   const version = __APP_VERSION__;
-  // const updated = new Date(__APP_UPDATED__).toLocaleDateString('en-US', {
-  //   month: 'short',
-  //   day: 'numeric',
-  //   year: 'numeric',
-  // });
   const commit = __APP_COMMIT__.substring(0, 7);
   const note = `
 Note to sender: You can use Markdown formatting in the template above if you know it — for example:
@@ -88,52 +96,103 @@ I'd like to request a new feature/tool for ${appName} or report in the CWR tool.
 
 ${note}
 
-Thanks!
-`.trim();
+Thanks!`;
+
+  const copyBuild = async () => {
+    try {
+      await navigator.clipboard.writeText(`v${version}-${commit}`);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    } catch {}
+  };
 
   return (
-    <footer
-      className="w-full py-2 px-4 text-xs text-gray-500 dark:text-gray-400
-    flex flex-wrap justify-center items-center gap-x-4 gap-y-1
-    bg-gray-50 dark:bg-gray-900 border-t dark:border-gray-700 transition-colors"
-    >
-      <div className="flex items-center gap-1 text-gray-500 dark:text-gray-500">
-        <span>v{version}</span>
-        <GitCommitHorizontal className="inline h-3 w-3 opacity-70" />
-        <span>{commit}</span>
-      </div>
+    <footer className="w-full bg-gray-50/80 dark:bg-gray-900/80 backdrop-blur border-t border-gray-200 dark:border-gray-800">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-2">
+        {/* 3-column utility bar; perfect center alignment on all widths */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 items-center gap-y-2 text-xs text-gray-600 dark:text-gray-400">
+          {/* LEFT: brand + quick nav */}
+          <div className="flex items-center gap-3 justify-center sm:justify-start">
+            <span aria-label="TūlBOX copyright">
+              © {new Date().getFullYear()} TūlBOX
+            </span>
+            <nav
+              aria-label="Footer navigation"
+              className="hidden sm:flex items-center gap-3"
+            >
+              <a
+                href="https://docs.tulbox.app"
+                className="inline-flex items-center gap-1 hover:underline underline-offset-2"
+              >
+                <BookOpen className="h-3.5 w-3.5" /> Docs
+              </a>
+              <span className="inline-flex items-center gap-1">
+                <Activity className="h-3.5 w-3.5 text-emerald-600" /> Status
+              </span>
+              <button
+                onClick={() => setShowShortcut(true)}
+                className="inline-flex items-center gap-1 hover:underline underline-offset-2"
+              >
+                <Keyboard className="h-3.5 w-3.5 text-blue-600" /> Shortcuts
+              </button>
+            </nav>
+          </div>
 
-      {/* <div className="text-gray-400 dark:text-gray-500">Updated {updated}</div> */}
+          {/* CENTER: version & commit with copy */}
+          <div className="flex items-center justify-center">
+            <div className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 dark:border-gray-800 bg-white/40 dark:bg-gray-950/40 px-2.5 py-1">
+              <span className="tabular-nums">v{version}</span>
+              <GitCommitHorizontal className="h-3.5 w-3.5 opacity-70" />
+              <span className="font-mono text-[11px] leading-none">
+                {commit}
+              </span>
+              <button
+                type="button"
+                onClick={copyBuild}
+                className="ml-1 rounded-md px-1 py-0.5 hover:bg-gray-100 dark:hover:bg-gray-800"
+                aria-label="Copy version and commit"
+                title="Copy build (v + commit)"
+              >
+                {copied ? (
+                  <Check className="h-3.5 w-3.5 text-emerald-500" />
+                ) : (
+                  <Copy className="h-3.5 w-3.5 opacity-80" />
+                )}
+              </button>
+            </div>
+          </div>
 
-      <div className="flex gap-2 items-center text-blue-600">
-        <a
-          href={`mailto:brandon@tulbox.app?subject=Bug/Feedback:%20v${version}-${commit}&body=${encodeURIComponent(
-            emailTemplate
-          )}`}
-          onClick={() => {
-            trackEvent('bugs_link_click', { label: 'Bugs Link Clicked' });
-          }}
-          className="hover:underline underline-offset-2"
-        >
-          Feedback
-        </a>
-        <span className="text-gray-400 dark:text-gray-600">|</span>
-        <a
-          href={`mailto:brandon@tulbox.app?subject=Request:%20v${version}-${commit}&body=${encodeURIComponent(
-            requestTemplate
-          )}`}
-          onClick={() => {
-            trackEvent('request_link_click', { label: 'Request Link Clicked' });
-          }}
-          className="hover:underline underline-offset-2"
-        >
-          Requests
-        </a>
-        <span className="text-gray-400 dark:text-gray-600">|</span>
-        <button onClick={() => setShowShortcut(true)}>Shortcuts</button>
+          {/* RIGHT: action chips */}
+          <div className="flex items-center justify-center sm:justify-end gap-2">
+            <a
+              href={`mailto:brandon@tulbox.app?subject=Bug/Feedback:%20v${version}-${commit}&body=${encodeURIComponent(
+                emailTemplate
+              )}`}
+              onClick={() =>
+                trackEvent('bugs_link_click', { label: 'Bugs Link Clicked' })
+              }
+              className="inline-flex items-center gap-1 rounded-full border border-gray-200 dark:border-gray-800 bg-white/60 dark:bg-gray-950/40 px-2.5 py-1 hover:shadow"
+            >
+              <MessageSquare className="h-3.5 w-3.5 text-blue-600" />
+              Feedback
+            </a>
+            <a
+              href={`mailto:brandon@tulbox.app?subject=Request:%20v${version}-${commit}&body=${encodeURIComponent(
+                requestTemplate
+              )}`}
+              onClick={() =>
+                trackEvent('request_link_click', {
+                  label: 'Request Link Clicked',
+                })
+              }
+              className="inline-flex items-center gap-1 rounded-full border border-gray-200 dark:border-gray-800 bg-white/60 dark:bg-gray-950/40 px-2.5 py-1 hover:shadow"
+            >
+              <MessageSquare className="h-3.5 w-3.5 text-blue-600" />
+              Request
+            </a>
+          </div>
+        </div>
       </div>
     </footer>
   );
-};
-
-export default Footer;
+}

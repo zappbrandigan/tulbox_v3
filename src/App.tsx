@@ -1,14 +1,18 @@
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { SessionContext } from './context/sessionContext';
 import { Layout } from './components/ui';
-import { PDFManager, ProductionSearch, CWRConverter } from './pages';
+import {
+  Home,
+  PDFManager,
+  ProductionSearch,
+  CWRConverter,
+  NotFound,
+} from './pages';
 import CueSheetConverter from './pages/CueSheetConverter';
+import { Routes, Route, useNavigate } from 'react-router';
+import { useShortcut } from './hooks';
 
 function App() {
-  const [currentTool, setCurrentTool] = useState(() => {
-    return localStorage.getItem('defaultTool') ?? 'pdf-manager';
-  });
-
   const appName = 'TūlBOX';
 
   const sessionId = useMemo(() => {
@@ -22,34 +26,26 @@ function App() {
     return newId;
   }, []);
 
-  const handleToolChange = (tool: string) => {
-    setCurrentTool(tool);
-    localStorage.setItem('defaultTool', tool);
-  };
-
-  const renderCurrentTool = () => {
-    switch (currentTool) {
-      case 'pdf-manager':
-        return <PDFManager />;
-      case 'production-search':
-        return <ProductionSearch />;
-      case 'cwr-converter':
-        return <CWRConverter />;
-      case 'cue-sheet-converter':
-        return <CueSheetConverter />;
-      default:
-        return <PDFManager />;
-    }
-  };
+  const navigate = useNavigate();
+  useShortcut({
+    h: { callback: () => navigate('/'), allowInInput: false },
+    p: { callback: () => navigate('/pdf'), allowInInput: false },
+    s: { callback: () => navigate('/search'), allowInInput: false },
+    c: { callback: () => navigate('/cwr'), allowInInput: false },
+    x: { callback: () => navigate('/cues'), allowInInput: false },
+  });
 
   return (
     <SessionContext.Provider value={sessionId}>
-      <Layout
-        appName={appName}
-        currentTool={currentTool}
-        onToolChange={handleToolChange}
-      >
-        {renderCurrentTool()}
+      <Layout appName={appName}>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/pdf" element={<PDFManager />} />
+          <Route path="/cwr" element={<CWRConverter />} />
+          <Route path="/cues" element={<CueSheetConverter />} />
+          <Route path="/search" element={<ProductionSearch />} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
       </Layout>
     </SessionContext.Provider>
   );
