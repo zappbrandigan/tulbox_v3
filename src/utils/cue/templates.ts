@@ -52,10 +52,10 @@ const CUE_SHEET_FORMATS: CueSheetTemplate[] = [
     disabled: true,
   },
   {
-    id: 'cue-spark',
+    id: 'cue-trak',
     version: '0.0.1',
-    name: 'CueSpark',
-    description: 'CueSpark PDF formatted cue sheets.',
+    name: 'Cuetrak',
+    description: 'Cuetrak PDF formatted cue sheets.',
     fields: [
       { key: 'fileName', label: 'File Name', type: 'string', width: 200 },
       { key: 'sequenceNumber', label: 'Seq #', type: 'number', width: 75 },
