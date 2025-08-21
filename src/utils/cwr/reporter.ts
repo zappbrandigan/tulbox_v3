@@ -123,6 +123,8 @@ class CWRReporter {
         : publisher.fields.publisherName ?? 'UNKNOWN PUBLISHER';
     let prCollectionShare: number = 0;
     let mrCollectionShare: number = 0;
+    const publisherControlFlag =
+      publisher.fields.recordType === 'SPU' ? 'Y' : 'N';
     if (publisher.fields.recordType === 'SPU') {
       prCollectionShare = Number(
         (publisher as ParsedSPU).spts?.[0].fields.prCollectionShare ??
@@ -150,6 +152,8 @@ class CWRReporter {
     row.set('workType', workType);
     row.set('workTitle', workTitle);
     row.set('publisherSeqNum', publisher.fields.publisherSequenceNumber);
+
+    row.set('controlled', publisherControlFlag);
     row.set('capacity', publisher.fields.publisherType ?? '');
     row.set('ipNum', publisher.fields.interestedPartyNumber ?? '');
     row.set('publisherName', publisherName);
@@ -266,20 +270,35 @@ class CWRReporter {
           workTitle: currentWork.header.fields.workTitle,
         };
 
-        // let totalContribution = 0;
-        // const contributionLookup = Object.fromEntries(
-        //   [
-        //     ...(transaction.work?.swrs ?? []),
-        //     ...(transaction.work?.owrs ?? []),
-        //   ].map((w) => [
-        //     w.fields?.interestedPartyNumber,
-        //     this.getContribution(
-        //       w,
-        //       w.fields.recordType === 'SWR' ? true : false
-        //     ),
-        //   ]) ?? []
-        // );
-        // const normalizedContributions = this.normalizeToTarget(contributionLookup);
+        let totalContribution = 0;
+        const contributionLookup = Object.fromEntries(
+          [
+            ...(transaction.work?.swrs ?? []),
+            ...(transaction.work?.owrs ?? []),
+          ].map((w) => [
+            w.fields?.interestedPartyNumber,
+            this.getContribution(
+              w,
+              w.fields.recordType === 'SWR' ? true : false
+            ),
+          ]) ?? []
+        );
+        const normalizedContributions =
+          this.normalizeToTarget(contributionLookup);
+
+        Object.values(normalizedContributions).forEach(
+          (v) => (totalContribution += v * 2)
+        );
+        if (Math.abs(totalContribution - 100) > 1e-6)
+          warnings.push(
+            `<span class="text-rose-600 dark:text-rose-300 font-semibold">[Contribution %]</span>
+            <span class="text-gray-500 dark:text-gray-400 font-medium">Title: ${
+              repeatedData.workTitle
+            }</span>
+            <span class="text-blue-600 dark:text-blue-300 font-medium">
+            Contribution percentage total: ${totalContribution.toFixed(2)}
+            </span>`
+          );
 
         for (const publisher of [
           ...(currentWork.spus ?? []),
@@ -293,6 +312,18 @@ class CWRReporter {
         ]) {
           rows.push(this.getWriterInfo(repeatedData, writer, columns));
         }
+
+        if (
+          [...(currentWork.swrs ?? []), ...(currentWork.owrs ?? [])].length ===
+          0
+        )
+          warnings.push(
+            `<span class="text-rose-600 dark:text-rose-300 font-semibold">[Missing Writer]</span>
+            <span class="text-gray-500 dark:text-gray-400 font-medium">Title: ${repeatedData.workTitle}</span>
+            <span class="text-blue-600 dark:text-blue-300 font-medium">
+            No writers listed for this work
+            </span>`
+          );
 
         rowCollection.push(...rows);
       }
