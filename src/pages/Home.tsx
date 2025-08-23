@@ -89,7 +89,7 @@ export default function RootHub() {
     {
       id: 'cue-format-2',
       title: 'Cue Sheet Converter Formats',
-      summary: 'Add support for CueSpark cue sheet format.',
+      summary: 'Add support for Cuetrak cue sheet format.',
       stage: 'Next',
       eta: 'Q4 2025',
       icon: <LetterText />,
