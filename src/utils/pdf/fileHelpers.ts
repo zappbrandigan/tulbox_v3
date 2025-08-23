@@ -2,6 +2,7 @@ import { FileItem, SearchReplaceRule } from '@/types';
 import JSZip from 'jszip';
 import { saveAs } from 'file-saver';
 import dotifyTitleGeneric from './dotify';
+import { useToastStore } from '@/stores/toast';
 
 const generateFileId = (): string => {
   return Date.now().toString(36) + Math.random().toString(36).substring(2);
@@ -70,7 +71,7 @@ const applySearchReplace = (
           );
         }
       } catch {
-        console.warn('Invalid regex pattern:', rule.searchPattern);
+        console.log('Invalid regex.');
       }
     });
 
@@ -98,14 +99,25 @@ const downloadRenamedFiles = async (files: FileItem[]): Promise<void> => {
       zip.file(ensurePdfExtension(fileItem.currentName), blob);
     } catch (error) {
       console.error('Error downloading file:', fileItem.currentName, error);
+      useToastStore.getState().toast({
+        description: 'Error: failed to download file.',
+        variant: 'error',
+      });
     }
   }
 
   try {
     const content = await zip.generateAsync({ type: 'blob' });
     saveAs(content, 'dotified.zip');
+    useToastStore.getState().toast({
+      description: 'File downloaded!',
+      variant: 'success',
+    });
   } catch {
-    console.log('Error. Please reload and try again.');
+    useToastStore.getState().toast({
+      description: 'Error: failed to download file.',
+      variant: 'error',
+    });
   }
 };
 

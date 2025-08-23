@@ -1,5 +1,5 @@
 import { logUserEvent } from '@/utils/general/logEvent';
-import { useSessionId } from '@/context/sessionContext';
+import { useSession } from '@/stores/session';
 
 interface ShortcutButtonProps {
   children: React.ReactNode;
@@ -14,7 +14,7 @@ const ShortcutButton: React.FC<ShortcutButtonProps> = ({
   title = 'Shortcut',
   active,
 }) => {
-  const sessionId = useSessionId();
+  const sessionId = useSession((s) => s.sessionId);
 
   const handleClick = () => {
     toggle((prev) => !prev);

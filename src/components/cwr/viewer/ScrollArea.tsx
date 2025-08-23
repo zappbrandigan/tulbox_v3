@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useSearch, useShortcut } from '@/hooks';
 import { CWRParsedRecord } from 'cwr-parser/types';
 import { logUserEvent } from '@/utils/general/logEvent';
-import { useSessionId } from '@/context/sessionContext';
+import { useSession } from '@/stores/session';
 
 const ROW_HEIGHT = 24;
 const PAGE_SIZE = 50;
@@ -39,7 +39,7 @@ const ScrollArea: React.FC<Props> = ({
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
 
-  const sessionId = useSessionId();
+  const sessionId = useSession((s) => s.sessionId);
 
   const handleSearchInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;

@@ -6,13 +6,13 @@ import {
   ToggleLeft,
   ToggleRight,
   AlertCircle,
-  Regex,
   Trash,
 } from 'lucide-react';
 import { SearchReplaceRule } from '@/types';
-import { useToast, useShortcut } from '@/hooks';
+import { useShortcut } from '@/hooks';
 import { Panel } from '@/components/ui';
 import commonReplacements from '@/constants/searchAndReplaceTemplates';
+import { useToast } from '@/stores/toast';
 
 const createRuleFromTemplate = (
   template: (typeof commonReplacements)[number],
@@ -348,15 +348,7 @@ const SearchReplace = ({
   onApply: () => void;
 }) => {
   const [showAdvanced, setShowAdvanced] = useState(false);
-  const { showToast } = useToast();
-
-  const applyRules = () => {
-    onApply();
-    showToast({
-      message: 'Rule(s) applied!',
-      icon: <Regex className="w-4 h-4 text-blue-500 dark:text-blue-300" />,
-    });
-  };
+  const { toast } = useToast();
 
   const addRule = () => {
     const newRule: SearchReplaceRule = {
@@ -368,6 +360,14 @@ const SearchReplace = ({
       isEnabled: true,
     };
     onRulesChange([...rules, newRule]);
+  };
+
+  const applyRules = () => {
+    onApply();
+    toast({
+      description: 'Applied search and replace rules.',
+      variant: 'default',
+    });
   };
 
   useShortcut(

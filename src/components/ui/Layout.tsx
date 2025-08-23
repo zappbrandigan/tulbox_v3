@@ -4,6 +4,7 @@ import { Footer } from '@/components/footer';
 import ToolContainer from './ToolContainer';
 import ShortcutModal from './ShortcutModal';
 import { useShortcut } from '@/hooks';
+import { Toaster } from './Toaster';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -28,6 +29,7 @@ const Layout: React.FC<LayoutProps> = ({ children, appName }) => {
         showShortcuts={showShortcuts}
         setShowShortcuts={setShowShortcuts}
       />
+      <Toaster />
     </div>
   );
 };

@@ -27,7 +27,7 @@ import {
 import { ToolHeader, LoadingOverlay } from '@/components/ui';
 import { logUserEvent } from '@/utils/general/logEvent';
 import { PageMeta } from '@/PageMeta';
-import { useSessionId } from '@/context/sessionContext';
+import { useSession } from '@/stores/session';
 
 const ProductionSearch: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -41,7 +41,7 @@ const ProductionSearch: React.FC = () => {
   const [searchType, setSearchType] = useState<productionType>('all');
   const [error, setError] = useState(false);
 
-  const sessionId = useSessionId();
+  const sessionId = useSession((s) => s.sessionId);
 
   const handleSearch = async () => {
     if (!searchQuery.trim()) return;

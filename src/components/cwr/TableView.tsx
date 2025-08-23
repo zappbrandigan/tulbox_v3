@@ -4,6 +4,7 @@ import { CWRTemplateField } from '@/types';
 import { Table } from 'lucide-react';
 import ReportWorker from '@/workers/reportWorker?worker';
 import { LoadingOverlay, Panel, WarningModal } from '@/components/ui';
+import { useToast } from '@/stores/toast';
 
 const ROW_HEIGHT = 36;
 const PAGE_SIZE = 50;
@@ -35,6 +36,7 @@ const TableView: React.FC<Props> = ({
   const [showWarnings, setShowWarnings] = useState(false);
 
   const [isPending, startTransition] = useTransition();
+  const { toast } = useToast();
 
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -70,6 +72,11 @@ const TableView: React.FC<Props> = ({
 
         startTransition(() => {
           setReportData(e.data.reportData);
+          if (e.data.warnings.length > 0)
+            toast({
+              description: 'Processed with warnings',
+              variant: 'warning',
+            });
           setWarnings(e.data.warnings);
         });
 

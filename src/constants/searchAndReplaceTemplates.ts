@@ -5,7 +5,7 @@ const commonReplacements = [
     search: '.*',
     replace: 'CUE_SHEET',
     regex: true,
-    ignoreCase: false,
+    ignoreCase: true,
   },
   {
     name: 'Cue Sheet T2',
@@ -13,7 +13,7 @@ const commonReplacements = [
     search: '.*',
     replace: 'CUE_SHEET_NO_EP',
     regex: true,
-    ignoreCase: false,
+    ignoreCase: true,
   },
   {
     name: 'Date Conversion 1',

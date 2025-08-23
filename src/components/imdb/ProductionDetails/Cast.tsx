@@ -1,12 +1,12 @@
 import { Copy, User, Users } from 'lucide-react';
-import { useToast } from '@/hooks/useToast';
+import { useToast } from '@/stores/toast';
 
 interface CastProps {
   actors: string[];
 }
 
 const Cast: React.FC<CastProps> = ({ actors }) => {
-  const { showToast } = useToast();
+  const { toast } = useToast();
   return (
     <div>
       <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3 flex items-center">
@@ -19,7 +19,10 @@ const Cast: React.FC<CastProps> = ({ actors }) => {
             key={index}
             onClick={() => {
               navigator.clipboard.writeText(`${actor}`);
-              showToast();
+              toast({
+                description: 'Copied to clipboard!',
+                variant: 'success',
+              });
             }}
             className="group flex items-center p-2 bg-gray-50 dark:bg-gray-800 rounded hover:cursor-pointer transition-colors"
           >

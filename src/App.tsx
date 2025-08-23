@@ -1,5 +1,6 @@
-import { useMemo } from 'react';
-import { SessionContext } from './context/sessionContext';
+// App.tsx
+import { useEffect } from 'react';
+import { useSession } from '@/stores/session';
 import { Layout } from './components/ui';
 import {
   Home,
@@ -15,15 +16,21 @@ import { useShortcut } from './hooks';
 function App() {
   const appName = 'TūlBOX';
 
-  const sessionId = useMemo(() => {
-    if (typeof window === 'undefined') return '';
-    const key = 'tulbox_session';
-    const existing = localStorage.getItem(key);
-    if (existing) return existing;
+  const ensureSession = useSession((s) => s.ensureSession);
+  useEffect(() => {
+    ensureSession();
+  }, [ensureSession]);
 
-    const newId = crypto.randomUUID?.() || Date.now().toString(36);
-    localStorage.setItem(key, newId);
-    return newId;
+  // temporary: removing old storage keys for state management migration
+  useEffect(() => {
+    const LEGACY_KEYS = ['tulbox_session', 'theme', 'defaultTool'];
+    LEGACY_KEYS.forEach((k) => {
+      try {
+        localStorage.removeItem(k);
+      } catch {
+        console.log();
+      }
+    });
   }, []);
 
   const navigate = useNavigate();
@@ -36,18 +43,16 @@ function App() {
   });
 
   return (
-    <SessionContext.Provider value={sessionId}>
-      <Layout appName={appName}>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/pdf" element={<PDFManager />} />
-          <Route path="/cwr" element={<CWRConverter />} />
-          <Route path="/cues" element={<CueSheetConverter />} />
-          <Route path="/search" element={<ProductionSearch />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </Layout>
-    </SessionContext.Provider>
+    <Layout appName={appName}>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/pdf" element={<PDFManager />} />
+        <Route path="/cwr" element={<CWRConverter />} />
+        <Route path="/cues" element={<CueSheetConverter />} />
+        <Route path="/search" element={<ProductionSearch />} />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </Layout>
   );
 }
 

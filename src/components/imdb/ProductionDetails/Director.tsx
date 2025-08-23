@@ -1,12 +1,12 @@
 import { Copy, User } from 'lucide-react';
-import { useToast } from '@/hooks/useToast';
+import { useToast } from '@/stores/toast';
 
 interface DirectorProps {
   director: string | null;
 }
 
 const Director: React.FC<DirectorProps> = ({ director }) => {
-  const { showToast } = useToast();
+  const { toast } = useToast();
   if (!director) return null;
 
   return (
@@ -18,7 +18,10 @@ const Director: React.FC<DirectorProps> = ({ director }) => {
       <div
         onClick={() => {
           navigator.clipboard.writeText(`${director}`);
-          showToast();
+          toast({
+            description: 'Copied to clipboard!',
+            variant: 'success',
+          });
         }}
         className="group flex items-center p-2 bg-gray-50 dark:bg-gray-800 rounded hover:cursor-pointer transition-colors"
       >

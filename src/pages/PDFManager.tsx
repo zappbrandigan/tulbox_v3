@@ -11,7 +11,7 @@ import {
 import { ToolHeader, DragDropZone, Disclaimer } from '@/components/ui';
 import { logUserEvent } from '@/utils/general/logEvent';
 import { PageMeta } from '@/PageMeta';
-import { useSessionId } from '@/context/sessionContext';
+import { useSession } from '@/stores/session';
 
 const PDFManager: React.FC = () => {
   const [files, setFiles] = useState<FileItem[]>([]);
@@ -20,7 +20,7 @@ const PDFManager: React.FC = () => {
   >([]);
   const [isDownloading, setIsDownloading] = useState(false);
 
-  const sessionId = useSessionId();
+  const sessionId = useSession((s) => s.sessionId);
 
   const handleFilesAdded = (files: File[] | File) => {
     const actualFiles = Array.isArray(files) ? files : [files];

@@ -103,7 +103,9 @@ Thanks!`;
       await navigator.clipboard.writeText(`v${version}-${commit}`);
       setCopied(true);
       setTimeout(() => setCopied(false), 1500);
-    } catch {}
+    } catch {
+      console.log();
+    }
   };
 
   return (

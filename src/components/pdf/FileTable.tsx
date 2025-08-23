@@ -12,9 +12,10 @@ import {
 import { FileItem } from '@/types';
 import { logUserEvent } from '@/utils/general/logEvent';
 import { ensurePdfExtension } from '@/utils';
-import { useSessionId } from '@/context/sessionContext';
+import { useSession } from '@/stores/session';
 import SortableHeader from '../ui/SortableHeader';
-import { useSortableData, useToast } from '@/hooks';
+import { useSortableData } from '@/hooks';
+import { useToast } from '@/stores/toast';
 
 interface FileTableProps {
   files: FileItem[];
@@ -37,8 +38,8 @@ const FileTable: React.FC<FileTableProps> = ({
     files
   );
 
-  const { showToast } = useToast();
-  const sessionId = useSessionId();
+  const { toast } = useToast();
+  const sessionId = useSession((s) => s.sessionId);
 
   const startEditing = (file: FileItem) => {
     logUserEvent(sessionId, 'PDF Files Inline Edit', {
@@ -156,6 +157,10 @@ const FileTable: React.FC<FileTableProps> = ({
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
+    toast({
+      description: 'File downloaded!',
+      variant: 'success',
+    });
   };
 
   if (files.length === 0) return null;
@@ -265,11 +270,9 @@ const FileTable: React.FC<FileTableProps> = ({
                   <button
                     onClick={() => {
                       navigator.clipboard.writeText(file.currentName);
-                      showToast({
-                        message: 'Copied to cliboard!',
-                        icon: (
-                          <ClipboardCopy className="w-4 h-4 text-blue-500 dark:text-blue-300" />
-                        ),
+                      toast({
+                        description: 'Copied to cliboard!',
+                        variant: 'success',
                       });
                     }}
                     className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 transition-colors"

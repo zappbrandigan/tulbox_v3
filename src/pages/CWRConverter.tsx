@@ -13,7 +13,7 @@ import { CWRConverterRecord } from 'cwr-parser/types';
 import { CWRTemplate } from '@/types';
 import { logUserEvent } from '@/utils/general/logEvent';
 import { PageMeta } from '@/PageMeta';
-import { useSessionId } from '@/context/sessionContext';
+import { useSession } from '@/stores/session';
 
 const CWRConverter: React.FC = () => {
   const [file, setFile] = useState<string>('');
@@ -33,7 +33,7 @@ const CWRConverter: React.FC = () => {
 
   const [isPending, startTransition] = useTransition();
 
-  const sessionId = useSessionId();
+  const sessionId = useSession((s) => s.sessionId);
 
   const handleFileUpload = async (files: File[] | File) => {
     const file = Array.isArray(files) ? files[0] : files;

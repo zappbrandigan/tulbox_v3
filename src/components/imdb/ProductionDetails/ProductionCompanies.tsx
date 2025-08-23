@@ -1,5 +1,5 @@
+import { useToast } from '@/stores/toast';
 import { Building, Copy } from 'lucide-react';
-import { useToast } from '@/hooks/useToast';
 
 interface ProductionCompaniesProps {
   productionCompanies: string[];
@@ -8,7 +8,7 @@ interface ProductionCompaniesProps {
 const ProductionCompanies: React.FC<ProductionCompaniesProps> = ({
   productionCompanies,
 }) => {
-  const { showToast } = useToast();
+  const { toast } = useToast();
   if (!productionCompanies) return null;
 
   return (
@@ -23,7 +23,10 @@ const ProductionCompanies: React.FC<ProductionCompaniesProps> = ({
             <span
               onClick={() => {
                 navigator.clipboard.writeText(`${company}`);
-                showToast();
+                toast({
+                  description: 'Copied to clipboard!',
+                  variant: 'success',
+                });
               }}
               className="inline-flex items-center pr-2 pl-6 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 hover:cursor-pointer"
             >

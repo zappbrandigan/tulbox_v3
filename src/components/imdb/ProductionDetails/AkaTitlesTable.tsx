@@ -1,6 +1,6 @@
 import { LoadingOverlay } from '@/components/ui';
 import { AKATitle } from '@/types';
-import { useToast } from '@/hooks/useToast';
+import { useToast } from '@/stores/toast';
 import { Copy, Globe } from 'lucide-react';
 import { useSortableData } from '@/hooks';
 import SortableHeader from '@/components/ui/SortableHeader';
@@ -21,7 +21,7 @@ const AkaTitlesTable: React.FC<AkaTitlesTableProps> = ({
   akaTitles,
   isLoadingAkas,
 }) => {
-  const { showToast } = useToast();
+  const { toast } = useToast();
   const {
     sortedItems: sortedAkas,
     sortConfig,
@@ -92,7 +92,10 @@ const AkaTitlesTable: React.FC<AkaTitlesTableProps> = ({
                   navigator.clipboard.writeText(
                     `${aka.transliterated}\t${aka.article}\t${aka.type}\t${aka.language}`
                   );
-                  showToast();
+                  toast({
+                    description: 'Copied to clipboard!',
+                    variant: 'success',
+                  });
                 }}
                 className="group hover:bg-gray-50 dark:hover:bg-gray-700 hover:cursor-pointer transition-colors"
               >

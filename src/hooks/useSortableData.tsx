@@ -18,8 +18,8 @@ export function useSortableData<TItem, TKey extends keyof TItem>(
       let aVal = a[sortConfig.key];
       let bVal = b[sortConfig.key];
 
-      if (typeof aVal === 'string') aVal = aVal.toLowerCase() as any;
-      if (typeof bVal === 'string') bVal = bVal.toLowerCase() as any;
+      if (typeof aVal === 'string') aVal = aVal.toLowerCase() as TItem[TKey];
+      if (typeof bVal === 'string') bVal = bVal.toLowerCase() as TItem[TKey];
 
       if (aVal < bVal) return sortConfig.direction === 'asc' ? -1 : 1;
       if (aVal > bVal) return sortConfig.direction === 'asc' ? 1 : -1;

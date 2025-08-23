@@ -51,7 +51,7 @@ class CWRReporter {
       return [k, f, u - f] as const; // [key, floor, fractional remainder]
     });
 
-    let unitsSum = floors.reduce((a, [, f]) => a + f, 0);
+    const unitsSum = floors.reduce((a, [, f]) => a + f, 0);
     let need = targetUnits - unitsSum;
 
     const units = new Map<string, number>(floors.map(([k, f]) => [k, f]));
@@ -97,7 +97,7 @@ class CWRReporter {
     ).find(Boolean);
 
     // Use collection share if we found a record; otherwise fall back to ownership share
-    let contribution =
+    const contribution =
       collectionRecord?.fields.prCollectionShare ??
       writer.fields.prOwnershipShare ??
       0;

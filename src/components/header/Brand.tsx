@@ -1,40 +1,21 @@
-import React, { useEffect, useState } from 'react';
-import { Moon, PocketKnife, Sun } from 'lucide-react';
-import { logUserEvent } from '@/utils/general/logEvent';
-import { useSessionId } from '@/context/sessionContext';
+import React, { useEffect } from 'react';
+import { Moon, PocketKnife, Sun, SunMoon } from 'lucide-react';
 import { Link } from 'react-router';
 import { useShortcut } from '@/hooks';
+import { useTheme } from '@/stores/theme';
 
 interface BrandProps {
   appName: string;
 }
 
 const Brand: React.FC<BrandProps> = ({ appName }) => {
-  const sessionId = useSessionId();
-  const [theme, setTheme] = useState(
-    () => localStorage.getItem('theme') ?? 'light'
-  );
-
+  const initTheme = useTheme((s) => s.init);
+  const toggleTheme = useTheme((s) => s.toggleTheme);
+  const currentTheme = useTheme((s) => s.theme);
   useEffect(() => {
-    document.documentElement.classList.toggle('dark', theme === 'dark');
-    localStorage.setItem('theme', theme);
-  }, [theme]);
-
-  const toggleDarkMode = () => {
-    setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
-    logUserEvent(sessionId, 'User changed theme', {
-      action: 'ui-interaction',
-      target: 'theme-toggle',
-      value: theme === 'light' ? 'dark' : 'light',
-    });
-  };
-
-  useShortcut({
-    t: {
-      callback: toggleDarkMode,
-      allowInInput: false,
-    },
-  });
+    initTheme();
+  }, [initTheme]);
+  useShortcut({ t: { callback: toggleTheme, allowInInput: false } });
 
   return (
     <div className="flex items-center space-x-3">
@@ -51,13 +32,14 @@ const Brand: React.FC<BrandProps> = ({ appName }) => {
       </Link>
 
       <button
-        onClick={toggleDarkMode}
+        onClick={toggleTheme}
         aria-label="Toggle dark mode"
-        title="Toggle dark mode"
+        title={`Toggle theme: ${currentTheme}`}
         className="inline-flex items-center px-2 py-2 text-sm font-medium rounded-full bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-100 transition-colors"
       >
-        <Sun className="w-4 h-4 hidden dark:inline" />
-        <Moon className="w-4 h-4 dark:hidden" />
+        {currentTheme === 'light' && <Sun className="w-4 h-4" />}
+        {currentTheme === 'dark' && <Moon className="w-4 h-4" />}
+        {currentTheme === 'system' && <SunMoon className="w-4 h-4" />}
       </button>
     </div>
   );

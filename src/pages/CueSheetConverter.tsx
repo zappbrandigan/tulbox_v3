@@ -1,15 +1,14 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { logUserEvent } from '@/utils/general/logEvent';
 import { PageMeta } from '@/PageMeta';
 import { FileItem } from '@/types';
-import { checkForDuplicates, generateFileId } from '@/utils';
+import { checkForDuplicates, generateFileId, trackEvent } from '@/utils';
 import { AlertCircle, MousePointer2, Table } from 'lucide-react';
 import CUE_SHEET_FORMATS from '@/utils/cue/templates';
 import { extractTextFromPDF } from '@/utils/cue/extract';
 import { parseSoundmouseText } from '@/utils/cue/transform';
 import { CueRow } from '@/utils/cue/types';
 import { exportCueSheetCSV } from '@/utils/cue/exportCueSheetCSV';
-import { useSessionId } from '@/context/sessionContext';
 import { Summary, Controller, CueTable } from '@/components/cue';
 import {
   ResultHeader,
@@ -20,6 +19,8 @@ import {
   Disclaimer,
   Panel,
 } from '@/components/ui';
+import { useSession } from '@/stores/session';
+import { useToast } from '@/stores/toast';
 
 const CueSheetConverter: React.FC = () => {
   const [files, setFiles] = useState<FileItem[]>([]);
@@ -31,7 +32,8 @@ const CueSheetConverter: React.FC = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [isError, setIsError] = useState(false);
 
-  const sessionId = useSessionId();
+  const sessionId = useSession((s) => s.sessionId);
+  const { toast } = useToast();
 
   const handleFilesAdded = (newFiles: File[] | File) => {
     const files = Array.isArray(newFiles) ? newFiles : [newFiles];
@@ -72,6 +74,10 @@ const CueSheetConverter: React.FC = () => {
     )!;
     try {
       exportCueSheetCSV(cueRows, currentTemplate, `${currentTemplate.id}.csv`);
+      toast({
+        description: 'File donloading.',
+        variant: 'success',
+      });
       logUserEvent(
         sessionId,
         'Cue Sheet CSV Downloaded',
@@ -94,7 +100,10 @@ const CueSheetConverter: React.FC = () => {
         'cue-sheet-converter',
         'error'
       );
-      console.error('Export Error:', error);
+      toast({
+        description: 'Failed to download file.',
+        variant: 'error',
+      });
     }
   };
 
@@ -125,6 +134,13 @@ const CueSheetConverter: React.FC = () => {
       'cue-sheet-converter'
     );
   };
+
+  useEffect(() => {
+    trackEvent('screen_view', {
+      firebase_screen: 'CueSheetConverter',
+      firebase_screen_class: 'CueSheetConverter',
+    });
+  }, []);
 
   const template = CUE_SHEET_FORMATS.find((f) => f.id === selectedTemplate);
   const uniqueWorkCount = new Set(
