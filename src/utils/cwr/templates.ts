@@ -12,7 +12,7 @@ const CWR_TEMPLATES: CWRTemplate[] = [
   {
     id: 'work-report',
     name: 'Work Report',
-    version: '1.0.1',
+    version: '1.0.2',
     description: 'Detailed works information with roles and shares',
     fields: [
       { key: 'songCode', label: 'Song Code', type: 'string', width: 180 },
@@ -119,7 +119,7 @@ const CWR_TEMPLATES: CWRTemplate[] = [
   },
   {
     id: 'cat-import',
-    version: '0.3.7',
+    version: '0.4.1',
     name: 'Cat Import',
     description: 'CWR data formated for Cat Import.',
     fields: [

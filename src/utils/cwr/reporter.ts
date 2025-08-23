@@ -3,6 +3,7 @@ import {
   ParsedOWR,
   ParsedSPU,
   ParsedSWR,
+  ParsedTransaction,
   ParsedTransmission,
 } from 'cwr-parser/types';
 import { CWRTemplate, CWRTemplateField } from '@/types';
@@ -15,25 +16,37 @@ class CWRReporter {
    */
   static normalizeToTarget(
     input: Record<string, number>,
-    target = 50,
-    step = 0.01
+    target = 100,
+    step = 0.01,
+    opts?: { absTol?: number; relTol?: number }
   ): Record<string, number> {
+    const absTol = opts?.absTol ?? step;
+    const relTol = opts?.relTol ?? 0;
+    const threshold = Math.max(absTol, Math.abs(target) * relTol);
+    // Keep only finite entries
     const entries = Object.entries(input).filter(([, v]) => Number.isFinite(v));
     const sum = entries.reduce((a, [, v]) => a + v, 0);
 
-    // Nothing to normalize
+    // If sum is zero, nothing meaningful to scale
     if (sum === 0) {
       return Object.fromEntries(entries.map(([k]) => [k, 0]));
     }
 
-    // Scale to the target first (preserves proportions)
+    // Only normalize if the current sum is close to the target.
+    // Otherwise, return values unchanged (for finite keys we kept).
+    const delta = Math.abs(sum - target);
+    if (delta > threshold) {
+      return Object.fromEntries(entries);
+    }
+
+    // Proportional scale
     const scaled = entries.map(([k, v]) => [k, (v * target) / sum] as const);
 
-    // Work in integer "units" of `step` to avoid float drift
+    // Integer units in step
     const targetUnits = Math.round(target / step);
     const rawUnits = scaled.map(([k, v]) => [k, v / step] as const);
 
-    // Floor first, then distribute the remainder by largest fractional parts
+    // Floor then distribute remainder
     const floors = rawUnits.map(([k, u]) => {
       const f = Math.floor(u);
       return [k, f, u - f] as const; // [key, floor, fractional remainder]
@@ -74,34 +87,58 @@ class CWRReporter {
   }
 
   static getContribution(writer: ParsedSWR | ParsedOWR, isControlled: boolean) {
-    if (isControlled) {
-      let collectionRecord = (writer as ParsedSWR).swts?.find(
-        (t) => t.fields.tisCode === '2136'
-      ); // world
-      if (!collectionRecord) {
-        collectionRecord = (writer as ParsedSWR).swts?.find(
-          (t) => t.fields.tisCode === '0840'
-        ); // U.S.
-      }
-      if (!collectionRecord) {
-        return (writer as ParsedSWR).fields.prOwnershipShare ?? 0;
-      }
-      return collectionRecord?.fields.prCollectionShare ?? 0;
-    } else {
-      let collectionRecord = (writer as ParsedOWR).owts?.find(
-        (t) => t.fields.tisCode === '2136'
-      ); //world
-      if (!collectionRecord) {
-        collectionRecord = (writer as ParsedOWR).owts?.find(
-          (t) => t.fields.tisCode === '0840'
-        ); // U.S.
-      }
-      if (!collectionRecord) {
-        return (writer as ParsedOWR).fields.prOwnershipShare ?? 0;
-      }
-      return collectionRecord?.fields.prCollectionShare ?? 0;
-    }
+    const PREFERRED_TIS = ['2136', '0840']; // World, then U.S.
+
+    const recs = isControlled
+      ? (writer as ParsedSWR).swts ?? []
+      : (writer as ParsedOWR).owts ?? [];
+
+    const collectionRecord = PREFERRED_TIS.map((code) =>
+      recs.find((t) => t.fields.tisCode === code)
+    ).find(Boolean);
+
+    // Use collection share if we found a record; otherwise fall back to ownership share
+    let contribution =
+      collectionRecord?.fields.prCollectionShare ??
+      writer.fields.prOwnershipShare ??
+      0;
+
+    return contribution * 2;
   }
+
+  static buildContributionMap(
+    transaction: ParsedTransaction
+  ): Record<string, number> {
+    const items = [
+      ...(transaction.work?.swrs ?? []),
+      ...(transaction.work?.owrs ?? []),
+    ];
+
+    const out: Record<string, number> = {};
+
+    for (const w of items) {
+      const ipn = String(w.fields.interestedPartyNumber);
+      const isControlled = w.fields.recordType === 'SWR';
+      const contrib = this.getContribution(w, isControlled);
+
+      out[ipn] = (out[ipn] ?? 0) + contrib;
+    }
+
+    return out;
+  }
+
+  // static buildContributionMap(transaction: ParsedTransaction) {
+  //   const contributionLookup = Object.fromEntries(
+  //     [
+  //       ...(transaction.work?.swrs ?? []),
+  //       ...(transaction.work?.owrs ?? []),
+  //     ].map((w) => [
+  //       w.fields?.interestedPartyNumber,
+  //       this.getContribution(w, w.fields.recordType === 'SWR' ? true : false),
+  //     ]) ?? []
+  //   );
+  //   return contributionLookup;
+  // }
 
   static getPublisherInfo(
     {
@@ -185,6 +222,7 @@ class CWRReporter {
       workTitle: string;
     },
     writer: ParsedSWR | ParsedOWR,
+    contriubtion: number,
     columns: [string, string][]
   ) {
     const row = new Map<string, string | number>(columns);
@@ -194,9 +232,9 @@ class CWRReporter {
       ? writer.fields.writerLastName
       : `${writer.fields.writerLastName}, ${writer.fields.writerFirstName}`;
     const writerControlFlag = writer.fields.recordType === 'SWR' ? 'Y' : 'N';
-    const adjustedContribution = (writer.fields.prOwnershipShare ?? 0) * 2;
+    // const adjustedContribution = (writer.fields.prOwnershipShare ?? 0) * 2;
 
-    row.set('contribution', adjustedContribution.toFixed(2)); // e.g., 16.67
+    row.set('contribution', contriubtion.toFixed(2)); // e.g., 16.67
 
     row.set('songCode', songCode);
     row.set('workType', workType);
@@ -271,23 +309,12 @@ class CWRReporter {
         };
 
         let totalContribution = 0;
-        const contributionLookup = Object.fromEntries(
-          [
-            ...(transaction.work?.swrs ?? []),
-            ...(transaction.work?.owrs ?? []),
-          ].map((w) => [
-            w.fields?.interestedPartyNumber,
-            this.getContribution(
-              w,
-              w.fields.recordType === 'SWR' ? true : false
-            ),
-          ]) ?? []
-        );
+        const contributionLookup = this.buildContributionMap(transaction);
         const normalizedContributions =
           this.normalizeToTarget(contributionLookup);
 
         Object.values(normalizedContributions).forEach(
-          (v) => (totalContribution += v * 2)
+          (v) => (totalContribution += v)
         );
         if (Math.abs(totalContribution - 100) > 1e-6)
           warnings.push(
@@ -306,11 +333,19 @@ class CWRReporter {
         ]) {
           rows.push(this.getPublisherInfo(repeatedData, publisher, columns));
         }
-        for (const writer of [
-          ...(currentWork.swrs ?? []),
-          ...(currentWork.owrs ?? []),
-        ]) {
-          rows.push(this.getWriterInfo(repeatedData, writer, columns));
+        for (const ip of Object.keys(normalizedContributions)) {
+          const writer = [
+            ...(currentWork.swrs ?? []),
+            ...(currentWork.owrs ?? []),
+          ].find((w) => w.fields.interestedPartyNumber === ip)!;
+          rows.push(
+            this.getWriterInfo(
+              repeatedData,
+              writer,
+              normalizedContributions[ip],
+              columns
+            )
+          );
         }
 
         if (
@@ -514,33 +549,32 @@ class CWRReporter {
         const songTypeCode = 'OG';
 
         let totalContribution = 0;
-        const contributionLookup = Object.fromEntries(
-          [
-            ...(transaction.work?.swrs ?? []),
-            ...(transaction.work?.owrs ?? []),
-          ].map((w) => [
-            w.fields?.interestedPartyNumber,
-            this.getContribution(
-              w,
-              w.fields.recordType === 'SWR' ? true : false
-            ),
-          ]) ?? []
+        const contributionLookup = this.buildContributionMap(transaction);
+        const normalizedContributions = this.normalizeToTarget(
+          contributionLookup,
+          100,
+          0.01,
+          { absTol: 0.06 }
         );
-        const normalizedContributions =
-          this.normalizeToTarget(contributionLookup);
+
         for (const aka of transaction.work?.alts ?? [
           { fields: { alternativeTitle: '' } },
         ]) {
           totalContribution = 0;
-          for (const writer of transaction.work?.swrs ?? []) {
+          for (const ip of Object.keys(normalizedContributions)) {
             const row = new Map<string, string | number>(
               columnKeys.map((key: string) => [key, ''])
             );
+            const writer = [
+              ...(transaction.work?.swrs ?? []),
+              ...(transaction.work?.owrs ?? []),
+            ].find((w) => w.fields.interestedPartyNumber === ip)!;
+            const controlled = writer.fields.recordType === 'SWR' ? 'Y' : 'N';
             totalContribution +=
-              normalizedContributions[writer.fields.interestedPartyNumber] * 2;
-            const contribution = (
-              normalizedContributions[writer.fields.interestedPartyNumber] * 2
-            )
+              normalizedContributions[writer.fields.interestedPartyNumber];
+            const contribution = normalizedContributions[
+              writer.fields.interestedPartyNumber
+            ]
               .toFixed(2) // ensures 2 decimal places
               .padStart(6, '0'); // pads total length to 6 (e.g. "005.00")
 
@@ -557,47 +591,31 @@ class CWRReporter {
             row.set('firstName', writer.fields.writerFirstName ?? '');
             row.set('capacity', writer.fields.writerDesignationCode ?? '');
             row.set('contribution', contribution);
-            row.set('controlled', 'Y');
-            row.set('affiliation', patchSociety);
-            row.set('ipiNameNumber', writer.fields.ipiNameNumber ?? '');
-            row.set('aka', aka.fields.alternativeTitle);
-            rowCollection.push(row);
-          }
-          for (const writer of transaction.work?.owrs ?? []) {
-            const row = new Map<string, string | number>(
-              columnKeys.map((key: string) => [key, ''])
-            );
-            totalContribution += this.getContribution(writer, false) * 2;
-            const contribution = (this.getContribution(writer, false) * 2)
-              .toFixed(2) // ensures 2 decimal places
-              .padStart(6, '0'); // pads total length to 6 (e.g. "005.00")
-
-            const patchSociety = ['099', '000', '', null].includes(
-              writer.fields.prAffiliationSocietyNumber
-            )
-              ? 'NS'
-              : writer.fields.prAffiliationSocietyNumber;
-
-            row.set('iswc', iswc);
-            row.set('workTitle', workTitle);
-            row.set('songTypeCode', songTypeCode);
-            row.set('lastName', writer.fields.writerLastName ?? '');
-            row.set('firstName', writer.fields.writerFirstName ?? '');
-            row.set('capacity', writer.fields.writerDesignationCode ?? '');
-            row.set('contribution', contribution);
-            row.set('controlled', 'N');
+            row.set('controlled', controlled);
             row.set('affiliation', patchSociety);
             row.set('ipiNameNumber', writer.fields.ipiNameNumber ?? '');
             row.set('aka', aka.fields.alternativeTitle);
             rowCollection.push(row);
           }
         }
-        if (Math.abs(totalContribution - 100) > 1e-6)
+        if (Math.abs(totalContribution - 100) > 1e-6) {
           warnings.push(
             `<span class="text-rose-600 dark:text-rose-300 font-semibold">[Contribution %]</span>
             <span class="text-gray-500 dark:text-gray-400 font-medium">Title: ${workTitle}</span>
             <span class="text-blue-600 dark:text-blue-300 font-medium">
             Contribution percentage total: ${totalContribution.toFixed(2)}
+            </span>`
+          );
+        }
+        if (
+          [...(transaction.work?.swrs ?? []), ...(transaction.work?.owrs ?? [])]
+            .length === 0
+        )
+          warnings.push(
+            `<span class="text-rose-600 dark:text-rose-300 font-semibold">[Missing Writer]</span>
+            <span class="text-gray-500 dark:text-gray-400 font-medium">Title: ${workTitle}</span>
+            <span class="text-blue-600 dark:text-blue-300 font-medium">
+            No writers listed for this work
             </span>`
           );
       }
