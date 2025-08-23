@@ -11,7 +11,6 @@ import { CWRTemplate, CWRTemplateField } from '@/types';
 class CWRReporter {
   /**
    * Normalize a flat map of { ipn: percent } so the values sum to `target`
-   * (default 50), with each value in increments of `step` (default 0.01).
    * Keeps proportions by scaling, then distributes the rounding remainder.
    */
   static normalizeToTarget(
@@ -126,19 +125,6 @@ class CWRReporter {
 
     return out;
   }
-
-  // static buildContributionMap(transaction: ParsedTransaction) {
-  //   const contributionLookup = Object.fromEntries(
-  //     [
-  //       ...(transaction.work?.swrs ?? []),
-  //       ...(transaction.work?.owrs ?? []),
-  //     ].map((w) => [
-  //       w.fields?.interestedPartyNumber,
-  //       this.getContribution(w, w.fields.recordType === 'SWR' ? true : false),
-  //     ]) ?? []
-  //   );
-  //   return contributionLookup;
-  // }
 
   static getPublisherInfo(
     {
