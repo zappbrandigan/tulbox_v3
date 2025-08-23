@@ -23,6 +23,7 @@ const SearchInput: React.FC<SearchInputProps> = ({
           name="search"
           value={searchQuery}
           autoComplete="off"
+          autoFocus={true}
           onChange={(e) => setSearchQuery(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
           placeholder="Search for movies, TV shows, games..."
