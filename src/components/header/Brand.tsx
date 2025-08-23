@@ -3,6 +3,7 @@ import { Moon, PocketKnife, Sun } from 'lucide-react';
 import { logUserEvent } from '@/utils/general/logEvent';
 import { useSessionId } from '@/context/sessionContext';
 import { Link } from 'react-router';
+import { useShortcut } from '@/hooks';
 
 interface BrandProps {
   appName: string;
@@ -20,13 +21,20 @@ const Brand: React.FC<BrandProps> = ({ appName }) => {
   }, [theme]);
 
   const toggleDarkMode = () => {
-    setTheme(theme === 'dark' ? 'light' : 'dark');
+    setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
     logUserEvent(sessionId, 'User changed theme', {
       action: 'ui-interaction',
       target: 'theme-toggle',
       value: theme === 'light' ? 'dark' : 'light',
     });
   };
+
+  useShortcut({
+    t: {
+      callback: toggleDarkMode,
+      allowInInput: false,
+    },
+  });
 
   return (
     <div className="flex items-center space-x-3">

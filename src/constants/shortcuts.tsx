@@ -31,6 +31,10 @@ function getAvailableShortcuts() {
         keys: [<kbd key="h">h</kbd>],
         description: 'Go to Home',
       },
+      {
+        keys: [<kbd key="t">t</kbd>],
+        description: 'Toggle Dark Mode',
+      },
     ],
     'CWR Converter': [
       {
