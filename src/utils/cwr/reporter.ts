@@ -399,6 +399,36 @@ class CWRReporter {
     return { rows: rowCollection, warnings };
   }
 
+  static generateIswcReport(
+    transmission: ParsedTransmission,
+    template: CWRTemplate
+  ) {
+    const warnings: string[] = [];
+    const rowCollection: Map<string, string | number>[] = [];
+    const columns = template.fields.map(
+      (field: CWRTemplateField) => [field.key, ''] as [string, string]
+    );
+
+    for (const group of transmission.groups) {
+      for (const transaction of group.transactions ?? []) {
+        const rows: Map<string, string | number>[] = [];
+        const iswc = transaction.work?.header.fields.iswc ?? '';
+        if (!iswc) {
+          continue;
+        }
+        const row = new Map<string, string | number>(columns);
+        row.set(
+          'songCode',
+          transaction.work?.header.fields.submitterWorkNumber ?? ''
+        );
+        row.set('iswc', iswc);
+        rows.push(row);
+        rowCollection.push(...rows);
+      }
+    }
+    return { rows: rowCollection, warnings };
+  }
+
   static generateAkaReport(
     transmission: ParsedTransmission,
     template: CWRTemplate

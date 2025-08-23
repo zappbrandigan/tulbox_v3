@@ -9,9 +9,10 @@ type ReportGenerator = (
 
 export const templateReportGenerators: Record<string, ReportGenerator> = {
   'work-report': CWRReporter.generateWorkReport.bind(CWRReporter),
+  'cat-import': CWRReporter.generateCatImport.bind(CWRReporter),
   'isrc-report': CWRReporter.generateIsrcReport.bind(CWRReporter),
+  'iswc-report': CWRReporter.generateIswcReport.bind(CWRReporter),
   'aka-report': CWRReporter.generateAkaReport.bind(CWRReporter),
   'ip-report': CWRReporter.generateIpReport.bind(CWRReporter),
-  'cat-import': CWRReporter.generateCatImport.bind(CWRReporter),
   'msg-report': CWRReporter.generateMsgReport.bind(CWRReporter),
 };
