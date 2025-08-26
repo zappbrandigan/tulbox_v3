@@ -75,7 +75,7 @@ const CueSheetConverter: React.FC = () => {
     try {
       exportCueSheetCSV(cueRows, currentTemplate, `${currentTemplate.id}.csv`);
       toast({
-        description: 'File donloading.',
+        description: 'File downloading.',
         variant: 'success',
       });
       logUserEvent(
