@@ -151,6 +151,52 @@ const CWR_TEMPLATES: CWRTemplate[] = [
     ],
   },
   {
+    id: 'rec-report',
+    version: '0.0.1',
+    name: 'Recordings Info',
+    description: 'Sound recording details',
+    fields: [
+      { key: 'songCode', label: 'Song Code', type: 'string', width: 9 },
+      { key: 'workTitle', label: 'Work Title', type: 'string', width: 100 },
+      {
+        key: 'firstAlbumTitle',
+        label: 'First Album Title',
+        type: 'string',
+        width: 100,
+      },
+      {
+        key: 'recordingTitle',
+        label: 'Recording Title',
+        type: 'string',
+        width: 100,
+      },
+      {
+        key: 'displayArtist',
+        label: 'Dislay Artist',
+        type: 'string',
+        width: 100,
+      },
+      {
+        key: 'performingArtist',
+        label: 'Performing Artist',
+        type: 'string',
+        width: 100,
+      },
+      {
+        key: 'firstReleaseCatalog',
+        label: 'Catalog #',
+        type: 'string',
+        width: 50,
+      },
+      {
+        key: 'firstReleaseDate',
+        label: 'Release Date',
+        type: 'string',
+        width: 100,
+      },
+    ],
+  },
+  {
     id: 'ip-report',
     version: '1.0.0',
     name: 'Interested Parties',

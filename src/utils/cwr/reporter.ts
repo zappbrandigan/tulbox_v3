@@ -385,6 +385,57 @@ class CWRReporter {
     return { rows: rowCollection, warnings };
   }
 
+  static generateRecordingReport(
+    transmission: ParsedTransmission,
+    template: CWRTemplate
+  ) {
+    const warnings: string[] = [];
+    const rowCollection: Map<string, string | number>[] = [];
+    const columns = template.fields.map(
+      (field: CWRTemplateField) => [field.key, ''] as [string, string]
+    );
+
+    for (const group of transmission.groups) {
+      for (const transaction of group.transactions ?? []) {
+        const rows: Map<string, string | number>[] = [];
+        if (
+          !transaction.work?.recs?.length ||
+          !transaction.work?.pers?.length
+        ) {
+          continue;
+        } // skip if not REC/PER records
+
+        let performerName = '';
+        if (transaction.work.pers.length) {
+          performerName = !transaction.work.pers[0].fields.artistFirstName
+            ? transaction.work.pers[0].fields.artistLastName
+            : `${transaction.work.pers[0].fields.artistLastName}, ${transaction.work.pers[0].fields.artistFirstName}`;
+        }
+
+        for (const recording of transaction.work?.recs ?? []) {
+          const row = new Map<string, string | number>(columns);
+          row.set(
+            'songCode',
+            transaction.work.header.fields.submitterWorkNumber
+          );
+          row.set('workTitle', transaction.work.header.fields.workTitle);
+          row.set('firstAlbumTitle', recording.fields.firstAlbumTitle ?? '');
+          row.set('recordingTitle', recording.fields.recordingTitle ?? '');
+          row.set('displayArtist', recording.fields.displayArtist ?? '');
+          row.set('performingArtist', performerName);
+          row.set(
+            'firstReleaseCatalog',
+            recording.fields.firstReleaseCatalogNumber ?? ''
+          );
+          row.set('firstReleaseDate', recording.fields.firstReleaseDate ?? '');
+          rows.push(row);
+        }
+        rowCollection.push(...rows);
+      }
+    }
+    return { rows: rowCollection, warnings };
+  }
+
   static generateIswcReport(
     transmission: ParsedTransmission,
     template: CWRTemplate

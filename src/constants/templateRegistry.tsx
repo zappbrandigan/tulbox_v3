@@ -13,6 +13,7 @@ export const templateReportGenerators: Record<string, ReportGenerator> = {
   'isrc-report': CWRReporter.generateIsrcReport.bind(CWRReporter),
   'iswc-report': CWRReporter.generateIswcReport.bind(CWRReporter),
   'aka-report': CWRReporter.generateAkaReport.bind(CWRReporter),
+  'rec-report': CWRReporter.generateRecordingReport.bind(CWRReporter),
   'ip-report': CWRReporter.generateIpReport.bind(CWRReporter),
   'msg-report': CWRReporter.generateMsgReport.bind(CWRReporter),
 };
