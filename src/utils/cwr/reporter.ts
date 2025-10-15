@@ -399,14 +399,14 @@ class CWRReporter {
       for (const transaction of group.transactions ?? []) {
         const rows: Map<string, string | number>[] = [];
         if (
-          !transaction.work?.recs?.length ||
+          !transaction.work?.recs?.length &&
           !transaction.work?.pers?.length
         ) {
           continue;
         } // skip if not REC/PER records
 
         let performerName = '';
-        if (transaction.work.pers.length) {
+        if (transaction.work.pers?.length) {
           performerName = !transaction.work.pers[0].fields.artistFirstName
             ? transaction.work.pers[0].fields.artistLastName
             : `${transaction.work.pers[0].fields.artistLastName}, ${transaction.work.pers[0].fields.artistFirstName}`;
