@@ -281,7 +281,7 @@ export default function RootHub() {
                                       <div className="mt-1 flex items-center justify-between text-[10px] text-gray-600 dark:text-gray-400">
                                         <span>In progress</span>
                                         <span>
-                                          {r.progress}% • ETA {r.eta ?? '—'}
+                                          {r.progress}% • ETA {r.eta ?? 'TBD'}
                                         </span>
                                       </div>
                                     </div>
