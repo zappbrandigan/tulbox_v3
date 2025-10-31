@@ -111,7 +111,7 @@ export default function RootHub() {
 
       <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 sm:py-12 text-gray-900 dark:text-gray-100">
         {/* --- What's New --- */}
-        <section className="mb-8">
+        <section className="mb-6">
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-lg sm:text-xl font-bold flex items-center gap-2">
               <span className="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-800">
@@ -180,7 +180,7 @@ export default function RootHub() {
         </section>
 
         {/* --- Roadmap --- */}
-        <section className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-8">
+        <section className="grid grid-cols-1 lg:grid-cols-3 gap-4">
           <div className="lg:col-span-3 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-4 shadow-sm transition-colors">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
