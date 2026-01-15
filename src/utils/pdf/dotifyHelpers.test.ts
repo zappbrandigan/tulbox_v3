@@ -47,6 +47,12 @@ describe('dotifyHelpers', () => {
       expect(titleCase("eleve et l'ecole")).toBe("Eleve Et L'Ecole");
     });
 
+    it('handles parentheses', () => {
+      expect(titleCase('the title (show) is this')).toBe(
+        'The Title (Show) Is This'
+      );
+    });
+
     it('handles small words in various positions', () => {
       expect(titleCase('the rise and fall of nations')).toBe(
         'The Rise And Fall Of Nations'

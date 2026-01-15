@@ -25,11 +25,15 @@ export const titleCase = (input: string): string => {
 
         let s = seg.toLowerCase();
 
-        s = s.replace(/^([A-Za-zÀ-ÖØ-öø-ÿ])/, (m) => m.toUpperCase());
         s = s.replace(
-          /^([A-Za-zÀ-ÖØ-öø-ÿ])([’'])([A-Za-zÀ-ÖØ-öø-ÿ])/,
-          (_, a: string, apo: string, b: string) =>
-            `${a}${apo}${b.toUpperCase()}`
+          /^([^A-Za-zÀ-ÖØ-öø-ÿ]*)([A-Za-zÀ-ÖØ-öø-ÿ])/,
+          (_, prefix: string, letter: string) =>
+            `${prefix}${letter.toUpperCase()}`
+        );
+        s = s.replace(
+          /^([^A-Za-zÀ-ÖØ-öø-ÿ]*[A-Za-zÀ-ÖØ-öø-ÿ])([’'])([A-Za-zÀ-ÖØ-öø-ÿ])/,
+          (_, head: string, apo: string, letter: string) =>
+            `${head}${apo}${letter.toUpperCase()}`
         );
         return s;
       };
