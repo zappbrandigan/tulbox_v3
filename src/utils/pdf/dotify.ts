@@ -35,6 +35,10 @@ function parseTokens(
       return { prodTitle: prod, epTitle: ep, epNum: num };
     }
 
+    // User selected T2 with T1 file names
+    if (rest.split('  ')) {
+      return null;
+    }
     return { prodTitle: prod, epNum: rest };
   } catch {
     return null;
