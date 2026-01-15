@@ -36,7 +36,7 @@ function parseTokens(
     }
 
     // User selected T2 with T1 file names
-    if (rest.split('  ')) {
+    if (rest.split('  ').length > 1) {
       return null;
     }
     return { prodTitle: prod, epNum: rest };
