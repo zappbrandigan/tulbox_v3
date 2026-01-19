@@ -9,12 +9,15 @@ import {
   CWRConverter,
   NotFound,
 } from './pages';
+import RawText from './pages/RawText';
 import CueSheetConverter from './pages/CueSheetConverter';
-import { Routes, Route, useNavigate } from 'react-router';
+import { Routes, Route, useNavigate, useLocation } from 'react-router';
 import { useShortcut } from './hooks';
 
 function App() {
   const appName = 'TūlBOX';
+  const location = useLocation();
+  const rawTextPath = '/ferp/xmp/1.0';
 
   const ensureSession = useSession((s) => s.ensureSession);
   useEffect(() => {
@@ -41,6 +44,15 @@ function App() {
     c: { callback: () => navigate('/cwr'), allowInInput: false },
     x: { callback: () => navigate('/cues'), allowInInput: false },
   });
+
+  if (location.pathname === rawTextPath) {
+    return (
+      <Routes>
+        <Route path={rawTextPath} element={<RawText />} />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    );
+  }
 
   return (
     <Layout appName={appName}>
