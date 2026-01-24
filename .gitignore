@@ -7,3 +7,4 @@ firebase.ts
 firebase.json
 .firebase/
 dist/
+.prettierrc
