@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Summary, SearchReplace, FileTable } from '@/components/pdf';
-import { FileItem, SearchReplaceRule } from '@/types';
+import { FileItem } from '@/types';
 import {
   generateFileId,
   checkForDuplicates,
@@ -12,17 +12,38 @@ import { ToolHeader, DragDropZone, Disclaimer } from '@/components/ui';
 import { logUserEvent } from '@/utils/general/logEvent';
 import { PageMeta } from '@/PageMeta';
 import { useSession } from '@/stores/session';
+import { usePDFManagerStore } from '@/stores/pdfManager';
+import {
+  clearStoredFiles,
+  deleteStoredFile,
+  getStoredFile,
+  putStoredFile,
+} from '@/utils/pdf/storage';
 
 const PDFManager: React.FC = () => {
   const [files, setFiles] = useState<FileItem[]>([]);
-  const [searchReplaceRules, setSearchReplaceRules] = useState<
-    SearchReplaceRule[]
-  >([]);
   const [isDownloading, setIsDownloading] = useState(false);
-
   const sessionId = useSession((s) => s.sessionId);
+  const filesMeta = usePDFManagerStore((s) => s.filesMeta);
+  const setFilesMeta = usePDFManagerStore((s) => s.setFilesMeta);
+  const searchReplaceRules = usePDFManagerStore((s) => s.searchReplaceRules);
+  const setSearchReplaceRules = usePDFManagerStore(
+    (s) => s.setSearchReplaceRules
+  );
+  const clearStore = usePDFManagerStore((s) => s.clearAll);
+  const hasHydrated = usePDFManagerStore((s) => s.hasHydrated);
 
-  const handleFilesAdded = (files: File[] | File) => {
+  const toMeta = (items: FileItem[]) =>
+    items.map((item) => ({
+      id: item.id,
+      originalName: item.originalName,
+      currentName: item.currentName,
+      characterCount: item.characterCount,
+      status: item.status,
+      lastModified: item.lastModified.getTime(),
+    }));
+
+  const handleFilesAdded = async (files: File[] | File) => {
     const actualFiles = Array.isArray(files) ? files : [files];
     logUserEvent(
       sessionId,
@@ -45,7 +66,15 @@ const PDFManager: React.FC = () => {
       lastModified: new Date(file.lastModified),
     }));
 
-    setFiles((prevFiles) => checkForDuplicates([...prevFiles, ...fileItems]));
+    await Promise.all(
+      fileItems.map((fileItem) => putStoredFile(fileItem.id, fileItem.file))
+    );
+
+    setFiles((prevFiles) => {
+      const nextFiles = checkForDuplicates([...prevFiles, ...fileItems]);
+      setFilesMeta(toMeta(nextFiles));
+      return nextFiles;
+    });
   };
 
   const handleFileUpdate = (id: string, newName: string) => {
@@ -59,15 +88,20 @@ const PDFManager: React.FC = () => {
             }
           : file
       );
-      return checkForDuplicates(updatedFiles);
+      const nextFiles = checkForDuplicates(updatedFiles);
+      setFilesMeta(toMeta(nextFiles));
+      return nextFiles;
     });
   };
 
   const handleFileRemove = (id: string) => {
     setFiles((prevFiles) => {
       const filteredFiles = prevFiles.filter((file) => file.id !== id);
-      return checkForDuplicates(filteredFiles);
+      const nextFiles = checkForDuplicates(filteredFiles);
+      setFilesMeta(toMeta(nextFiles));
+      return nextFiles;
     });
+    deleteStoredFile(id);
   };
 
   const handleApplySearchReplace = () => {
@@ -84,7 +118,9 @@ const PDFManager: React.FC = () => {
 
     setFiles((prevFiles) => {
       const updatedFiles = applySearchReplace(prevFiles, searchReplaceRules);
-      return checkForDuplicates(updatedFiles);
+      const nextFiles = checkForDuplicates(updatedFiles);
+      setFilesMeta(toMeta(nextFiles));
+      return nextFiles;
     });
   };
 
@@ -127,7 +163,8 @@ const PDFManager: React.FC = () => {
 
   const handleClearAll = () => {
     setFiles([]);
-    setSearchReplaceRules([]);
+    clearStore();
+    clearStoredFiles();
   };
 
   useEffect(() => {
@@ -136,6 +173,36 @@ const PDFManager: React.FC = () => {
       firebase_screen_class: 'PDFManager',
     });
   }, []);
+
+  useEffect(() => {
+    if (!hasHydrated || filesMeta.length === 0) return;
+
+    let isCancelled = false;
+    const hydrateFiles = async () => {
+      const hydrated: FileItem[] = [];
+      for (const meta of filesMeta) {
+        const storedFile = await getStoredFile(meta.id);
+        if (!storedFile) continue;
+        hydrated.push({
+          ...meta,
+          file: storedFile,
+          lastModified: new Date(storedFile.lastModified),
+        });
+      }
+
+      if (isCancelled) return;
+      const nextFiles = checkForDuplicates(hydrated);
+      setFiles(nextFiles);
+      if (nextFiles.length !== filesMeta.length) {
+        setFilesMeta(toMeta(nextFiles));
+      }
+    };
+
+    hydrateFiles();
+    return () => {
+      isCancelled = true;
+    };
+  }, [filesMeta, hasHydrated, setFilesMeta]);
 
   return (
     <>
