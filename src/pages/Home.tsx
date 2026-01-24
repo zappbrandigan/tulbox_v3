@@ -14,6 +14,7 @@ import {
 import { PageMeta } from '@/PageMeta';
 import { useEffect, useMemo, useState } from 'react';
 import { trackEvent } from '@/utils';
+import homeData from './data/home.json';
 
 // --- types ---
 type RoadmapStage = 'Now' | 'Next' | 'Later';
@@ -53,35 +54,19 @@ export default function RootHub() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    (async () => {
-      try {
-        const res = await fetch(
-          `${import.meta.env.VITE_REQUEST_URL}/files/internal/home`,
-          {
-            cache: 'no-store',
-          }
-        );
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const json = (await res.json()) as {
-          changelog: ChangeItem[];
-          roadmap: RemoteRoadmapItem[];
-        };
+    const json = homeData as {
+      changelog: ChangeItem[];
+      roadmap: RemoteRoadmapItem[];
+    };
 
-        const mappedRoadmap: RoadmapItem[] = (json.roadmap ?? []).map((r) => ({
-          ...r,
-          iconNode: r.icon ? ICONS[r.icon] : undefined,
-        }));
+    const mappedRoadmap: RoadmapItem[] = (json.roadmap ?? []).map((r) => ({
+      ...r,
+      iconNode: r.icon ? ICONS[r.icon] : undefined,
+    }));
 
-        setChangelog(json.changelog ?? []);
-        setRoadmap(mappedRoadmap);
-      } catch (e) {
-        if (e instanceof Error) {
-          setError(e.message);
-        } else {
-          setError('Failed to load');
-        }
-      }
-    })();
+    setChangelog(json.changelog ?? []);
+    setRoadmap(mappedRoadmap);
+    setError(null);
 
     trackEvent('screen_view', {
       firebase_screen: 'HomePage',

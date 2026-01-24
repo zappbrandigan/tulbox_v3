@@ -1,0 +1,64 @@
+{
+  "changelog": [
+    {
+      "date": "2026-01-24",
+      "tag": "New",
+      "title": "PDF Manager: State Persistence",
+      "summary": "The PDF Manager state now persists between refreshes so users won't lose progress.",
+      "link": "https://docs.tulbox.app/changelog#360"
+    },
+    {
+      "date": "2025-09-03",
+      "tag": "New",
+      "title": "CWR Converter: Recording Info",
+      "summary": "A new report detailing recording info (REC/PER records) for CWRs",
+      "link": "https://docs.tulbox.app/changelog#354"
+    },
+    {
+      "date": "2025-08-18",
+      "tag": "New",
+      "title": "Info Page and Direct URL Support",
+      "summary": "This page! Also, users can now access tools via a direct URL path.",
+      "link": "https://docs.tulbox.app/blog/2025/08/18/update"
+    }
+  ],
+  "roadmap": [
+    {
+      "id": "prod-search",
+      "title": "Production Search improved results",
+      "summary": "Improved search results when searching by category.",
+      "stage": "Now",
+      "progress": 60,
+      "icon": "Search"
+    },
+    {
+      "id": "cue-format-1",
+      "title": "Cue Sheet Converter Formats",
+      "summary": "Add support for RapidCue cue sheet format.",
+      "stage": "Now",
+      "progress": 15,
+      "icon": "LetterText"
+    },
+    {
+      "id": "cue-format-2",
+      "title": "Cue Sheet Converter Formats",
+      "summary": "Add support for Cuetrak cue sheet format.",
+      "stage": "Next",
+      "icon": "LetterText"
+    },
+    {
+      "id": "ext-2",
+      "title": "Browser Extension",
+      "summary": "A new browser extension to connect directly to internal systems.",
+      "stage": "Later",
+      "icon": "Globe"
+    },
+    {
+      "id": "ext-1",
+      "title": "Browser Extension: Hotkeys",
+      "summary": "A new browser extension that adds shortcut keys to internal web app.",
+      "stage": "Next",
+      "icon": "Globe"
+    }
+  ]
+}
