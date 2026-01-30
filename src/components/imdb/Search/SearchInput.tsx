@@ -1,5 +1,5 @@
-import { Loader2, Search } from 'lucide-react';
-import React from 'react';
+import { Loader2, Search } from "lucide-react";
+import React from "react";
 
 interface SearchInputProps {
   searchQuery: string;
@@ -25,15 +25,15 @@ const SearchInput: React.FC<SearchInputProps> = ({
           autoComplete="off"
           autoFocus={true}
           onChange={(e) => setSearchQuery(e.target.value)}
-          onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+          onKeyDown={(e) => e.key === "Enter" && handleSearch()}
           placeholder="Search for movies, TV shows, games..."
-          className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
         />
       </div>
       <button
         onClick={handleSearch}
         disabled={!searchQuery.trim() || isSearching}
-        className="px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 disabled:bg-gray-300 dark:disabled:bg-gray-700 disabled:cursor-not-allowed transition-colors flex items-center"
+        className="px-6 py-3 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 disabled:bg-gray-300 dark:disabled:bg-gray-700 disabled:cursor-not-allowed transition-colors flex items-center"
       >
         {isSearching ? (
           <Loader2 className="w-5 h-5 animate-spin" />

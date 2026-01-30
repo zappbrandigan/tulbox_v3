@@ -1,8 +1,8 @@
-import { MenuIcon } from 'lucide-react';
-import { TOOLS } from '@/constants/appTools';
-import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
-import { DocsLink } from '../ui';
-import { NavLink } from 'react-router';
+import { MenuIcon } from "lucide-react";
+import { TOOLS } from "@/constants/appTools";
+import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
+import { DocsLink } from "../ui";
+import { NavLink } from "react-router";
 
 const Nav = () => {
   return (
@@ -10,11 +10,11 @@ const Nav = () => {
       {/* Mobile Nav (Dropdown) */}
       <div className="lg:hidden relative">
         <Menu>
-          <MenuButton className="flex items-center px-2 py-1 rounded-lg dark:border-gray-60 dark:bg-gray-800 text-sm font-medium text-gray-700 dark:text-gray-200 shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+          <MenuButton className="flex items-center px-2 py-1 rounded-md dark:border-gray-60 dark:bg-gray-800 text-sm font-medium text-gray-700 dark:text-gray-200 shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition">
             <MenuIcon className="size-7" />
           </MenuButton>
 
-          <MenuItems className="absolute right-0 mt-2 p-1 w-72 rounded-lg shadow-lg bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 z-50 focus:outline-none overflow-hidden">
+          <MenuItems className="absolute right-0 mt-2 p-1 w-72 rounded-md shadow-lg bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 z-50 focus:outline-none overflow-hidden">
             <div className="py-1">
               {TOOLS.map((tool) => (
                 <MenuItem key={tool.id}>
@@ -24,9 +24,9 @@ const Nav = () => {
                       className={({ isActive }) =>
                         `w-full flex items-center px-4 py-2 text-sm text-left rounded transition ${
                           focus
-                            ? 'bg-gray-100 dark:bg-gray-700 text-blue-700 dark:text-blue-300'
-                            : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
-                        } ${isActive ? 'font-semibold' : ''}`
+                            ? "bg-gray-100 dark:bg-gray-700 text-blue-700 dark:text-blue-300"
+                            : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                        } ${isActive ? "font-semibold" : ""}`
                       }
                     >
                       {tool.title}
@@ -52,8 +52,8 @@ const Nav = () => {
             className={({ isActive }) =>
               `flex items-center md:px-2 lg:px-4 py-2 rounded text-sm font-medium transition-all duration-200 whitespace-nowrap ${
                 isActive
-                  ? 'bg-blue-100 text-blue-700 dark:bg-blue-800/30 dark:text-blue-300 shadow-sm'
-                  : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700'
+                  ? "bg-blue-100 text-blue-700 dark:bg-blue-800/30 dark:text-blue-300 shadow-sm"
+                  : "text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
               }`
             }
           >

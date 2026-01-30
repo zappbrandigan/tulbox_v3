@@ -1,4 +1,4 @@
-import { clsx } from 'clsx';
+import { clsx } from "clsx";
 
 interface Props {
   value: string | number;
@@ -22,16 +22,16 @@ const StatCard: React.FC<Props> = ({
   return (
     <div
       onClick={isClickable ? onClick : undefined}
-      title={`${label}: ${String(value ?? '')}`}
+      title={`${label}: ${String(value ?? "")}`}
       className={clsx(
-        'flex flex-col justify-center truncate text-center p-4 rounded-lg transition-colors',
+        "flex flex-col justify-center truncate text-center p-4 rounded-md transition-colors",
         bg,
         isClickable &&
-          'hover:cursor-pointer hover:scale-[1.05] transform transition-all duration-400 ease-in-out hover:ring-1'
+          "hover:cursor-pointer hover:scale-[1.05] transform transition-all duration-400 ease-in-out hover:ring-1",
       )}
     >
-      <div className={clsx('text-2xl font-bold', text)}>{value}</div>
-      <div className={clsx('text-sm', text.replace('600', '800'))}>{label}</div>
+      <div className={clsx("text-2xl font-bold", text)}>{value}</div>
+      <div className={clsx("text-sm", text.replace("600", "800"))}>{label}</div>
     </div>
   );
 };

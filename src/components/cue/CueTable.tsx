@@ -1,6 +1,6 @@
-import { CueSheetTemplate, FileItem } from '@/types';
-import { CueRow } from '@/utils/cue/types';
-import React from 'react';
+import { CueSheetTemplate, FileItem } from "@/types";
+import { CueRow } from "@/utils/cue/types";
+import React from "react";
 interface Props {
   cueRows: CueRow[];
   template: CueSheetTemplate | undefined;
@@ -20,8 +20,8 @@ const CueTable: React.FC<Props> = ({
   const maxWriters = Math.max(...cueRows.map((row) => row.writers.length));
   return (
     <>
-      <div className="text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
-        <div className="overflow-auto max-h-[82vh] rounded-t-xl  scrollbar-none hover:scrollbar-thin scrollbar-thumb-gray-400 dark:scrollbar-thumb-gray-600 scrollbar-track-gray-100 dark:scrollbar-track-gray-800">
+      <div className="text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-900 rounded-md shadow-sm border border-gray-200 dark:border-gray-700">
+        <div className="overflow-auto max-h-[82vh] rounded-t-md  scrollbar-none hover:scrollbar-thin scrollbar-thumb-gray-400 dark:scrollbar-thumb-gray-600 scrollbar-track-gray-100 dark:scrollbar-track-gray-800">
           <table className="min-w-full table-fixed text-sm text-left">
             <thead className="sticky top-0 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 text-xs uppercase font-semibold">
               <tr>
@@ -70,7 +70,7 @@ const CueTable: React.FC<Props> = ({
                       }}
                       className={`px-4 py-2 truncate whitespace-pre uppercase w-[${field.width}px]`}
                     >
-                      {String(row[field.key as keyof typeof row] ?? '')}
+                      {String(row[field.key as keyof typeof row] ?? "")}
                     </td>
                   ))}
 
@@ -88,7 +88,7 @@ const CueTable: React.FC<Props> = ({
                               }}
                               className={`px-4 py-2 truncate uppercase w-[${sub.width}px]`}
                             >
-                              {writer?.[sub.key as keyof typeof writer] ?? ''}
+                              {writer?.[sub.key as keyof typeof writer] ?? ""}
                             </td>
                           ))}
                         </React.Fragment>
@@ -99,11 +99,11 @@ const CueTable: React.FC<Props> = ({
             </tbody>
           </table>
         </div>
-        <div className="bg-gray-50 dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 px-4 py-2 rounded-b-xl">
+        <div className="bg-gray-50 dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 px-4 py-2 rounded-b-md">
           <div className="flex items-center justify-between text-xs text-gray-600 dark:text-gray-300">
             <span>
               <span className="text-emerald-500">{files.length}</span>
-              {` ${files.length > 1 ? 'files' : 'file'} • `}
+              {` ${files.length > 1 ? "files" : "file"} • `}
               <span className="text-blue-500">{cueRows.length}</span>
               {` rows`}
               {warnings.length > 0 && (
@@ -115,13 +115,13 @@ const CueTable: React.FC<Props> = ({
                     title="Click to view warnings"
                   >
                     ⚠ {warnings.length} warning
-                    {warnings.length !== 1 ? 's' : ''}
+                    {warnings.length !== 1 ? "s" : ""}
                   </span>
                 </>
               )}
             </span>
             <span>
-              <span>{template?.name} Converter</span>{' '}
+              <span>{template?.name} Converter</span>{" "}
               <span className="text-blue-500">v{template?.version}</span>
             </span>
           </div>

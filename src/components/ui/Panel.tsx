@@ -1,5 +1,5 @@
-import { ReactNode } from 'react';
-import clsx from 'clsx';
+import { ReactNode } from "react";
+import clsx from "clsx";
 
 interface PanelProps {
   children: ReactNode;
@@ -21,8 +21,8 @@ interface PanelBodyProps {
 const PanelRoot: React.FC<PanelProps> = ({ children, className }) => (
   <div
     className={clsx(
-      'bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 transition-colors duration-300',
-      className
+      "bg-white dark:bg-gray-900 rounded-md shadow-sm border border-gray-200 dark:border-gray-700 p-6 transition-colors duration-300",
+      className,
     )}
   >
     {children}

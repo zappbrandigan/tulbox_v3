@@ -1,11 +1,11 @@
-import { Minimize } from 'lucide-react';
-import RecordLine from './RecordLine';
-import Search from './Search';
-import { useEffect, useRef, useState } from 'react';
-import { useSearch, useShortcut } from '@/hooks';
-import { CWRParsedRecord } from 'cwr-parser/types';
-import { logUserEvent } from '@/utils/general/logEvent';
-import { useSession } from '@/stores/session';
+import { Minimize } from "lucide-react";
+import RecordLine from "./RecordLine";
+import Search from "./Search";
+import { useEffect, useRef, useState } from "react";
+import { useSearch, useShortcut } from "@/hooks";
+import { CWRParsedRecord } from "cwr-parser/types";
+import { logUserEvent } from "@/utils/general/logEvent";
+import { useSession } from "@/stores/session";
 
 const ROW_HEIGHT = 24;
 const PAGE_SIZE = 50;
@@ -29,7 +29,7 @@ const ScrollArea: React.FC<Props> = ({
   isFullScreen,
   setIsFullScreen,
 }) => {
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
   const [startIndex, setStartIndex] = useState(0);
   const [currentMatchIndex, setCurrentMatchIndex] = useState(-1);
   const [hitRows, setHitRows] = useState<number[]>([]);
@@ -60,23 +60,23 @@ const ScrollArea: React.FC<Props> = ({
   }, [matchLines]);
 
   useShortcut({
-    'mod+e': () => {
+    "mod+e": () => {
       setIsFullScreen((prev) => !prev);
       logUserEvent(
         sessionId,
-        'Shortcut Key Used',
+        "Shortcut Key Used",
         {
-          action: 'ui-interaction',
-          target: 'kb-shortcut',
-          value: 'Full Screen',
+          action: "ui-interaction",
+          target: "kb-shortcut",
+          value: "Full Screen",
         },
-        'cwr-converter'
+        "cwr-converter",
       );
     },
-    'mod+f': () => {
+    "mod+f": () => {
       setShowSearch((show) => {
         if (show) {
-          setSearchQuery('');
+          setSearchQuery("");
           setHitRows([]);
           setCurrentMatchIndex(-1);
         }
@@ -84,32 +84,32 @@ const ScrollArea: React.FC<Props> = ({
       });
       logUserEvent(
         sessionId,
-        'Shortcut Key Used',
+        "Shortcut Key Used",
         {
-          action: 'ui-interaction',
-          target: 'kb-shortcut',
-          value: 'Search Bar',
+          action: "ui-interaction",
+          target: "kb-shortcut",
+          value: "Search Bar",
         },
-        'cwr-converter'
+        "cwr-converter",
       );
     },
-    'mod+k': () => {
+    "mod+k": () => {
       setIsTooltipEnabled((prev) => !prev);
       logUserEvent(
         sessionId,
-        'Shortcut Key Used',
+        "Shortcut Key Used",
         {
-          action: 'ui-interaction',
-          target: 'kb-shortcut',
-          value: 'Toggle Tooltips',
+          action: "ui-interaction",
+          target: "kb-shortcut",
+          value: "Toggle Tooltips",
         },
-        'cwr-converter'
+        "cwr-converter",
       );
     },
     escape: () => {
       setIsFullScreen(false);
       setShowSearch(false);
-      setSearchQuery('');
+      setSearchQuery("");
       setHitRows([]);
       setCurrentMatchIndex(-1);
     },
@@ -118,7 +118,7 @@ const ScrollArea: React.FC<Props> = ({
   return (
     <div
       className={`bg-slate-800 text-gray-100 dark:bg-gray-900 overflow-hidden transition-all duration-500 ease ${
-        isFullScreen ? 'absolute top-0 left-0 right-0 bottom-0 z-50' : ''
+        isFullScreen ? "absolute top-0 left-0 right-0 bottom-0 z-50" : ""
       }`}
     >
       <Search
@@ -144,8 +144,8 @@ const ScrollArea: React.FC<Props> = ({
         }}
         className={`${
           isFullScreen
-            ? 'absolute top-2 right-2 bg-red-200 bg-opacity-25 p-2 rounded-lg z-[1001] hover:bg-opacity-100 hover:text-red-500'
-            : 'hidden'
+            ? "absolute top-2 right-2 bg-red-200 bg-opacity-25 p-2 rounded-md z-[1001] hover:bg-opacity-100 hover:text-red-500"
+            : "hidden"
         }`}
         title="Exit Full Screen (Esc)"
       >
@@ -155,7 +155,7 @@ const ScrollArea: React.FC<Props> = ({
       {/* Virtual scroll container */}
       <div
         className={`min-h-[600px] ${
-          isFullScreen ? 'h-[100vh]' : 'h-[73vh]'
+          isFullScreen ? "h-[100vh]" : "h-[73vh]"
         } overflow-auto scrollbar-none hover:scrollbar-thin scrollbar-thumb-gray-400 dark:scrollbar-thumb-gray-600 scrollbar-track-gray-100 dark:scrollbar-track-gray-800`}
         ref={scrollContainerRef}
         onScroll={() => {
@@ -177,15 +177,15 @@ const ScrollArea: React.FC<Props> = ({
             {lines.slice(startIndex, startIndex + PAGE_SIZE).map((line, i) => {
               const actualIndex = startIndex + i;
               const isRowMatched = matchLines.has(actualIndex);
-              const recordType = line.recordType ?? '';
+              const recordType = line.recordType ?? "";
               const spacingRecords = [
-                'HDR',
-                'GRH',
-                'GRT',
-                'TRL',
-                'NWR',
-                'REV',
-                'ACK',
+                "HDR",
+                "GRH",
+                "GRT",
+                "TRL",
+                "NWR",
+                "REV",
+                "ACK",
               ];
               const addMarginTop = spacingRecords.includes(recordType);
 
@@ -194,7 +194,7 @@ const ScrollArea: React.FC<Props> = ({
                   key={actualIndex}
                   id={`match-${actualIndex}`}
                   className={`flex transition-colors ${
-                    addMarginTop ? 'mt-3' : ''
+                    addMarginTop ? "mt-3" : ""
                   }`}
                   style={{ height: `${ROW_HEIGHT}px` }}
                 >

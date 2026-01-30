@@ -1,5 +1,5 @@
-import React, { useCallback, useState } from 'react';
-import { Upload, FileText, AlertCircle } from 'lucide-react';
+import React, { useCallback, useState } from "react";
+import { Upload, FileText, AlertCircle } from "lucide-react";
 
 type FileValidationFn = (file: File) => boolean;
 
@@ -17,13 +17,13 @@ interface Props {
 
 const DragDropZone: React.FC<Props> = ({
   onFilesAdded,
-  accept = '',
+  accept = "",
   maxFiles = 100,
   allowMultiple = true,
   validateFile = () => true,
-  title = 'Upload Files',
-  description = 'Drag and drop files here, or click to browse',
-  note = `Maximum ${maxFiles} file${maxFiles > 1 ? 's' : ''}`,
+  title = "Upload Files",
+  description = "Drag and drop files here, or click to browse",
+  note = `Maximum ${maxFiles} file${maxFiles > 1 ? "s" : ""}`,
   isVisible = true,
 }) => {
   const [isDragOver, setIsDragOver] = useState(false);
@@ -34,19 +34,19 @@ const DragDropZone: React.FC<Props> = ({
       const filtered = Array.from(files).filter(validateFile);
 
       if (filtered.length === 0) {
-        setError('Invalid file type.');
+        setError("Invalid file type.");
         return [];
       }
 
       if (filtered.length > maxFiles) {
-        setError(`Maximum ${maxFiles} file${maxFiles > 1 ? 's' : ''} allowed.`);
+        setError(`Maximum ${maxFiles} file${maxFiles > 1 ? "s" : ""} allowed.`);
         return [];
       }
 
       setError(null);
       return filtered;
     },
-    [validateFile, maxFiles]
+    [validateFile, maxFiles],
   );
 
   const handleDrop = useCallback(
@@ -58,7 +58,7 @@ const DragDropZone: React.FC<Props> = ({
         onFilesAdded(allowMultiple ? files : files[0]);
       }
     },
-    [handleValidation, onFilesAdded, allowMultiple]
+    [handleValidation, onFilesAdded, allowMultiple],
   );
 
   const handleDragOver = useCallback((e: React.DragEvent<HTMLDivElement>) => {
@@ -76,7 +76,7 @@ const DragDropZone: React.FC<Props> = ({
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       const files = handleValidation(e.target.files);
-      e.target.value = '';
+      e.target.value = "";
       if (files.length > 0) {
         onFilesAdded(allowMultiple ? files : files[0]);
       }
@@ -91,18 +91,18 @@ const DragDropZone: React.FC<Props> = ({
         onDrop={handleDrop}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
-        className={`relative border-2 border-dashed rounded-xl p-8 text-center transition-all duration-300
+        className={`relative border-2 border-dashed rounded-md p-8 text-center transition-all duration-300
           ${
             isDragOver
-              ? 'border-blue-400 bg-blue-50 dark:bg-blue-900/20 scale-105'
-              : 'border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-400'
+              ? "border-blue-400 bg-blue-50 dark:bg-blue-900/20 scale-105"
+              : "border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-400"
           }
           cursor-pointer group`}
       >
         <input
           type="file"
           title=""
-          aria-label={allowMultiple ? 'Upload files' : 'Upload a file'}
+          aria-label={allowMultiple ? "Upload files" : "Upload a file"}
           accept={accept}
           multiple={allowMultiple}
           onChange={handleFileSelect}
@@ -115,8 +115,8 @@ const DragDropZone: React.FC<Props> = ({
             w-16 h-16 rounded-full flex items-center justify-center transition-all duration-300
             ${
               isDragOver
-                ? 'bg-blue-100 dark:bg-blue-800 text-blue-600 dark:text-blue-300 scale-110'
-                : 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-300 group-hover:bg-gray-200 dark:group-hover:bg-gray-700'
+                ? "bg-blue-100 dark:bg-blue-800 text-blue-600 dark:text-blue-300 scale-110"
+                : "bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-300 group-hover:bg-gray-200 dark:group-hover:bg-gray-700"
             }
           `}
           >
@@ -134,7 +134,7 @@ const DragDropZone: React.FC<Props> = ({
               className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2"
             >
               {isDragOver
-                ? `Drop your file${allowMultiple ? 's' : ''} here`
+                ? `Drop your file${allowMultiple ? "s" : ""} here`
                 : title}
             </div>
             <p className="text-gray-600 dark:text-gray-300 mb-1">
@@ -146,7 +146,7 @@ const DragDropZone: React.FC<Props> = ({
       </div>
 
       {error && (
-        <div className="mt-4 p-3 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-500/40 rounded-lg flex items-center space-x-2">
+        <div className="mt-4 p-3 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-500/40 rounded-md flex items-center space-x-2">
           <AlertCircle className="w-5 h-5 text-red-500 dark:text-red-300 flex-shrink-0" />
           <span className="text-red-700 dark:text-red-300 text-sm">
             {error}

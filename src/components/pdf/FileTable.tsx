@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
   Edit3,
   Check,
@@ -8,14 +8,14 @@ import {
   Layers2,
   Download,
   ClipboardCopy,
-} from 'lucide-react';
-import { FileItem } from '@/types';
-import { logUserEvent } from '@/utils/general/logEvent';
-import { ensurePdfExtension } from '@/utils';
-import { useSession } from '@/stores/session';
-import SortableHeader from '../ui/SortableHeader';
-import { useSortableData } from '@/hooks';
-import { useToast } from '@/stores/toast';
+} from "lucide-react";
+import { FileItem } from "@/types";
+import { logUserEvent } from "@/utils/general/logEvent";
+import { ensurePdfExtension } from "@/utils";
+import { useSession } from "@/stores/session";
+import SortableHeader from "../ui/SortableHeader";
+import { useSortableData } from "@/hooks";
+import { useToast } from "@/stores/toast";
 
 interface FileTableProps {
   files: FileItem[];
@@ -29,22 +29,22 @@ const FileTable: React.FC<FileTableProps> = ({
   onFileRemove,
 }) => {
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [editValue, setEditValue] = useState('');
+  const [editValue, setEditValue] = useState("");
   const {
     sortedItems: sortedFiles,
     sortConfig,
     requestSort,
-  } = useSortableData<FileItem, 'currentName' | 'characterCount' | 'status'>(
-    files
+  } = useSortableData<FileItem, "currentName" | "characterCount" | "status">(
+    files,
   );
 
   const { toast } = useToast();
   const sessionId = useSession((s) => s.sessionId);
 
   const startEditing = (file: FileItem) => {
-    logUserEvent(sessionId, 'PDF Files Inline Edit', {
-      action: 'ui-interaction',
-      target: 'file-edit',
+    logUserEvent(sessionId, "PDF Files Inline Edit", {
+      action: "ui-interaction",
+      target: "file-edit",
     });
     setEditingId(file.id);
     setEditValue(file.currentName);
@@ -55,18 +55,18 @@ const FileTable: React.FC<FileTableProps> = ({
       onFileUpdate(editingId, editValue.trim());
     }
     setEditingId(null);
-    setEditValue('');
+    setEditValue("");
   };
 
   const cancelEdit = () => {
     setEditingId(null);
-    setEditValue('');
+    setEditValue("");
   };
 
-  const GetStatusText = (status: FileItem['status']) => {
-    const base = 'text-sm font-medium';
+  const GetStatusText = (status: FileItem["status"]) => {
+    const base = "text-sm font-medium";
     switch (status) {
-      case 'valid':
+      case "valid":
         return (
           <>
             <CheckCircle className="w-5 h-5 text-green-800 dark:text-green-200" />
@@ -75,7 +75,7 @@ const FileTable: React.FC<FileTableProps> = ({
             </span>
           </>
         );
-      case 'invalid':
+      case "invalid":
         return (
           <>
             <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400" />
@@ -84,7 +84,7 @@ const FileTable: React.FC<FileTableProps> = ({
             </span>
           </>
         );
-      case 'duplicate':
+      case "duplicate":
         return (
           <>
             <Layers2 className="w-5 h-5 text-amber-600 dark:text-amber-500" />
@@ -93,7 +93,7 @@ const FileTable: React.FC<FileTableProps> = ({
             </span>
           </>
         );
-      case 'dotified':
+      case "dotified":
         return (
           <>
             <CheckCircle className="w-5 h-5 text-blue-700 dark:text-blue-400" />
@@ -102,7 +102,7 @@ const FileTable: React.FC<FileTableProps> = ({
             </span>
           </>
         );
-      case 'modified':
+      case "modified":
         return (
           <>
             <CheckCircle className="w-5 h-5 text-green-700 dark:text-green-400" />
@@ -123,22 +123,22 @@ const FileTable: React.FC<FileTableProps> = ({
     }
   };
 
-  const getRowClassName = (status: FileItem['status']) => {
+  const getRowClassName = (status: FileItem["status"]) => {
     const base =
-      'transition-all duration-200 hover:bg-gray-50 dark:hover:bg-gray-800 border-b border-gray-200 dark:border-gray-800 last:border-b-0';
+      "transition-all duration-200 hover:bg-gray-50 dark:hover:bg-gray-800 border-b border-gray-200 dark:border-gray-800 last:border-b-0";
 
     switch (status) {
-      case 'valid':
+      case "valid":
         return `${base} border-l-4 border-l-green-800 dark:border-l-green-200`;
-      case 'modified':
+      case "modified":
         return `${base} border-l-4 border-l-green-500 dark:border-l-green-500`;
-      case 'dotified':
+      case "dotified":
         return `${base} border-l-4 border-l-blue-500 dark:border-l-blue-500`;
-      case 'invalid':
+      case "invalid":
         return `${base} border-l-4 border-l-red-500 dark:border-l-red-500`;
-      case 'error':
+      case "error":
         return `${base} border-l-4 border-l-red-700 dark:border-l-red-400`;
-      case 'duplicate':
+      case "duplicate":
         return `${base} border-l-4 border-l-amber-600 dark:border-l-amber-500`;
       default:
         return base;
@@ -150,7 +150,7 @@ const FileTable: React.FC<FileTableProps> = ({
       type: selectedFile.file.type,
     });
     const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
+    const link = document.createElement("a");
     link.href = url;
     link.download = ensurePdfExtension(selectedFile.currentName);
     document.body.appendChild(link);
@@ -158,15 +158,15 @@ const FileTable: React.FC<FileTableProps> = ({
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
     toast({
-      description: 'File downloaded!',
-      variant: 'success',
+      description: "File downloaded!",
+      variant: "success",
     });
   };
 
   if (files.length === 0) return null;
 
   return (
-    <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+    <div className="bg-white dark:bg-gray-900 rounded-md shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead className="bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
@@ -189,7 +189,7 @@ const FileTable: React.FC<FileTableProps> = ({
                 sortConfig={sortConfig}
                 onSort={requestSort}
               />
-              <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wide">
+              <th className="px-6 py-2 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wide">
                 Actions
               </th>
             </tr>
@@ -198,7 +198,7 @@ const FileTable: React.FC<FileTableProps> = ({
           <tbody>
             {sortedFiles.map((file) => (
               <tr key={file.id} className={getRowClassName(file.status)}>
-                <td className="px-6 py-4 text-sm w-[60%]">
+                <td className="px-6 py-2 text-sm w-[60%]">
                   {editingId === file.id ? (
                     <div className="flex items-center space-x-2">
                       <input
@@ -206,10 +206,10 @@ const FileTable: React.FC<FileTableProps> = ({
                         type="text"
                         value={editValue}
                         onChange={(e) => setEditValue(e.target.value)}
-                        className="flex-1 px-3 py-1 border border-gray-300 dark:border-gray-600 rounded-md text-sm dark:bg-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="flex-1 px-3 py-1 border border-gray-300 dark:border-gray-600 rounded-md text-sm dark:bg-gray-800 dark:text-white focus:outline-none focus:ring-1 focus:ring-blue-500"
                         onKeyDown={(e) => {
-                          if (e.key === 'Enter') saveEdit();
-                          if (e.key === 'Escape') cancelEdit();
+                          if (e.key === "Enter") saveEdit();
+                          if (e.key === "Escape") cancelEdit();
                         }}
                         autoFocus
                       />
@@ -243,23 +243,23 @@ const FileTable: React.FC<FileTableProps> = ({
                     </div>
                   )}
                 </td>
-                <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-300">
+                <td className="px-6 py-2 text-sm text-gray-600 dark:text-gray-300">
                   <span
                     className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium  ${
                       file.characterCount > 60
-                        ? 'bg-red-200 dark:bg-red-500 text-red-800 dark:text-white'
-                        : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200'
+                        ? "bg-red-200 dark:bg-red-500 text-red-800 dark:text-white"
+                        : "bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200"
                     }`}
                   >
                     {file.characterCount}
                   </span>
                 </td>
-                <td className="px-6 py-4 text-sm">
+                <td className="px-6 py-2 text-sm">
                   <div className="flex items-center space-x-2">
                     {GetStatusText(file.status)}
                   </div>
                 </td>
-                <td className="flex space-x-4 px-2 py-4 text-sm">
+                <td className="flex space-x-4 px-2 py-2 text-sm">
                   <button
                     onClick={() => onFileRemove(file.id)}
                     className="text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 transition-colors"
@@ -271,8 +271,8 @@ const FileTable: React.FC<FileTableProps> = ({
                     onClick={() => {
                       navigator.clipboard.writeText(file.currentName);
                       toast({
-                        description: 'Copied to cliboard!',
-                        variant: 'success',
+                        description: "Copied to cliboard!",
+                        variant: "success",
                       });
                     }}
                     className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 transition-colors"

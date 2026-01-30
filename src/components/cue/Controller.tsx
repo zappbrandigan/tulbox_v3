@@ -1,8 +1,8 @@
-import { Download, Settings, Trash } from 'lucide-react';
-import { Panel } from '../ui';
-import { DropdownSelector } from '../ui/DropDownSelector';
-import CUE_SHEET_FORMATS from '@/utils/cue/templates';
-import { CueRow } from '@/utils/cue/types';
+import { Download, Settings, Trash } from "lucide-react";
+import { Panel } from "../ui";
+import { DropdownSelector } from "../ui/DropDownSelector";
+import CUE_SHEET_FORMATS from "@/utils/cue/templates";
+import { CueRow } from "@/utils/cue/types";
 
 interface Props {
   selectedTemplate: string;
@@ -46,7 +46,7 @@ const Controller: React.FC<Props> = ({
           <button
             disabled={isProcessing}
             onClick={handleClearAll}
-            className="inline-flex items-center px-4 py-2 bg-gray-600 dark:bg-gray-700 text-white font-medium rounded-lg hover:bg-gray-700 dark:hover:bg-gray-600 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+            className="inline-flex items-center px-4 py-2 bg-gray-600 dark:bg-gray-700 text-white font-medium rounded-md hover:bg-gray-700 dark:hover:bg-gray-600 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
           >
             <Trash className="w-4 h-4 mr-2" />
             Clear
@@ -55,7 +55,7 @@ const Controller: React.FC<Props> = ({
             <button
               disabled={isProcessing}
               onClick={() => convertCueSheet()}
-              className="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600 text-white font-medium rounded-lg transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+              className="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600 text-white font-medium rounded-md transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
             >
               Convert
             </button>
@@ -64,7 +64,7 @@ const Controller: React.FC<Props> = ({
             <button
               disabled={isProcessing}
               onClick={() => handleExport()}
-              className="inline-flex items-center px-4 py-2 bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-700 dark:hover:bg-emerald-600 text-white font-medium rounded-lg transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+              className="inline-flex items-center px-4 py-2 bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-700 dark:hover:bg-emerald-600 text-white font-medium rounded-md transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
             >
               <Download className="w-4 h-4 mr-2" />
               Export CSV
@@ -75,7 +75,7 @@ const Controller: React.FC<Props> = ({
 
       {template && (
         <Panel.Body>
-          <div className="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg transition-colors">
+          <div className="p-3 bg-gray-50 dark:bg-gray-800 rounded-md transition-colors">
             <p className="text-sm text-gray-700 dark:text-gray-300">
               {template.description}
             </p>

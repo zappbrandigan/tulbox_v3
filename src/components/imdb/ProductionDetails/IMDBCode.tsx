@@ -1,6 +1,6 @@
-import React from 'react';
-import { ExternalLink, Copy } from 'lucide-react';
-import { useToast } from '@/stores/toast';
+import React from "react";
+import { ExternalLink, Copy } from "lucide-react";
+import { useToast } from "@/stores/toast";
 
 interface IMDBCodeProps {
   imdbCode: string;
@@ -10,14 +10,14 @@ const IMDBCode: React.FC<IMDBCodeProps> = ({ imdbCode }) => {
   const { toast } = useToast();
 
   return (
-    <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+    <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-md">
       <div
         onClick={() => {
           const code = imdbCode.length < 10 ? imdbCode : imdbCode.substring(1);
           navigator.clipboard.writeText(code);
           toast({
-            description: 'Copied to clipboard!',
-            variant: 'success',
+            description: "Copied to clipboard!",
+            variant: "success",
           });
         }}
         className="flex items-center space-x-2 group"

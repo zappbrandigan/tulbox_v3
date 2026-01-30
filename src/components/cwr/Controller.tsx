@@ -1,7 +1,7 @@
-import { CWR_TEMPLATES, getTemplateById } from '@/utils';
-import { Download, Settings, Trash, Loader2 } from 'lucide-react';
-import { DropdownSelector } from '../ui/DropDownSelector';
-import { Panel } from '../ui';
+import { CWR_TEMPLATES, getTemplateById } from "@/utils";
+import { Download, Settings, Trash, Loader2 } from "lucide-react";
+import { DropdownSelector } from "../ui/DropDownSelector";
+import { Panel } from "../ui";
 
 interface TemplateBoxProps {
   selectedTemplate: string;
@@ -9,7 +9,7 @@ interface TemplateBoxProps {
   isProcessing: boolean;
   isDownloading: boolean;
   handleFileRemove: () => void;
-  handleExport: (format: 'csv') => void;
+  handleExport: (format: "csv") => void;
   reportHasData: boolean;
 }
 
@@ -45,17 +45,17 @@ const Controller: React.FC<TemplateBoxProps> = ({
           <button
             disabled={isProcessing || isDownloading}
             onClick={handleFileRemove}
-            className="inline-flex items-center px-4 py-2 bg-gray-600 dark:bg-gray-700 text-white font-medium rounded-lg hover:bg-gray-700 dark:hover:bg-gray-600 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+            className="inline-flex items-center px-4 py-2 bg-gray-600 dark:bg-gray-700 text-white font-medium rounded-md hover:bg-gray-700 dark:hover:bg-gray-600 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
           >
             <Trash className="w-4 h-4 mr-2" />
             Clear
           </button>
 
-          {selectedTemplate !== 'raw-viewer' && (
+          {selectedTemplate !== "raw-viewer" && (
             <button
               disabled={isProcessing || isDownloading || !reportHasData}
-              onClick={() => handleExport('csv')}
-              className="inline-flex items-center px-4 py-2 bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-700 dark:hover:bg-emerald-600 text-white font-medium rounded-lg transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+              onClick={() => handleExport("csv")}
+              className="inline-flex items-center px-4 py-2 bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-700 dark:hover:bg-emerald-600 text-white font-medium rounded-md transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
             >
               {isDownloading ? (
                 <>
@@ -78,7 +78,7 @@ const Controller: React.FC<TemplateBoxProps> = ({
         {(() => {
           const template = getTemplateById(selectedTemplate);
           return template ? (
-            <div className="mt-4 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg transition-colors">
+            <div className="mt-4 p-3 bg-gray-50 dark:bg-gray-800 rounded-md transition-colors">
               <p className="text-sm text-gray-700 dark:text-gray-300">
                 {template.description}
               </p>

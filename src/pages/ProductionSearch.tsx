@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
 import {
   Search,
   Podcast,
@@ -9,28 +9,28 @@ import {
   Gamepad2,
   CircleUser,
   CircleXIcon,
-} from 'lucide-react';
+} from "lucide-react";
 import {
   AKATitle,
   IMDBProduction,
   IMDBSearchResult,
   productionType,
-} from '@/types';
-import { searchIMDB, getProductionDetails, getAkas, trackEvent } from '@/utils';
+} from "@/types";
+import { searchIMDB, getProductionDetails, getAkas, trackEvent } from "@/utils";
 import {
   SearchContainer,
   SearchInput,
   SearchFilter,
   SearchResult,
   ProductionDetails,
-} from '@/components/imdb';
-import { ToolHeader, LoadingOverlay } from '@/components/ui';
-import { logUserEvent } from '@/utils/general/logEvent';
-import { PageMeta } from '@/PageMeta';
-import { useSession } from '@/stores/session';
+} from "@/components/imdb";
+import { ToolHeader, LoadingOverlay } from "@/components/ui";
+import { logUserEvent } from "@/utils/general/logEvent";
+import { PageMeta } from "@/PageMeta";
+import { useSession } from "@/stores/session";
 
 const ProductionSearch: React.FC = () => {
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<IMDBSearchResult[]>([]);
   const [selectedProduction, setSelectedProduction] =
     useState<IMDBProduction | null>(null);
@@ -38,7 +38,7 @@ const ProductionSearch: React.FC = () => {
   const [isSearching, setIsSearching] = useState(false);
   const [isLoadingDetails, setIsLoadingDetails] = useState(false);
   const [isLoadingAkas, setIsLoadingAkas] = useState(false);
-  const [searchType, setSearchType] = useState<productionType>('all');
+  const [searchType, setSearchType] = useState<productionType>("all");
   const [error, setError] = useState(false);
 
   const sessionId = useSession((s) => s.sessionId);
@@ -57,28 +57,28 @@ const ProductionSearch: React.FC = () => {
       setSearchResults(results);
       logUserEvent(
         sessionId,
-        'IMDb Search',
+        "IMDb Search",
         {
-          action: 'search',
-          target: 'prod-search',
+          action: "search",
+          target: "prod-search",
           value: searchQuery,
         },
-        'imdb-search'
+        "imdb-search",
       );
     } catch (error) {
       logUserEvent(
         sessionId,
-        'Error: IMDb Search Failed',
+        "Error: IMDb Search Failed",
         {
-          action: 'search',
-          target: 'prod-search',
+          action: "search",
+          target: "prod-search",
           value: `${searchQuery}: ${error}`,
         },
-        'imdb-search',
-        'error'
+        "imdb-search",
+        "error",
       );
       setError(true);
-      console.error('Search failed:', error);
+      console.error("Search failed:", error);
     } finally {
       setIsSearching(false);
     }
@@ -92,27 +92,27 @@ const ProductionSearch: React.FC = () => {
       setIsLoadingAkas(false);
       logUserEvent(
         sessionId,
-        'IMDb Search AKAs',
+        "IMDb Search AKAs",
         {
-          action: 'search',
-          target: 'aka-search',
+          action: "search",
+          target: "aka-search",
           value: result.id,
         },
-        'imdb-search'
+        "imdb-search",
       );
     } catch (error) {
       logUserEvent(
         sessionId,
-        'Error: Failed to load AKAs:',
+        "Error: Failed to load AKAs:",
         {
-          action: 'search',
-          target: 'aka-search',
+          action: "search",
+          target: "aka-search",
           value: `${result.id}: ${error}`,
         },
-        'imdb-search',
-        'error'
+        "imdb-search",
+        "error",
       );
-      console.error('Failed to load AKAs:', error);
+      console.error("Failed to load AKAs:", error);
     } finally {
       setIsLoadingAkas(false);
     }
@@ -127,31 +127,31 @@ const ProductionSearch: React.FC = () => {
       setSelectedProduction(details);
       logUserEvent(
         sessionId,
-        'IMDb Production Select',
+        "IMDb Production Select",
         {
-          action: 'search',
-          target: 'prod-select',
+          action: "search",
+          target: "prod-select",
           value: result.id,
         },
-        'imdb-search'
+        "imdb-search",
       );
     } catch (error) {
       logUserEvent(
         sessionId,
-        'Error: Failed to Load Production Details',
+        "Error: Failed to Load Production Details",
         {
-          action: 'search',
-          target: 'prod-select',
+          action: "search",
+          target: "prod-select",
           value: `${result.id}: ${error}`,
         },
-        'imdb-search',
-        'error'
+        "imdb-search",
+        "error",
       );
       setError(true);
-      console.warn('Failed to load production details:', error);
+      console.warn("Failed to load production details:", error);
     } finally {
       setIsLoadingDetails(false);
-      setSearchQuery('');
+      setSearchQuery("");
       setSearchResults([]);
       handleGetAkas(result);
     }
@@ -188,9 +188,9 @@ const ProductionSearch: React.FC = () => {
   };
 
   useEffect(() => {
-    trackEvent('screen_view', {
-      firebase_screen: 'IMDbSearch',
-      firebase_screen_class: 'IMDbSearch',
+    trackEvent("screen_view", {
+      firebase_screen: "IMDbSearch",
+      firebase_screen_class: "IMDbSearch",
     });
   }, []);
 
@@ -252,7 +252,7 @@ const ProductionSearch: React.FC = () => {
         !selectedProduction &&
         searchQuery &&
         error && (
-          <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-12 text-center">
+          <div className="bg-white dark:bg-gray-900 rounded-md shadow-sm border border-gray-200 dark:border-gray-700 p-12 text-center">
             <Search className="w-12 h-12 mx-auto mb-4 text-gray-300 dark:text-gray-500" />
             <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
               No results found
@@ -264,7 +264,7 @@ const ProductionSearch: React.FC = () => {
         )}
       {/* TODO: update error handling and display */}
       {error && (
-        <div className="flex items-start gap-4 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-500/50 text-red-700 dark:text-red-300 p-4 rounded-lg transition-colors">
+        <div className="flex items-start gap-4 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-500/50 text-red-700 dark:text-red-300 p-4 rounded-md transition-colors">
           <span className="flex-1">
             Details are not currently available for the selected production.
           </span>

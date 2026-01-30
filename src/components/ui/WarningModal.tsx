@@ -1,5 +1,5 @@
-import { FixedSizeList as List, ListChildComponentProps } from 'react-window';
-import { useShortcut } from '@/hooks';
+import { FixedSizeList as List, ListChildComponentProps } from "react-window";
+import { useShortcut } from "@/hooks";
 
 interface Props {
   warnings: string[];
@@ -35,7 +35,7 @@ const WarningModal: React.FC<Props> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 !mt-0">
-      <div className="bg-white dark:bg-gray-900  p-6 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700">
+      <div className="bg-white dark:bg-gray-900  p-6 rounded-md shadow-lg border border-gray-200 dark:border-gray-700">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-lg font-semibold text-amber-700">Warnings</h2>
           <button

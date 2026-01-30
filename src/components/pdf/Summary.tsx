@@ -1,7 +1,7 @@
-import { FileItem } from '@/types';
-import { Download, RefreshCw, Trash2 } from 'lucide-react';
-import React from 'react';
-import { Panel, StatCard } from '../ui';
+import { FileItem } from "@/types";
+import { Download, RefreshCw, Trash2 } from "lucide-react";
+import React from "react";
+import { Panel, StatCard } from "../ui";
 
 interface SummaryProps {
   files: FileItem[];
@@ -18,7 +18,7 @@ const Summary: React.FC<SummaryProps> = ({
 }) => {
   if (files.length === 0) return null;
   const validFiles = files.filter((file) =>
-    ['valid', 'modified', 'dotified'].includes(file.status)
+    ["valid", "modified", "dotified"].includes(file.status),
   ).length;
 
   return (
@@ -38,7 +38,7 @@ const Summary: React.FC<SummaryProps> = ({
             text="text-emerald-600 dark:text-emerald-200"
           />
           <StatCard
-            value={files.filter((f) => f.status === 'duplicate').length}
+            value={files.filter((f) => f.status === "duplicate").length}
             label="Duplicates"
             bg="bg-amber-50 dark:bg-amber-900/30 w-24 flex-grow-0"
             text="text-amber-600 dark:text-amber-300"
@@ -46,7 +46,7 @@ const Summary: React.FC<SummaryProps> = ({
           <StatCard
             value={
               files.filter(
-                (f) => f.status === 'invalid' || f.status === 'error'
+                (f) => f.status === "invalid" || f.status === "error",
               ).length
             }
             label="Issues"
@@ -56,7 +56,7 @@ const Summary: React.FC<SummaryProps> = ({
           <div className="flex flex-wrap items-center gap-3 lg:ml-auto">
             <button
               onClick={handleClearAll}
-              className="inline-flex items-center px-4 py-2 text-gray-700 dark:text-gray-200 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg transition-colors"
+              className="inline-flex items-center px-4 py-2 text-gray-700 dark:text-gray-200 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-md transition-colors"
             >
               <Trash2 className="w-4 h-4 mr-2" />
               Clear All
@@ -64,14 +64,14 @@ const Summary: React.FC<SummaryProps> = ({
             <button
               onClick={handleDownloadAll}
               disabled={validFiles === 0 || isDownloading}
-              className="inline-flex items-center px-6 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 disabled:bg-gray-300 dark:disabled:bg-gray-600 disabled:cursor-not-allowed transition-colors"
+              className="inline-flex items-center px-6 py-2 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 disabled:bg-gray-300 dark:disabled:bg-gray-600 disabled:cursor-not-allowed transition-colors"
             >
               {isDownloading ? (
                 <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
               ) : (
                 <Download className="w-4 h-4 mr-2" />
               )}
-              Download {validFiles > 0 ? `(${validFiles})` : 'All'}
+              Download {validFiles > 0 ? `(${validFiles})` : "All"}
             </button>
           </div>
         </Panel.Body>

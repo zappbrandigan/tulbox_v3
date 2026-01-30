@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
   Plus,
   Search,
@@ -7,16 +7,16 @@ import {
   ToggleRight,
   AlertCircle,
   Trash,
-} from 'lucide-react';
-import { SearchReplaceRule } from '@/types';
-import { useShortcut } from '@/hooks';
-import { Panel } from '@/components/ui';
-import commonReplacements from '@/constants/searchAndReplaceTemplates';
-import { useToast } from '@/stores/toast';
+} from "lucide-react";
+import { SearchReplaceRule } from "@/types";
+import { useShortcut } from "@/hooks";
+import { Panel } from "@/components/ui";
+import commonReplacements from "@/constants/searchAndReplaceTemplates";
+import { useToast } from "@/stores/toast";
 
 const createRuleFromTemplate = (
   template: (typeof commonReplacements)[number],
-  index: number
+  index: number,
 ): SearchReplaceRule => ({
   id: `${Date.now().toString()}-${Math.random()
     .toString(36)
@@ -54,19 +54,19 @@ const Header = ({
           onClick={() => setShowAdvanced((prev) => !prev)}
           className="text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors"
         >
-          {showAdvanced ? 'Hide Templates' : 'Show Templates'}
+          {showAdvanced ? "Hide Templates" : "Show Templates"}
         </button>
         <button
           onClick={() => onRulesChange([])}
           disabled={rules.length === 0}
-          className="inline-flex items-center px-3 py-1.5 bg-amber-600 text-white text-sm font-medium rounded-lg hover:bg-amber-700 transition-colors disabled:bg-gray-300"
+          className="inline-flex items-center px-3 py-1.5 bg-amber-600 text-white text-sm font-medium rounded-md hover:bg-amber-700 transition-colors disabled:bg-gray-300"
         >
           <Trash className="w-4 h-4 mr-1" />
           Clear Rules
         </button>
         <button
           onClick={addRule}
-          className="inline-flex items-center px-3 py-1.5 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
+          className="inline-flex items-center px-3 py-1.5 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 transition-colors"
         >
           <Plus className="w-4 h-4 mr-1" />
           Add Rule
@@ -88,7 +88,7 @@ const TemplateGrid = ({
   if (!showAdvanced) return null;
 
   return (
-    <div className="mb-3 mt-3 p-4 bg-blue-50 dark:bg-slate-700 rounded-lg border border-blue-200 dark:border-blue-700">
+    <div className="mb-3 mt-3 p-4 bg-blue-50 dark:bg-slate-700 rounded-md border border-blue-200 dark:border-blue-700">
       <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2">
         {commonReplacements.map((template, index) => (
           <button
@@ -156,13 +156,13 @@ const Inputs = ({
             rule.isRegex &&
             rule.searchPattern &&
             !validateRegex(rule.searchPattern)
-              ? 'border-red-300 bg-red-50 dark:border-red-500 dark:bg-red-900 text-red-900'
-              : 'border border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white'
+              ? "border-red-300 bg-red-50 dark:border-red-500 dark:bg-red-900 text-red-900"
+              : "border border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
           }`}
           disabled={!rule.isEnabled}
           readOnly={
-            rule.replaceWith === 'CUE_SHEET' ||
-            rule.replaceWith === 'CUE_SHEET_NO_EP'
+            rule.replaceWith === "CUE_SHEET" ||
+            rule.replaceWith === "CUE_SHEET_NO_EP"
           }
         />
         {rule.isRegex &&
@@ -195,8 +195,8 @@ const Inputs = ({
           className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white read-only:focus:ring-transparent"
           disabled={!rule.isEnabled}
           readOnly={
-            rule.replaceWith === 'CUE_SHEET' ||
-            rule.replaceWith === 'CUE_SHEET_NO_EP'
+            rule.replaceWith === "CUE_SHEET" ||
+            rule.replaceWith === "CUE_SHEET_NO_EP"
           }
         />
       </div>
@@ -214,7 +214,7 @@ const RuleCard = ({
   if (rules.length === 0) return null;
   const updateRule = (id: string, updates: Partial<SearchReplaceRule>) => {
     onRulesChange(
-      rules.map((rule) => (rule.id === id ? { ...rule, ...updates } : rule))
+      rules.map((rule) => (rule.id === id ? { ...rule, ...updates } : rule)),
     );
   };
 
@@ -236,8 +236,8 @@ const RuleCard = ({
         <span
           className={
             rule.isEnabled
-              ? 'text-gray-900 dark:text-white'
-              : 'text-gray-500 dark:text-gray-400'
+              ? "text-gray-900 dark:text-white"
+              : "text-gray-500 dark:text-gray-400"
           }
         >
           Rule {rules.indexOf(rule) + 1}
@@ -257,10 +257,10 @@ const RuleCard = ({
       {rules.map((rule) => (
         <div
           key={rule.id}
-          className={`p-4 rounded-lg transition-all ${
+          className={`p-4 rounded-md transition-all ${
             rule.isEnabled
-              ? 'border border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800'
-              : 'border border-gray-100 bg-gray-50 dark:border-gray-800 dark:bg-gray-900'
+              ? "border border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800"
+              : "border border-gray-100 bg-gray-50 dark:border-gray-800 dark:bg-gray-900"
           }`}
         >
           <Header rule={rule} />
@@ -279,8 +279,8 @@ const RuleCard = ({
                 className="w-4 h-4 text-blue-600 border-gray-300 dark:border-gray-600 rounded focus:ring-blue-500"
                 disabled={
                   !rule.isEnabled ||
-                  rule.replaceWith === 'CUE_SHEET' ||
-                  rule.replaceWith === 'CUE_SHEET_NO_EP'
+                  rule.replaceWith === "CUE_SHEET" ||
+                  rule.replaceWith === "CUE_SHEET_NO_EP"
                 }
               />
               <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">
@@ -298,8 +298,8 @@ const RuleCard = ({
                 className="w-4 h-4 text-blue-600 border-gray-300 dark:border-gray-600 rounded focus:ring-blue-500"
                 disabled={
                   !rule.isEnabled ||
-                  rule.replaceWith === 'CUE_SHEET' ||
-                  rule.replaceWith === 'CUE_SHEET_NO_EP'
+                  rule.replaceWith === "CUE_SHEET" ||
+                  rule.replaceWith === "CUE_SHEET_NO_EP"
                 }
               />
               <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">
@@ -329,7 +329,7 @@ const FooterButton = ({
         disabled={
           rules.filter((r) => r.isEnabled && r.searchPattern).length === 0
         }
-        className="px-6 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 disabled:bg-gray-300 dark:disabled:bg-gray-700 disabled:cursor-not-allowed transition-colors"
+        className="px-6 py-2 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 disabled:bg-gray-300 dark:disabled:bg-gray-700 disabled:cursor-not-allowed transition-colors"
       >
         Apply Rules (
         {rules.filter((r) => r.isEnabled && r.searchPattern).length})
@@ -353,8 +353,8 @@ const SearchReplace = ({
   const addRule = () => {
     const newRule: SearchReplaceRule = {
       id: Date.now().toString(),
-      searchPattern: '',
-      replaceWith: '',
+      searchPattern: "",
+      replaceWith: "",
       isRegex: false,
       isCaseInsensitive: false,
       isEnabled: true,
@@ -365,30 +365,33 @@ const SearchReplace = ({
   const applyRules = () => {
     onApply();
     toast({
-      description: 'Applied search and replace rules.',
-      variant: 'default',
+      description: "Applied search and replace rules.",
+      variant: "default",
     });
   };
 
   useShortcut(
     {
-      'mod+h': () => setShowAdvanced((prev) => !prev),
-      'mod+.': () => addRule(),
-      'mod+j': () => onRulesChange([]),
-      'mod+shift+enter': () => {
+      "mod+h": () => setShowAdvanced((prev) => !prev),
+      "mod+.": () => addRule(),
+      "mod+j": () => onRulesChange([]),
+      "mod+shift+enter": () => {
         if (rules.some((r) => r.isEnabled && r.searchPattern)) {
           applyRules();
         }
       },
-      ...commonReplacements.reduce((acc, template, index) => {
-        acc[`mod+${index + 1}`] = () => {
-          const newRule = createRuleFromTemplate(template, index);
-          onRulesChange([...rules, newRule]);
-        };
-        return acc;
-      }, {} as { [combo: string]: (e: KeyboardEvent) => void }),
+      ...commonReplacements.reduce(
+        (acc, template, index) => {
+          acc[`mod+${index + 1}`] = () => {
+            const newRule = createRuleFromTemplate(template, index);
+            onRulesChange([...rules, newRule]);
+          };
+          return acc;
+        },
+        {} as { [combo: string]: (e: KeyboardEvent) => void },
+      ),
     },
-    [rules]
+    [rules],
   );
 
   return (

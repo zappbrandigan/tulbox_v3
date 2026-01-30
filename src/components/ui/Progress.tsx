@@ -6,12 +6,12 @@ interface Props {
 const Progress: React.FC<Props> = ({ progress, message }) => {
   return (
     <div
-      className="flex flex-col items-center justify-center gap-4 rounded-2xl 
+      className="flex flex-col items-center justify-center gap-4 rounded-md 
   bg-white dark:bg-gray-900 p-8 min-h-[235px] text-center transition-all duration-300"
     >
       {/* Label */}
       <span className="text-base font-semibold tracking-tight text-gray-700 dark:text-gray-100">
-        {message}&hellip;{' '}
+        {message}&hellip;{" "}
         {progress < 1 && (
           <span className="text-blue-600 dark:text-blue-400">
             {Math.round(progress * 100)}%

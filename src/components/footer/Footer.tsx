@@ -1,7 +1,7 @@
-import { trackEvent } from '@/utils';
+import { trackEvent } from "@/utils";
 // import { GitCommitHorizontal } from 'lucide-react';
 
-import { useState } from 'react';
+import { useState } from "react";
 import {
   GitCommitHorizontal,
   Copy,
@@ -10,7 +10,7 @@ import {
   BookOpen,
   Activity,
   Keyboard,
-} from 'lucide-react';
+} from "lucide-react";
 
 export default function AppFooter({
   appName,
@@ -142,7 +142,7 @@ Thanks!`;
 
           {/* CENTER: version & commit with copy */}
           <div className="flex items-center justify-center">
-            <div className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 dark:border-gray-800 bg-white/40 dark:bg-gray-950/40 px-2.5 py-1">
+            <div className="inline-flex items-center gap-1.5 rounded-md border border-gray-200 dark:border-gray-800 bg-white/40 dark:bg-gray-950/40 px-2.5 py-1">
               <span className="tabular-nums">v{version}</span>
               <GitCommitHorizontal className="h-3.5 w-3.5 opacity-70" />
               <span className="font-mono text-[11px] leading-none">
@@ -168,10 +168,10 @@ Thanks!`;
           <div className="flex items-center justify-center sm:justify-end gap-2">
             <a
               href={`mailto:brandon@tulbox.app?subject=Bug/Feedback:%20v${version}-${commit}&body=${encodeURIComponent(
-                emailTemplate
+                emailTemplate,
               )}`}
               onClick={() =>
-                trackEvent('bugs_link_click', { label: 'Bugs Link Clicked' })
+                trackEvent("bugs_link_click", { label: "Bugs Link Clicked" })
               }
               className="inline-flex items-center gap-1 rounded-full border border-gray-200 dark:border-gray-800 bg-white/60 dark:bg-gray-950/40 px-2.5 py-1 hover:shadow"
             >
@@ -180,11 +180,11 @@ Thanks!`;
             </a>
             <a
               href={`mailto:brandon@tulbox.app?subject=Request:%20v${version}-${commit}&body=${encodeURIComponent(
-                requestTemplate
+                requestTemplate,
               )}`}
               onClick={() =>
-                trackEvent('request_link_click', {
-                  label: 'Request Link Clicked',
+                trackEvent("request_link_click", {
+                  label: "Request Link Clicked",
                 })
               }
               className="inline-flex items-center gap-1 rounded-full border border-gray-200 dark:border-gray-800 bg-white/60 dark:bg-gray-950/40 px-2.5 py-1 hover:shadow"

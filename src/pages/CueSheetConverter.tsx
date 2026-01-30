@@ -1,15 +1,15 @@
-import React, { useEffect, useState } from 'react';
-import { logUserEvent } from '@/utils/general/logEvent';
-import { PageMeta } from '@/PageMeta';
-import { FileItem } from '@/types';
-import { checkForDuplicates, generateFileId, trackEvent } from '@/utils';
-import { AlertCircle, MousePointer2, Table } from 'lucide-react';
-import CUE_SHEET_FORMATS from '@/utils/cue/templates';
-import { extractTextFromPDF } from '@/utils/cue/extract';
-import { parseSoundmouseText } from '@/utils/cue/transform';
-import { CueRow } from '@/utils/cue/types';
-import { exportCueSheetCSV } from '@/utils/cue/exportCueSheetCSV';
-import { Summary, Controller, CueTable } from '@/components/cue';
+import React, { useEffect, useState } from "react";
+import { logUserEvent } from "@/utils/general/logEvent";
+import { PageMeta } from "@/PageMeta";
+import { FileItem } from "@/types";
+import { checkForDuplicates, generateFileId, trackEvent } from "@/utils";
+import { AlertCircle, MousePointer2, Table } from "lucide-react";
+import CUE_SHEET_FORMATS from "@/utils/cue/templates";
+import { extractTextFromPDF } from "@/utils/cue/extract";
+import { parseSoundmouseText } from "@/utils/cue/transform";
+import { CueRow } from "@/utils/cue/types";
+import { exportCueSheetCSV } from "@/utils/cue/exportCueSheetCSV";
+import { Summary, Controller, CueTable } from "@/components/cue";
 import {
   ResultHeader,
   WarningModal,
@@ -18,14 +18,14 @@ import {
   DragDropZone,
   Disclaimer,
   Panel,
-} from '@/components/ui';
-import { useSession } from '@/stores/session';
-import { useToast } from '@/stores/toast';
+} from "@/components/ui";
+import { useSession } from "@/stores/session";
+import { useToast } from "@/stores/toast";
 
 const CueSheetConverter: React.FC = () => {
   const [files, setFiles] = useState<FileItem[]>([]);
   const [selectedTemplate, setSelectedTemplate] =
-    useState<string>('sound-mouse');
+    useState<string>("sound-mouse");
   const [cueRows, setCueRows] = useState<CueRow[]>([]);
   const [warnings, setWarnings] = useState<string[]>([]);
   const [showWarnings, setShowWarnings] = useState(false);
@@ -39,22 +39,22 @@ const CueSheetConverter: React.FC = () => {
     const files = Array.isArray(newFiles) ? newFiles : [newFiles];
     logUserEvent(
       sessionId,
-      'User added files',
+      "User added files",
       {
-        action: 'file-upload',
-        target: 'cue-sheet-converter',
+        action: "file-upload",
+        target: "cue-sheet-converter",
         value: files.length,
       },
-      'cue-sheet-converter'
+      "cue-sheet-converter",
     );
 
     const fileItems: FileItem[] = files.map((file) => ({
       id: generateFileId(),
       originalName: file.name,
-      currentName: file.name.replace(/\.pdf$/i, ''),
+      currentName: file.name.replace(/\.pdf$/i, ""),
       file,
-      characterCount: file.name.replace(/\.pdf$/i, '').length,
-      status: 'valid',
+      characterCount: file.name.replace(/\.pdf$/i, "").length,
+      status: "valid",
       lastModified: new Date(file.lastModified),
     }));
 
@@ -70,39 +70,39 @@ const CueSheetConverter: React.FC = () => {
 
   const handleExport = () => {
     const currentTemplate = CUE_SHEET_FORMATS.find(
-      (f) => f.id === selectedTemplate
+      (f) => f.id === selectedTemplate,
     )!;
     try {
       exportCueSheetCSV(cueRows, currentTemplate, `${currentTemplate.id}.csv`);
       toast({
-        description: 'File downloading.',
-        variant: 'success',
+        description: "File downloading.",
+        variant: "success",
       });
       logUserEvent(
         sessionId,
-        'Cue Sheet CSV Downloaded',
+        "Cue Sheet CSV Downloaded",
         {
-          action: 'file-download',
-          target: 'cue-sheet-converter',
+          action: "file-download",
+          target: "cue-sheet-converter",
           value: cueRows.length,
         },
-        'cue-sheet-converter'
+        "cue-sheet-converter",
       );
     } catch (error) {
       logUserEvent(
         sessionId,
-        'Error: Cue Sheet CSV Downloaded',
+        "Error: Cue Sheet CSV Downloaded",
         {
-          action: 'file-download',
-          target: 'cue-sheet-converter',
+          action: "file-download",
+          target: "cue-sheet-converter",
           value: String(error),
         },
-        'cue-sheet-converter',
-        'error'
+        "cue-sheet-converter",
+        "error",
       );
       toast({
-        description: 'Failed to download file.',
-        variant: 'error',
+        description: "Failed to download file.",
+        variant: "error",
       });
     }
   };
@@ -125,20 +125,20 @@ const CueSheetConverter: React.FC = () => {
     setIsProcessing(false);
     logUserEvent(
       sessionId,
-      'Cue Sheet Converted',
+      "Cue Sheet Converted",
       {
-        action: 'cue-sheet-conversion',
-        target: 'cue-sheet-converter',
+        action: "cue-sheet-conversion",
+        target: "cue-sheet-converter",
         value: `Format: ${selectedTemplate}`,
       },
-      'cue-sheet-converter'
+      "cue-sheet-converter",
     );
   };
 
   useEffect(() => {
-    trackEvent('screen_view', {
-      firebase_screen: 'CueSheetConverter',
-      firebase_screen_class: 'CueSheetConverter',
+    trackEvent("screen_view", {
+      firebase_screen: "CueSheetConverter",
+      firebase_screen_class: "CueSheetConverter",
     });
   }, []);
 
@@ -146,8 +146,8 @@ const CueSheetConverter: React.FC = () => {
   const uniqueWorkCount = new Set(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     cueRows.map(({ fileName: _f, sequenceNumber: _s, duration: _d, ...rest }) =>
-      JSON.stringify(rest)
-    )
+      JSON.stringify(rest),
+    ),
   ).size;
 
   return (
@@ -165,7 +165,7 @@ const CueSheetConverter: React.FC = () => {
       />
 
       <Summary
-        template={template?.name ?? ''}
+        template={template?.name ?? ""}
         fileCount={files.length}
         rowCount={cueRows.length}
         uniqueCount={uniqueWorkCount}
@@ -179,8 +179,8 @@ const CueSheetConverter: React.FC = () => {
         maxFiles={25}
         allowMultiple={true}
         validateFile={(file) =>
-          file.type === 'application/pdf' ||
-          file.name.toLowerCase().endsWith('.pdf')
+          file.type === "application/pdf" ||
+          file.name.toLowerCase().endsWith(".pdf")
         }
         title="Upload PDF Files"
         description="Drag and drop your PDF files here, or click to browse"
@@ -239,7 +239,7 @@ const CueSheetConverter: React.FC = () => {
       />
 
       {!isProcessing && files.length > 0 && isError && (
-        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700 text-red-800 dark:text-red-300 rounded-xl shadow-sm p-6">
+        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700 text-red-800 dark:text-red-300 rounded-md shadow-sm p-6">
           <h3 className="text-lg font-semibold mb-2 flex items-center">
             <AlertCircle className="w-5 h-5 mr-2" />
             Parsing Error

@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from 'react';
-import { Code } from 'lucide-react';
-import { CWRConverterRecord } from 'cwr-parser/types';
-import Header from './Header';
-import Footer from './Footer';
-import ScrollArea from './ScrollArea';
-import ParserWorker from '@/workers/parserWorker?worker';
+import React, { useEffect, useState } from "react";
+import { Code } from "lucide-react";
+import { CWRConverterRecord } from "cwr-parser/types";
+import Header from "./Header";
+import Footer from "./Footer";
+import ScrollArea from "./ScrollArea";
+import ParserWorker from "@/workers/parserWorker?worker";
 
 interface Props {
   file: string;
@@ -55,21 +55,21 @@ const CodeView: React.FC<Props> = ({
     const worker = new ParserWorker();
     let timeoutId: ReturnType<typeof setTimeout> | null = null;
 
-    worker.postMessage({ type: 'parse', fileContent, file, chunk: 1_500 });
+    worker.postMessage({ type: "parse", fileContent, file, chunk: 1_500 });
 
     worker.onmessage = (e) => {
       switch (e.data.type) {
-        case 'progress':
+        case "progress":
           onProgress(Math.min(e.data.pct, 99));
           break;
 
-        case 'error':
+        case "error":
           worker.terminate();
           setShowMemoryError(true);
           onReady();
           return;
 
-        case 'done': {
+        case "done": {
           const elapsed = Date.now() - startTime;
           const delay = Math.max(0, MIN_DURATION - elapsed);
 
@@ -106,7 +106,7 @@ const CodeView: React.FC<Props> = ({
       </div>
 
       {/* Scrollable Container */}
-      <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden transition-colors duration-300">
+      <div className="bg-white dark:bg-gray-900 rounded-md shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden transition-colors duration-300">
         {!isProcessing && (
           <>
             <Header
@@ -117,7 +117,7 @@ const CodeView: React.FC<Props> = ({
               isTooltipEnabled={isTooltipEnabled}
               setIsTooltipEnabled={setIsTooltipEnabled}
               totalRecords={parseResult?.statistics?.totalRecords ?? 0}
-              fileName={parseResult?.fileName ?? 'Unknown'}
+              fileName={parseResult?.fileName ?? "Unknown"}
             />
 
             <ScrollArea
@@ -135,7 +135,7 @@ const CodeView: React.FC<Props> = ({
               errorCount={parseResult?.statistics?.errors.length ?? 0}
               warningCount={parseResult?.statistics?.warnings.length ?? 0}
               templateId={selectedTemplate}
-              cwrFileVersion={parseResult?.version ?? '0.0.0'}
+              cwrFileVersion={parseResult?.version ?? "0.0.0"}
             />
           </>
         )}

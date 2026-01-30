@@ -1,6 +1,6 @@
-import { IMDBProduction, productionType } from '@/types';
-import { Calendar, Languages, Globe, Star } from 'lucide-react';
-import React from 'react';
+import { IMDBProduction, productionType } from "@/types";
+import { Calendar, Languages, Globe, Star } from "lucide-react";
+import React from "react";
 
 interface ProductionHeaderProps {
   selectedProduction: IMDBProduction;
@@ -55,7 +55,7 @@ const ProductionHeader: React.FC<ProductionHeaderProps> = ({
           <img
             src={selectedProduction.poster}
             alt={selectedProduction.title}
-            className="w-24 h-36 object-cover rounded-lg shadow-lg"
+            className="w-24 h-36 object-cover rounded-md shadow-lg"
           />
         )}
       </div>

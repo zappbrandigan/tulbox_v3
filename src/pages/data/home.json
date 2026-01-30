@@ -1,6 +1,13 @@
 {
   "changelog": [
     {
+      "date": "2026-01-30",
+      "tag": "Update",
+      "title": "Minor UI Updates",
+      "summary": "Reduced border radius across all UI elements and reduced height of PDF Manager table rows.",
+      "link": "https://docs.tulbox.app/changelog#361"
+    },
+    {
       "date": "2026-01-24",
       "tag": "New",
       "title": "PDF Manager: State Persistence",
@@ -8,18 +15,11 @@
       "link": "https://docs.tulbox.app/changelog#360"
     },
     {
-      "date": "2025-09-03",
+      "date": "2026-01-03",
       "tag": "New",
-      "title": "CWR Converter: Recording Info",
-      "summary": "A new report detailing recording info (REC/PER records) for CWRs",
-      "link": "https://docs.tulbox.app/changelog#354"
-    },
-    {
-      "date": "2025-08-18",
-      "tag": "New",
-      "title": "Info Page and Direct URL Support",
-      "summary": "This page! Also, users can now access tools via a direct URL path.",
-      "link": "https://docs.tulbox.app/blog/2025/08/18/update"
+      "title": "Browser Extension: TūlBOX Tables",
+      "summary": "A new browser extension to download HTML tables from internal systems.",
+      "link": "https://docs.tulbox.app/extensions/"
     }
   ],
   "roadmap": [

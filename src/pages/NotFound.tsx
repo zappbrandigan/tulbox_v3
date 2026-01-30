@@ -1,6 +1,6 @@
-import { Link } from 'react-router';
-import { motion } from 'framer-motion';
-import { AlertTriangle } from 'lucide-react';
+import { Link } from "react-router";
+import { motion } from "framer-motion";
+import { AlertTriangle } from "lucide-react";
 
 export default function NotFound() {
   return (
@@ -20,7 +20,7 @@ export default function NotFound() {
         </p>
         <Link
           to="/"
-          className="inline-block rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-semibold px-5 py-3 shadow"
+          className="inline-block rounded-md bg-cyan-600 hover:bg-cyan-500 text-white font-semibold px-5 py-3 shadow"
         >
           Return to Dashboard
         </Link>
