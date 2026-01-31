@@ -104,12 +104,6 @@ export default function RootHub() {
               </span>
               What&apos;s New
             </h2>
-            <Link
-              to="https://docs.tulbox.app/blog"
-              className="text-sm text-cyan-700 dark:text-cyan-300 hover:text-cyan-800 dark:hover:text-cyan-200 hover:underline underline-offset-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500/60 dark:focus-visible:ring-cyan-400/60 rounded"
-            >
-              View all
-            </Link>
           </div>
 
           {/* Loading / Error / Data states */}
