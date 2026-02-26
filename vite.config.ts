@@ -10,6 +10,9 @@ const commitHash = execSync('git rev-parse --short HEAD').toString().trim();
 
 export default defineConfig({
   plugins: [react()],
+  worker: {
+    format: 'es',
+  },
   optimizeDeps: {
     exclude: ['lucide-react'],
   },

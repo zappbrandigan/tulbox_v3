@@ -1,11 +1,11 @@
 {
   "changelog": [
     {
-      "date": "2026-01-30",
+      "date": "2026-02-26",
       "tag": "Update",
-      "title": "Minor UI Updates",
-      "summary": "Reduced border radius across all UI elements and reduced height of PDF Manager table rows.",
-      "link": "https://docs.tulbox.app/changelog#361"
+      "title": "PDF Manager: Quality of Life Updates",
+      "summary": "Added search highlighting, undo option, change previews, and more",
+      "link": "https://docs.tulbox.app/changelog#370"
     },
     {
       "date": "2026-01-24",

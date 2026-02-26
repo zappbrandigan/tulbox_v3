@@ -1,42 +1,14 @@
-import { FileItem, SearchReplaceRule } from '@/types';
-import JSZip from 'jszip';
-import { saveAs } from 'file-saver';
-import dotifyTitleGeneric from './dotify';
-import { useToastStore } from '@/stores/toast';
+import type { SearchReplaceRule, fileStatus } from '@/types';
 
-const generateFileId = (): string => {
-  return Date.now().toString(36) + Math.random().toString(36).substring(2);
-};
-
-const validateFileName = (name: string): boolean => {
-  // Check for invalid characters in file names
-  const invalidChars = /[<>:"/\\|?*]/;
-  return !invalidChars.test(name) && name.trim().length > 0;
-};
-
-const checkForDuplicates = (files: FileItem[]): FileItem[] => {
-  const nameCounts = files.reduce((map, file) => {
-    map.set(file.currentName, (map.get(file.currentName) || 0) + 1);
-    return map;
-  }, new Map<string, number>());
-
-  return files.map((file) => {
-    if (!validateFileName(file.currentName)) {
-      return { ...file, status: 'invalid' };
-    }
-    if (nameCounts.get(file.currentName)! > 1) {
-      return { ...file, status: 'duplicate' };
-    }
-    if (['dotified', 'modified', 'error'].includes(file.status)) {
-      return file;
-    }
-    return { ...file, status: 'valid' };
-  });
+export type PreviewFile = {
+  id: string;
+  currentName: string;
+  status: fileStatus;
 };
 
 type RuleExecutionResult = {
   name: string;
-  status: FileItem['status'];
+  status: fileStatus;
   changed: boolean;
   invalidRegex: boolean;
 };
@@ -65,8 +37,6 @@ export type SearchReplacePreview = {
   ruleImpacts: SearchReplaceRuleImpact[];
 };
 
-export type SearchReplacePreviewNameMap = Record<string, string>;
-
 export type HighlightRange = {
   start: number;
   end: number;
@@ -80,9 +50,25 @@ export type HighlightSegment = {
   tone: HighlightTone;
 };
 
-export type NonCueHighlightMatcher = {
+type NonCueHighlightMatcher = {
   regex: RegExp;
   captureRegex: RegExp | null;
+};
+
+export type SearchReplacePreviewPayload = {
+  preview: SearchReplacePreview;
+  previewNameMap: Record<string, string>;
+  currentHighlightSegmentsMap: Record<string, HighlightSegment[]>;
+  previewHighlightSegmentsMap: Record<string, HighlightSegment[]>;
+};
+
+type DotifyTransform = (
+  title: string,
+  hasEpisodeTitle: boolean
+) => { title: string; status: fileStatus };
+
+type ComputeSearchReplaceOptions = {
+  cueTransform?: DotifyTransform;
 };
 
 const isCueSheetTemplateRule = (rule: SearchReplaceRule): boolean =>
@@ -126,6 +112,51 @@ const hasCapturingGroups = (pattern: string): boolean => {
 
   return false;
 };
+
+const escapeRegExp = (value: string): string =>
+  value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+const prepareRules = (rules: SearchReplaceRule[]): PreparedRule[] =>
+  rules.map((rule) => {
+    const isCueSheetWithEpisodeTitle = rule.replaceWith === 'CUE_SHEET';
+    const isCueSheetWithoutEpisodeTitle = rule.replaceWith === 'CUE_SHEET_NO_EP';
+
+    if (
+      !rule.isEnabled ||
+      isCueSheetWithEpisodeTitle ||
+      isCueSheetWithoutEpisodeTitle ||
+      rule.searchPattern.length === 0
+    ) {
+      return {
+        rule,
+        regex: null,
+        invalidRegex: false,
+        isCueSheetWithEpisodeTitle,
+        isCueSheetWithoutEpisodeTitle,
+      };
+    }
+
+    const flags = rule.isCaseInsensitive ? 'gi' : 'g';
+    try {
+      return {
+        rule,
+        regex: rule.isRegex
+          ? new RegExp(rule.searchPattern, flags)
+          : new RegExp(escapeRegExp(rule.searchPattern), flags),
+        invalidRegex: false,
+        isCueSheetWithEpisodeTitle,
+        isCueSheetWithoutEpisodeTitle,
+      };
+    } catch {
+      return {
+        rule,
+        regex: null,
+        invalidRegex: true,
+        isCueSheetWithEpisodeTitle,
+        isCueSheetWithoutEpisodeTitle,
+      };
+    }
+  });
 
 const getNonCueHighlightMatchers = (
   rules: SearchReplaceRule[]
@@ -177,7 +208,6 @@ const getHighlightRangesFromMatchers = (
   matchers: NonCueHighlightMatcher[]
 ): HighlightRange[] => {
   const ranges: HighlightRange[] = [];
-
   for (const matcher of matchers) {
     matcher.regex.lastIndex = 0;
     let safetyCounter = 0;
@@ -186,12 +216,8 @@ const getHighlightRangesFromMatchers = (
     while ((match = matcher.regex.exec(text)) !== null) {
       const start = match.index;
       const end = start + match[0].length;
+      if (end > start) ranges.push({ start, end });
 
-      if (end > start) {
-        ranges.push({ start, end });
-      }
-
-      // Prevent infinite loops on zero-length matches.
       if (match[0].length === 0) {
         matcher.regex.lastIndex += 1;
         if (matcher.regex.lastIndex > text.length) break;
@@ -201,7 +227,6 @@ const getHighlightRangesFromMatchers = (
       if (safetyCounter > 10000) break;
     }
   }
-
   return mergeHighlightRanges(ranges);
 };
 
@@ -221,15 +246,12 @@ const getCaptureRangesFromMatchers = (
       const withIndices = match as RegExpExecArray & {
         indices?: Array<[number, number] | undefined>;
       };
-
       if (withIndices.indices) {
         for (let i = 1; i < withIndices.indices.length; i += 1) {
           const range = withIndices.indices[i];
           if (!range) continue;
           const [start, end] = range;
-          if (end > start) {
-            ranges.push({ start, end });
-          }
+          if (end > start) ranges.push({ start, end });
         }
       }
 
@@ -246,7 +268,7 @@ const getCaptureRangesFromMatchers = (
   return mergeHighlightRanges(ranges);
 };
 
-const getHighlightSegmentsFromMatchers = (
+const getHighlightSegmentsForText = (
   text: string,
   matchers: NonCueHighlightMatcher[]
 ): HighlightSegment[] => {
@@ -254,6 +276,7 @@ const getHighlightSegmentsFromMatchers = (
   const captureRanges = getCaptureRangesFromMatchers(text, matchers);
 
   if (text.length === 0) return [];
+  if (matchRanges.length === 0 && captureRanges.length === 0) return [];
 
   const boundaries = new Set<number>([0, text.length]);
   for (const range of matchRanges) {
@@ -266,11 +289,10 @@ const getHighlightSegmentsFromMatchers = (
   }
 
   const points = [...boundaries].sort((a, b) => a - b);
-  const segments: HighlightSegment[] = [];
-
   const containsPoint = (ranges: HighlightRange[], point: number): boolean =>
     ranges.some((range) => range.start <= point && point < range.end);
 
+  const segments: HighlightSegment[] = [];
   for (let i = 0; i < points.length - 1; i += 1) {
     const start = points[i];
     const end = points[i + 1];
@@ -278,60 +300,21 @@ const getHighlightSegmentsFromMatchers = (
 
     const inCapture = containsPoint(captureRanges, start);
     const inMatch = containsPoint(matchRanges, start);
-    const tone: HighlightTone = inCapture ? 'capture' : inMatch ? 'match' : 'none';
-
-    segments.push({ start, end, tone });
+    segments.push({
+      start,
+      end,
+      tone: inCapture ? 'capture' : inMatch ? 'match' : 'none',
+    });
   }
 
   return segments;
 };
 
-const prepareRules = (rules: SearchReplaceRule[]): PreparedRule[] =>
-  rules.map((rule) => {
-    const isCueSheetWithEpisodeTitle = rule.replaceWith === 'CUE_SHEET';
-    const isCueSheetWithoutEpisodeTitle = rule.replaceWith === 'CUE_SHEET_NO_EP';
-
-    if (
-      !rule.isEnabled ||
-      isCueSheetWithEpisodeTitle ||
-      isCueSheetWithoutEpisodeTitle ||
-      rule.searchPattern.length === 0
-    ) {
-      return {
-        rule,
-        regex: null,
-        invalidRegex: false,
-        isCueSheetWithEpisodeTitle,
-        isCueSheetWithoutEpisodeTitle,
-      };
-    }
-
-    const flags = rule.isCaseInsensitive ? 'gi' : 'g';
-    try {
-      return {
-        rule,
-        regex: rule.isRegex
-          ? new RegExp(rule.searchPattern, flags)
-          : new RegExp(escapeRegExp(rule.searchPattern), flags),
-        invalidRegex: false,
-        isCueSheetWithEpisodeTitle,
-        isCueSheetWithoutEpisodeTitle,
-      };
-    } catch {
-      return {
-        rule,
-        regex: null,
-        invalidRegex: true,
-        isCueSheetWithEpisodeTitle,
-        isCueSheetWithoutEpisodeTitle,
-      };
-    }
-  });
-
 const executeRule = (
   name: string,
-  status: FileItem['status'],
-  preparedRule: PreparedRule
+  status: fileStatus,
+  preparedRule: PreparedRule,
+  cueTransform: DotifyTransform
 ): RuleExecutionResult => {
   const { rule } = preparedRule;
   if (!rule.isEnabled) {
@@ -339,7 +322,7 @@ const executeRule = (
   }
 
   if (preparedRule.isCueSheetWithEpisodeTitle) {
-    const { title, status: nextStatus } = dotifyTitleGeneric(name, true);
+    const { title, status: nextStatus } = cueTransform(name, true);
     return {
       name: title,
       status: nextStatus,
@@ -349,7 +332,7 @@ const executeRule = (
   }
 
   if (preparedRule.isCueSheetWithoutEpisodeTitle) {
-    const { title, status: nextStatus } = dotifyTitleGeneric(name, false);
+    const { title, status: nextStatus } = cueTransform(name, false);
     return {
       name: title,
       status: nextStatus,
@@ -375,66 +358,19 @@ const executeRule = (
   };
 };
 
-const applySearchReplace = (
-  files: FileItem[],
-  rules: SearchReplaceRule[]
-): FileItem[] => {
+export const computeSearchReplacePreviewPayload = (
+  files: PreviewFile[],
+  rules: SearchReplaceRule[],
+  options: ComputeSearchReplaceOptions = {}
+): SearchReplacePreviewPayload => {
+  const cueTransform: DotifyTransform =
+    options.cueTransform ??
+    ((title, _hasEpisodeTitle) => ({ title, status: 'valid' }));
   const preparedRules = prepareRules(rules);
-
-  return files.map((file) => {
-    let newName = file.currentName;
-    let newStatus = file.status;
-
-    preparedRules.forEach((preparedRule) => {
-      const result = executeRule(newName, newStatus, preparedRule);
-      newName = result.name;
-      newStatus = result.status;
-    });
-
-    if (
-      newName !== file.currentName &&
-      !['dotified', 'error'].includes(newStatus)
-    ) {
-      newStatus = 'modified';
-    }
-
-    return {
-      ...file,
-      currentName: newName,
-      characterCount: newName.length,
-      status: newStatus,
-    };
-  });
-};
-
-const getSearchReplacePreviewNameMap = (
-  files: FileItem[],
-  rules: SearchReplaceRule[]
-): SearchReplacePreviewNameMap => {
-  const preparedRules = prepareRules(rules);
-  const previewNameMap: SearchReplacePreviewNameMap = {};
-
-  files.forEach((file) => {
-    let nextName = file.currentName;
-    let nextStatus = file.status;
-
-    preparedRules.forEach((preparedRule) => {
-      const result = executeRule(nextName, nextStatus, preparedRule);
-      nextName = result.name;
-      nextStatus = result.status;
-    });
-
-    previewNameMap[file.id] = nextName;
-  });
-
-  return previewNameMap;
-};
-
-const getSearchReplacePreview = (
-  files: FileItem[],
-  rules: SearchReplaceRule[]
-): SearchReplacePreview => {
-  const preparedRules = prepareRules(rules);
+  const highlightMatchers = getNonCueHighlightMatchers(rules);
+  const previewNameMap: Record<string, string> = {};
+  const currentHighlightSegmentsMap: Record<string, HighlightSegment[]> = {};
+  const previewHighlightSegmentsMap: Record<string, HighlightSegment[]> = {};
   const ruleImpacts = preparedRules.map((preparedRule) => ({
     ruleId: preparedRule.rule.id,
     changedFiles: 0,
@@ -452,7 +388,7 @@ const getSearchReplacePreview = (
     let nextStatus = file.status;
 
     preparedRules.forEach((preparedRule, index) => {
-      const result = executeRule(nextName, nextStatus, preparedRule);
+      const result = executeRule(nextName, nextStatus, preparedRule, cueTransform);
       if (result.changed) {
         ruleImpacts[index].changedFiles += 1;
       }
@@ -463,79 +399,38 @@ const getSearchReplacePreview = (
       nextStatus = result.status;
     });
 
-    if (nextName !== originalName) {
-      changedFiles += 1;
-    }
+    previewNameMap[file.id] = nextName;
+    currentHighlightSegmentsMap[file.id] = getHighlightSegmentsForText(
+      originalName,
+      highlightMatchers
+    );
+    previewHighlightSegmentsMap[file.id] = getHighlightSegmentsForText(
+      nextName,
+      highlightMatchers
+    );
+
+    if (nextName !== originalName) changedFiles += 1;
   });
 
   return {
-    changedFiles,
-    totalFiles: files.length,
-    applicableRulesCount: ruleImpacts.filter(
-      (impact) => impact.isEnabled && impact.isApplicable && !impact.invalidRegex
-    ).length,
-    hasInvalidRegexRules: ruleImpacts.some(
-      (impact) => impact.isEnabled && impact.invalidRegex
-    ),
-    ruleImpacts,
+    preview: {
+      changedFiles,
+      totalFiles: files.length,
+      applicableRulesCount: ruleImpacts.filter(
+        (impact) => impact.isEnabled && impact.isApplicable && !impact.invalidRegex
+      ).length,
+      hasInvalidRegexRules: ruleImpacts.some(
+        (impact) => impact.isEnabled && impact.invalidRegex
+      ),
+      ruleImpacts,
+    },
+    previewNameMap,
+    currentHighlightSegmentsMap,
+    previewHighlightSegmentsMap,
   };
 };
 
-const escapeRegExp = (string: string): string => {
-  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-};
-
-const downloadRenamedFiles = async (files: FileItem[]): Promise<void> => {
-  const zip = new JSZip();
-
-  for (const fileItem of files) {
-    if (!['valid', 'modified', 'dotified'].includes(fileItem.status)) continue;
-
-    try {
-      const blob = new Blob([fileItem.file], { type: fileItem.file.type });
-      zip.file(ensurePdfExtension(fileItem.currentName), blob);
-    } catch (error) {
-      console.error('Error downloading file:', fileItem.currentName, error);
-      useToastStore.getState().toast({
-        description: 'Error: failed to download file.',
-        variant: 'error',
-      });
-    }
-  }
-
-  try {
-    const content = await zip.generateAsync({ type: 'blob' });
-    saveAs(content, 'dotified.zip');
-    useToastStore.getState().toast({
-      description: 'File downloaded!',
-      variant: 'success',
-    });
-  } catch {
-    useToastStore.getState().toast({
-      description: 'Error: failed to download file.',
-      variant: 'error',
-    });
-  }
-};
-
-const ensurePdfExtension = (filename: string): string => {
-  if (!filename.toLowerCase().endsWith('.pdf')) {
-    return `${filename}.pdf`;
-  }
-  return filename;
-};
-
-export {
-  ensurePdfExtension,
-  downloadRenamedFiles,
-  escapeRegExp,
-  applySearchReplace,
-  getSearchReplacePreviewNameMap,
-  getSearchReplacePreview,
-  getNonCueHighlightMatchers,
-  getHighlightRangesFromMatchers,
-  getHighlightSegmentsFromMatchers,
-  checkForDuplicates,
-  validateFileName,
-  generateFileId,
-};
+export const isLatestPreviewWorkerResult = (
+  activeRequestId: number,
+  incomingRequestId: number
+): boolean => activeRequestId === incomingRequestId;

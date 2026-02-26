@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   Edit3,
   Check,
@@ -9,9 +9,12 @@ import {
   Download,
   ClipboardCopy,
 } from "lucide-react";
-import { FileItem } from "@/types";
+import { FileItem, SearchReplaceRule } from "@/types";
 import { logUserEvent } from "@/utils/general/logEvent";
-import { ensurePdfExtension } from "@/utils";
+import {
+  ensurePdfExtension,
+} from "@/utils";
+import type { HighlightSegment } from "@/utils/pdf/fileHelpers";
 import { useSession } from "@/stores/session";
 import SortableHeader from "../ui/SortableHeader";
 import { useSortableData } from "@/hooks";
@@ -19,12 +22,22 @@ import { useToast } from "@/stores/toast";
 
 interface FileTableProps {
   files: FileItem[];
+  rules: SearchReplaceRule[];
+  previewNameMap: Record<string, string>;
+  currentHighlightSegmentsMap: Record<string, HighlightSegment[]>;
+  previewHighlightSegmentsMap: Record<string, HighlightSegment[]>;
+  isPreviewVisible: boolean;
   onFileUpdate: (id: string, newName: string) => void;
   onFileRemove: (id: string) => void;
 }
 
 const FileTable: React.FC<FileTableProps> = ({
   files,
+  rules,
+  previewNameMap,
+  currentHighlightSegmentsMap,
+  previewHighlightSegmentsMap,
+  isPreviewVisible,
   onFileUpdate,
   onFileRemove,
 }) => {
@@ -40,6 +53,68 @@ const FileTable: React.FC<FileTableProps> = ({
 
   const { toast } = useToast();
   const sessionId = useSession((s) => s.sessionId);
+  const hasRules = rules.length > 0;
+  const affectedCount = useMemo(
+    () =>
+      files.reduce(
+        (count, file) =>
+          previewNameMap[file.id] !== file.currentName ? count + 1 : count,
+        0,
+      ),
+    [files, previewNameMap],
+  );
+  const [showAffectedOnly, setShowAffectedOnly] = useState(false);
+  useEffect(() => {
+    if (!hasRules || !isPreviewVisible) {
+      setShowAffectedOnly(false);
+    }
+  }, [hasRules, isPreviewVisible]);
+  useEffect(() => {
+    if (showAffectedOnly && affectedCount === 0) {
+      setShowAffectedOnly(false);
+    }
+  }, [showAffectedOnly, affectedCount]);
+
+  const renderHighlightedName = (name: string, segments: HighlightSegment[]) => {
+    if (!segments || segments.length === 0) return name;
+    if (segments.every((segment) => segment.tone === "none")) return name;
+
+    const nodes: React.ReactNode[] = [];
+    segments.forEach((segment, index) => {
+      const text = name.slice(segment.start, segment.end);
+      if (segment.tone === "capture") {
+        nodes.push(
+          <mark
+            key={`capture-${index}-${segment.start}`}
+            className="rounded bg-emerald-200/85 text-emerald-900 px-0.5 dark:bg-emerald-400/35 dark:text-emerald-100"
+          >
+            {text}
+          </mark>,
+        );
+        return;
+      }
+
+      if (segment.tone === "match") {
+        nodes.push(
+          <mark
+            key={`match-${index}-${segment.start}`}
+            className="rounded bg-amber-200/80 text-gray-900 px-0.5 dark:bg-amber-400/35 dark:text-amber-100"
+          >
+            {text}
+          </mark>,
+        );
+        return;
+      }
+
+      nodes.push(
+        <React.Fragment key={`text-${index}-${segment.start}`}>
+          {text}
+        </React.Fragment>,
+      );
+    });
+
+    return nodes;
+  };
 
   const startEditing = (file: FileItem) => {
     logUserEvent(sessionId, "PDF Files Inline Edit", {
@@ -164,9 +239,30 @@ const FileTable: React.FC<FileTableProps> = ({
   };
 
   if (files.length === 0) return null;
+  const displayedFiles = hasRules && isPreviewVisible && showAffectedOnly
+    ? sortedFiles.filter((file) => previewNameMap[file.id] !== file.currentName)
+    : sortedFiles;
 
   return (
     <div className="bg-white dark:bg-gray-900 rounded-md shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+      {hasRules && isPreviewVisible && (
+        <div className="px-4 py-2 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/60 flex items-center justify-between">
+          <p className="text-sm text-gray-700 dark:text-gray-200">
+            Affected files:{" "}
+            <span className="font-semibold">{affectedCount}</span> / {files.length}
+          </p>
+          <label className="inline-flex items-center gap-2 text-sm text-gray-700 dark:text-gray-200">
+            <input
+              type="checkbox"
+              checked={showAffectedOnly}
+              onChange={(e) => setShowAffectedOnly(e.target.checked)}
+              disabled={affectedCount === 0}
+              className="w-4 h-4 rounded border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-blue-500 disabled:opacity-50"
+            />
+            Show affected only
+          </label>
+        </div>
+      )}
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead className="bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
@@ -177,28 +273,41 @@ const FileTable: React.FC<FileTableProps> = ({
                 sortConfig={sortConfig}
                 onSort={requestSort}
               />
-              <SortableHeader
-                label="Characters"
-                columnKey="characterCount"
-                sortConfig={sortConfig}
-                onSort={requestSort}
-              />
-              <SortableHeader
-                label="Status"
-                columnKey="status"
-                sortConfig={sortConfig}
-                onSort={requestSort}
-              />
-              <th className="px-6 py-2 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wide">
-                Actions
-              </th>
+              {hasRules && isPreviewVisible && (
+                <th className="px-6 py-2 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wide">
+                  Preview
+                </th>
+              )}
+              {!isPreviewVisible && (
+                <>
+                  <SortableHeader
+                    label="Characters"
+                    columnKey="characterCount"
+                    sortConfig={sortConfig}
+                    onSort={requestSort}
+                  />
+                  <SortableHeader
+                    label="Status"
+                    columnKey="status"
+                    sortConfig={sortConfig}
+                    onSort={requestSort}
+                  />
+                  <th className="px-6 py-2 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wide">
+                    Actions
+                  </th>
+                </>
+              )}
             </tr>
           </thead>
 
           <tbody>
-            {sortedFiles.map((file) => (
+            {displayedFiles.map((file) => (
               <tr key={file.id} className={getRowClassName(file.status)}>
-                <td className="px-6 py-2 text-sm w-[60%]">
+                <td
+                  className={`px-6 py-2 text-sm ${
+                    hasRules && isPreviewVisible ? "w-[50%]" : "w-[60%]"
+                  }`}
+                >
                   {editingId === file.id ? (
                     <div className="flex items-center space-x-2">
                       <input
@@ -232,7 +341,10 @@ const FileTable: React.FC<FileTableProps> = ({
                       className="flex items-center space-x-2 hover:cursor-pointer group"
                     >
                       <span className="flex-1 font-medium text-gray-900 dark:text-white whitespace-pre">
-                        {file.currentName}
+                        {renderHighlightedName(
+                          file.currentName,
+                          currentHighlightSegmentsMap[file.id] ?? [],
+                        )}
                       </span>
                       <button
                         onClick={() => startEditing(file)}
@@ -243,51 +355,76 @@ const FileTable: React.FC<FileTableProps> = ({
                     </div>
                   )}
                 </td>
-                <td className="px-6 py-2 text-sm text-gray-600 dark:text-gray-300">
-                  <span
-                    className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium  ${
-                      file.characterCount > 60
-                        ? "bg-red-200 dark:bg-red-500 text-red-800 dark:text-white"
-                        : "bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200"
-                    }`}
-                  >
-                    {file.characterCount}
-                  </span>
-                </td>
-                <td className="px-6 py-2 text-sm">
-                  <div className="flex items-center space-x-2">
-                    {GetStatusText(file.status)}
-                  </div>
-                </td>
-                <td className="flex space-x-4 px-2 py-2 text-sm">
-                  <button
-                    onClick={() => onFileRemove(file.id)}
-                    className="text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 transition-colors"
-                    title="Remove file"
-                  >
-                    <X className="size-5" />
-                  </button>
-                  <button
-                    onClick={() => {
-                      navigator.clipboard.writeText(file.currentName);
-                      toast({
-                        description: "Copied to cliboard!",
-                        variant: "success",
-                      });
-                    }}
-                    className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 transition-colors"
-                    title="Copy filename"
-                  >
-                    <ClipboardCopy className="size-5" />
-                  </button>
-                  <button
-                    onClick={() => downloadFile(file)}
-                    className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 transition-colors"
-                    title="Download file"
-                  >
-                    <Download className="size-5" />
-                  </button>
-                </td>
+                {hasRules && isPreviewVisible && (
+                  <td className="px-6 py-2 text-sm">
+                    {(() => {
+                      const previewName = previewNameMap[file.id] ?? file.currentName;
+                      const changed = previewName !== file.currentName;
+                      if (!changed) {
+                        return (
+                          <span className="text-gray-400 dark:text-gray-500">No change</span>
+                        );
+                      }
+                      return (
+                        <span className="font-medium text-gray-800 dark:text-gray-100 whitespace-pre">
+                          {renderHighlightedName(
+                            previewName,
+                            previewHighlightSegmentsMap[file.id] ?? [],
+                          )}
+                        </span>
+                      );
+                    })()}
+                  </td>
+                )}
+                {!isPreviewVisible && (
+                  <>
+                    <td className="px-6 py-2 text-sm text-gray-600 dark:text-gray-300">
+                      <span
+                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium  ${
+                          file.characterCount > 60
+                            ? "bg-red-200 dark:bg-red-500 text-red-800 dark:text-white"
+                            : "bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200"
+                        }`}
+                      >
+                        {file.characterCount}
+                      </span>
+                    </td>
+                    <td className="px-6 py-2 text-sm">
+                      <div className="flex items-center space-x-2">
+                        {GetStatusText(file.status)}
+                      </div>
+                    </td>
+                    <td className="flex space-x-4 px-2 py-2 text-sm">
+                      <button
+                        onClick={() => onFileRemove(file.id)}
+                        className="text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 transition-colors"
+                        title="Remove file"
+                      >
+                        <X className="size-5" />
+                      </button>
+                      <button
+                        onClick={() => {
+                          navigator.clipboard.writeText(file.currentName);
+                          toast({
+                            description: "Copied to cliboard!",
+                            variant: "success",
+                          });
+                        }}
+                        className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 transition-colors"
+                        title="Copy filename"
+                      >
+                        <ClipboardCopy className="size-5" />
+                      </button>
+                      <button
+                        onClick={() => downloadFile(file)}
+                        className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 transition-colors"
+                        title="Download file"
+                      >
+                        <Download className="size-5" />
+                      </button>
+                    </td>
+                  </>
+                )}
               </tr>
             ))}
           </tbody>
