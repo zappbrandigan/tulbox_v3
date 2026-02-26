@@ -28,6 +28,18 @@ const createRuleFromTemplate = (
   isEnabled: true,
 });
 
+const isTemplateRule = (rule: SearchReplaceRule): boolean =>
+  rule.replaceWith === "CUE_SHEET" || rule.replaceWith === "CUE_SHEET_NO_EP";
+
+const validateRegex = (pattern: string): boolean => {
+  try {
+    new RegExp(pattern);
+    return true;
+  } catch {
+    return false;
+  }
+};
+
 const Header = ({
   showAdvanced,
   setShowAdvanced,
@@ -120,15 +132,6 @@ const Inputs = ({
   rule: SearchReplaceRule;
   updateRule: (id: string, updates: Partial<SearchReplaceRule>) => void;
 }) => {
-  const validateRegex = (pattern: string): boolean => {
-    try {
-      new RegExp(pattern);
-      return true;
-    } catch {
-      return false;
-    }
-  };
-
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
       <div>
@@ -314,26 +317,40 @@ const RuleCard = ({
 };
 
 const FooterButton = ({
-  rules,
+  applicableRulesCount,
+  hasInvalidRegexRules,
+  hasEmptyEnabledRules,
   applyRules,
 }: {
-  rules: SearchReplaceRule[];
+  applicableRulesCount: number;
+  hasInvalidRegexRules: boolean;
+  hasEmptyEnabledRules: boolean;
   applyRules: () => void;
 }) => {
-  if (rules.length === 0) return null;
+  if (applicableRulesCount === 0 && !hasInvalidRegexRules && !hasEmptyEnabledRules)
+    return null;
 
   return (
-    <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700 flex justify-end">
-      <button
-        onClick={applyRules}
-        disabled={
-          rules.filter((r) => r.isEnabled && r.searchPattern).length === 0
-        }
-        className="px-6 py-2 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 disabled:bg-gray-300 dark:disabled:bg-gray-700 disabled:cursor-not-allowed transition-colors"
-      >
-        Apply Rules (
-        {rules.filter((r) => r.isEnabled && r.searchPattern).length})
-      </button>
+    <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
+      <div className="flex justify-end">
+        <button
+          onClick={applyRules}
+          disabled={applicableRulesCount === 0 || hasInvalidRegexRules}
+          className="px-6 py-2 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 disabled:bg-gray-300 dark:disabled:bg-gray-700 disabled:cursor-not-allowed transition-colors"
+        >
+          Apply Rules ({applicableRulesCount})
+        </button>
+      </div>
+      {hasInvalidRegexRules && (
+        <p className="mt-2 text-sm text-red-600 dark:text-red-300">
+          Fix invalid regex patterns before applying rules.
+        </p>
+      )}
+      {hasEmptyEnabledRules && (
+        <p className="mt-1 text-sm text-amber-700 dark:text-amber-300">
+          Some enabled rules have an empty search pattern and will be ignored.
+        </p>
+      )}
     </div>
   );
 };
@@ -349,6 +366,23 @@ const SearchReplace = ({
 }) => {
   const [showAdvanced, setShowAdvanced] = useState(false);
   const { toast } = useToast();
+  const hasInvalidRegexRules = rules.some(
+    (rule) =>
+      rule.isEnabled &&
+      rule.isRegex &&
+      rule.searchPattern.length > 0 &&
+      !validateRegex(rule.searchPattern),
+  );
+  const hasEmptyEnabledRules = rules.some(
+    (rule) => rule.isEnabled && !isTemplateRule(rule) && rule.searchPattern.length === 0,
+  );
+  const applicableRulesCount = rules.filter((rule) => {
+    if (!rule.isEnabled) return false;
+    if (isTemplateRule(rule)) return true;
+    if (rule.searchPattern.length === 0) return false;
+    if (rule.isRegex && !validateRegex(rule.searchPattern)) return false;
+    return true;
+  }).length;
 
   const addRule = () => {
     const newRule: SearchReplaceRule = {
@@ -363,6 +397,14 @@ const SearchReplace = ({
   };
 
   const applyRules = () => {
+    if (hasInvalidRegexRules) {
+      toast({
+        description: "Fix invalid regex patterns before applying.",
+        variant: "error",
+      });
+      return;
+    }
+    if (applicableRulesCount === 0) return;
     onApply();
     toast({
       description: "Applied search and replace rules.",
@@ -376,7 +418,7 @@ const SearchReplace = ({
       "mod+.": () => addRule(),
       "mod+j": () => onRulesChange([]),
       "mod+shift+enter": () => {
-        if (rules.some((r) => r.isEnabled && r.searchPattern)) {
+        if (applicableRulesCount > 0 && !hasInvalidRegexRules) {
           applyRules();
         }
       },
@@ -391,7 +433,7 @@ const SearchReplace = ({
         {} as { [combo: string]: (e: KeyboardEvent) => void },
       ),
     },
-    [rules],
+    [rules, applicableRulesCount, hasInvalidRegexRules],
   );
 
   return (
@@ -412,7 +454,12 @@ const SearchReplace = ({
 
       <RuleCard rules={rules} onRulesChange={onRulesChange} />
 
-      <FooterButton rules={rules} applyRules={applyRules} />
+      <FooterButton
+        applicableRulesCount={applicableRulesCount}
+        hasInvalidRegexRules={hasInvalidRegexRules}
+        hasEmptyEnabledRules={hasEmptyEnabledRules}
+        applyRules={applyRules}
+      />
     </Panel>
   );
 };

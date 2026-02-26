@@ -45,6 +45,9 @@ const applySearchReplace = (
     rules.forEach((rule) => {
       if (!rule.isEnabled) return;
 
+      const isCueSheetTemplate =
+        rule.replaceWith === 'CUE_SHEET' || rule.replaceWith === 'CUE_SHEET_NO_EP';
+
       // Handle cue sheet template
       if (rule.replaceWith === 'CUE_SHEET') {
         const { title, status } = dotifyTitleGeneric(newName, true);
@@ -58,6 +61,9 @@ const applySearchReplace = (
         newStatus = status;
         return;
       }
+
+      // Empty patterns on non-template rules are ignored to prevent matching everywhere.
+      if (!isCueSheetTemplate && rule.searchPattern.length === 0) return;
 
       try {
         const flags = rule.isCaseInsensitive ? 'gi' : 'g';
@@ -74,6 +80,13 @@ const applySearchReplace = (
         console.log('Invalid regex.');
       }
     });
+
+    if (
+      newName !== file.currentName &&
+      !['dotified', 'error'].includes(newStatus)
+    ) {
+      newStatus = 'modified';
+    }
 
     return {
       ...file,
