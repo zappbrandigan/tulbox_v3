@@ -1,11 +1,11 @@
 {
   "changelog": [
     {
-      "date": "2026-02-26",
+      "date": "2026-07-28",
       "tag": "Update",
-      "title": "PDF Manager: Quality of Life Updates",
-      "summary": "Added search highlighting, undo option, change previews, and more",
-      "link": "https://docs.tulbox.app/changelog#370"
+      "title": "CWR Convert: Cat Import",
+      "summary": "Added submitter work numbers to exported file highlighting",
+      "link": "https://docs.tulbox.app/changelog#371"
     },
     {
       "date": "2026-01-24",

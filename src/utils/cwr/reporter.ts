@@ -5,8 +5,8 @@ import {
   ParsedSWR,
   ParsedTransaction,
   ParsedTransmission,
-} from 'cwr-parser/types';
-import { CWRTemplate, CWRTemplateField } from '@/types';
+} from "cwr-parser/types";
+import { CWRTemplate, CWRTemplateField } from "@/types";
 
 class CWRReporter {
   /**
@@ -17,7 +17,7 @@ class CWRReporter {
     input: Record<string, number>,
     target = 100,
     step = 0.01,
-    opts?: { absTol?: number; relTol?: number }
+    opts?: { absTol?: number; relTol?: number },
   ): Record<string, number> {
     const absTol = opts?.absTol ?? step;
     const relTol = opts?.relTol ?? 0;
@@ -79,21 +79,24 @@ class CWRReporter {
 
     // Back to numbers; clamp minor FP noise to 2 decimals
     const out = Object.fromEntries(
-      entries.map(([k]) => [k, Number(((units.get(k) ?? 0) * step).toFixed(2))])
+      entries.map(([k]) => [
+        k,
+        Number(((units.get(k) ?? 0) * step).toFixed(2)),
+      ]),
     );
 
     return out;
   }
 
   static getContribution(writer: ParsedSWR | ParsedOWR, isControlled: boolean) {
-    const PREFERRED_TIS = ['2136', '0840']; // World, then U.S.
+    const PREFERRED_TIS = ["2136", "0840"]; // World, then U.S.
 
     const recs = isControlled
-      ? (writer as ParsedSWR).swts ?? []
-      : (writer as ParsedOWR).owts ?? [];
+      ? ((writer as ParsedSWR).swts ?? [])
+      : ((writer as ParsedOWR).owts ?? []);
 
     const collectionRecord = PREFERRED_TIS.map((code) =>
-      recs.find((t) => t.fields.tisCode === code)
+      recs.find((t) => t.fields.tisCode === code),
     ).find(Boolean);
 
     // Use collection share if we found a record; otherwise fall back to ownership share
@@ -106,7 +109,7 @@ class CWRReporter {
   }
 
   static buildContributionMap(
-    transaction: ParsedTransaction
+    transaction: ParsedTransaction,
   ): Record<string, number> {
     const items = [
       ...(transaction.work?.swrs ?? []),
@@ -117,7 +120,7 @@ class CWRReporter {
 
     for (const w of items) {
       const ipn = String(w.fields.interestedPartyNumber);
-      const isControlled = w.fields.recordType === 'SWR';
+      const isControlled = w.fields.recordType === "SWR";
       const contrib = this.getContribution(w, isControlled);
 
       out[ipn] = (out[ipn] ?? 0) + contrib;
@@ -137,61 +140,61 @@ class CWRReporter {
       workTitle: string;
     },
     publisher: ParsedSPU | ParsedOPU,
-    columns: [string, string][]
+    columns: [string, string][],
   ) {
     const row = new Map<string, string | number>(columns);
     const publisherName =
-      publisher.fields.publisherUnknownIndicator === 'Y'
-        ? 'UNKNOWN PUBLISHER'
-        : publisher.fields.publisherName ?? 'UNKNOWN PUBLISHER';
+      publisher.fields.publisherUnknownIndicator === "Y"
+        ? "UNKNOWN PUBLISHER"
+        : (publisher.fields.publisherName ?? "UNKNOWN PUBLISHER");
     let prCollectionShare: number = 0;
     let mrCollectionShare: number = 0;
     const publisherControlFlag =
-      publisher.fields.recordType === 'SPU' ? 'Y' : 'N';
-    if (publisher.fields.recordType === 'SPU') {
+      publisher.fields.recordType === "SPU" ? "Y" : "N";
+    if (publisher.fields.recordType === "SPU") {
       prCollectionShare = Number(
         (publisher as ParsedSPU).spts?.[0].fields.prCollectionShare ??
           publisher.fields.prOwnershipShare ??
-          0
+          0,
       );
       mrCollectionShare = Number(
         (publisher as ParsedSPU).spts?.[0].fields.mrCollectionShare ??
           publisher.fields.mrOwnershipShare ??
-          0
+          0,
       );
     } else {
       prCollectionShare = Number(
         (publisher as ParsedOPU).opts?.[0].fields.prCollectionShare ??
           publisher.fields.prOwnershipShare ??
-          0
+          0,
       );
       mrCollectionShare = Number(
         (publisher as ParsedOPU).opts?.[0].fields.mrCollectionShare ??
           publisher.fields.mrOwnershipShare ??
-          0
+          0,
       );
     }
-    row.set('songCode', songCode);
-    row.set('workType', workType);
-    row.set('workTitle', workTitle);
-    row.set('publisherSeqNum', publisher.fields.publisherSequenceNumber);
+    row.set("songCode", songCode);
+    row.set("workType", workType);
+    row.set("workTitle", workTitle);
+    row.set("publisherSeqNum", publisher.fields.publisherSequenceNumber);
 
-    row.set('controlled', publisherControlFlag);
-    row.set('capacity', publisher.fields.publisherType ?? '');
-    row.set('ipNum', publisher.fields.interestedPartyNumber ?? '');
-    row.set('publisherName', publisherName);
-    row.set('ipiNameNum', Number(publisher.fields.ipiNameNumber ?? ''));
-    row.set('society', publisher.fields.prAffiliationSocietyNumber ?? '');
-    row.set('prOwnership', (publisher.fields.prOwnershipShare ?? 0).toFixed(2));
-    row.set('mrOwnership', (publisher.fields.mrOwnershipShare ?? 0).toFixed(2));
-    if ('spts' in publisher) {
-      row.set('territoryCode', publisher.spts?.[0]?.fields.tisCode ?? '');
+    row.set("controlled", publisherControlFlag);
+    row.set("capacity", publisher.fields.publisherType ?? "");
+    row.set("ipNum", publisher.fields.interestedPartyNumber ?? "");
+    row.set("publisherName", publisherName);
+    row.set("ipiNameNum", Number(publisher.fields.ipiNameNumber ?? ""));
+    row.set("society", publisher.fields.prAffiliationSocietyNumber ?? "");
+    row.set("prOwnership", (publisher.fields.prOwnershipShare ?? 0).toFixed(2));
+    row.set("mrOwnership", (publisher.fields.mrOwnershipShare ?? 0).toFixed(2));
+    if ("spts" in publisher) {
+      row.set("territoryCode", publisher.spts?.[0]?.fields.tisCode ?? "");
       row.set(
-        'ogTerritoryFlag',
-        publisher.spts?.[0]?.fields.inclusionExclusionIndicator ?? ''
+        "ogTerritoryFlag",
+        publisher.spts?.[0]?.fields.inclusionExclusionIndicator ?? "",
       );
-      row.set('prCollection', (prCollectionShare ?? 0).toFixed(2));
-      row.set('mrCollection', (mrCollectionShare ?? 0).toFixed(2));
+      row.set("prCollection", (prCollectionShare ?? 0).toFixed(2));
+      row.set("mrCollection", (mrCollectionShare ?? 0).toFixed(2));
     }
 
     return row;
@@ -209,60 +212,60 @@ class CWRReporter {
     },
     writer: ParsedSWR | ParsedOWR,
     contriubtion: number,
-    columns: [string, string][]
+    columns: [string, string][],
   ) {
     const row = new Map<string, string | number>(columns);
     const writerName = !writer.fields.writerLastName
-      ? 'UNKNOWN WRITER'
+      ? "UNKNOWN WRITER"
       : !writer.fields.writerFirstName
-      ? writer.fields.writerLastName
-      : `${writer.fields.writerLastName}, ${writer.fields.writerFirstName}`;
-    const writerControlFlag = writer.fields.recordType === 'SWR' ? 'Y' : 'N';
+        ? writer.fields.writerLastName
+        : `${writer.fields.writerLastName}, ${writer.fields.writerFirstName}`;
+    const writerControlFlag = writer.fields.recordType === "SWR" ? "Y" : "N";
     // const adjustedContribution = (writer.fields.prOwnershipShare ?? 0) * 2;
 
-    row.set('contribution', contriubtion.toFixed(2)); // e.g., 16.67
+    row.set("contribution", contriubtion.toFixed(2)); // e.g., 16.67
 
-    row.set('songCode', songCode);
-    row.set('workType', workType);
-    row.set('workTitle', workTitle);
-    row.set('publisherSeqNum', '');
+    row.set("songCode", songCode);
+    row.set("workType", workType);
+    row.set("workTitle", workTitle);
+    row.set("publisherSeqNum", "");
 
-    row.set('controlled', writerControlFlag);
-    row.set('capacity', writer.fields.writerDesignationCode);
-    row.set('ipNum', writer.fields.interestedPartyNumber);
-    row.set('publisherName', '');
-    row.set('composerName', writerName);
-    row.set('ipiNameNum', Number(writer.fields.ipiNameNumber ?? ''));
-    row.set('society', writer.fields.prAffiliationSocietyNumber ?? '');
-    row.set('prOwnership', (writer.fields.prOwnershipShare ?? 0).toFixed(2));
-    row.set('mrOwnership', (writer.fields.mrOwnershipShare ?? 0).toFixed(2));
-    if ('swts' in writer) {
-      row.set('territoryCode', writer.swts?.[0]?.fields.tisCode ?? '');
+    row.set("controlled", writerControlFlag);
+    row.set("capacity", writer.fields.writerDesignationCode);
+    row.set("ipNum", writer.fields.interestedPartyNumber);
+    row.set("publisherName", "");
+    row.set("composerName", writerName);
+    row.set("ipiNameNum", Number(writer.fields.ipiNameNumber ?? ""));
+    row.set("society", writer.fields.prAffiliationSocietyNumber ?? "");
+    row.set("prOwnership", (writer.fields.prOwnershipShare ?? 0).toFixed(2));
+    row.set("mrOwnership", (writer.fields.mrOwnershipShare ?? 0).toFixed(2));
+    if ("swts" in writer) {
+      row.set("territoryCode", writer.swts?.[0]?.fields.tisCode ?? "");
       row.set(
-        'ogTerritoryFlag',
-        writer.swts?.[0]?.fields.inclusionExclusionIndicator ?? ''
+        "ogTerritoryFlag",
+        writer.swts?.[0]?.fields.inclusionExclusionIndicator ?? "",
       );
       row.set(
-        'prCollection',
-        (writer.swts?.[0]?.fields.prCollectionShare ?? 0).toFixed(2)
+        "prCollection",
+        (writer.swts?.[0]?.fields.prCollectionShare ?? 0).toFixed(2),
       );
       row.set(
-        'mrCollection',
-        (writer.swts?.[0]?.fields.mrCollectionShare ?? 0).toFixed(2)
+        "mrCollection",
+        (writer.swts?.[0]?.fields.mrCollectionShare ?? 0).toFixed(2),
       );
-    } else if ('owts' in writer) {
-      row.set('territoryCode', writer.owts?.[0]?.fields.tisCode ?? '');
+    } else if ("owts" in writer) {
+      row.set("territoryCode", writer.owts?.[0]?.fields.tisCode ?? "");
       row.set(
-        'ogTerritoryFlag',
-        writer.owts?.[0]?.fields.inclusionExclusionIndicator ?? ''
-      );
-      row.set(
-        'prCollection',
-        (writer.owts?.[0]?.fields.prCollectionShare ?? 0).toFixed(2)
+        "ogTerritoryFlag",
+        writer.owts?.[0]?.fields.inclusionExclusionIndicator ?? "",
       );
       row.set(
-        'mrCollection',
-        (writer.owts?.[0]?.fields.mrCollectionShare ?? 0).toFixed(2)
+        "prCollection",
+        (writer.owts?.[0]?.fields.prCollectionShare ?? 0).toFixed(2),
+      );
+      row.set(
+        "mrCollection",
+        (writer.owts?.[0]?.fields.mrCollectionShare ?? 0).toFixed(2),
       );
     }
     return row;
@@ -270,12 +273,12 @@ class CWRReporter {
 
   static generateWorkReport(
     transmission: ParsedTransmission,
-    template: CWRTemplate
+    template: CWRTemplate,
   ) {
     const warnings: string[] = [];
     const rowCollection: Map<string, string | number>[] = [];
     const columns = template.fields.map(
-      (field: CWRTemplateField) => [field.key, ''] as [string, string]
+      (field: CWRTemplateField) => [field.key, ""] as [string, string],
     );
 
     for (const group of transmission.groups ?? []) {
@@ -285,12 +288,12 @@ class CWRReporter {
         const currentWork = transaction.work;
         const songCode = currentWork.header.fields.submitterWorkNumber;
         const workType =
-          currentWork.header.fields.recordType === 'NWR' ? 'New' : 'Rev.';
+          currentWork.header.fields.recordType === "NWR" ? "New" : "Rev.";
 
         const repeatedData = {
           songCode,
           workType,
-          languageCode: currentWork.header.fields.languageCode ?? '',
+          languageCode: currentWork.header.fields.languageCode ?? "",
           workTitle: currentWork.header.fields.workTitle,
         };
 
@@ -300,7 +303,7 @@ class CWRReporter {
           this.normalizeToTarget(contributionLookup);
 
         Object.values(normalizedContributions).forEach(
-          (v) => (totalContribution += v)
+          (v) => (totalContribution += v),
         );
         if (Math.abs(totalContribution - 100) > 1e-6)
           warnings.push(
@@ -310,7 +313,7 @@ class CWRReporter {
             }</span>
             <span class="text-blue-600 dark:text-blue-300 font-medium">
             Contribution percentage total: ${totalContribution.toFixed(2)}
-            </span>`
+            </span>`,
           );
 
         for (const publisher of [
@@ -329,8 +332,8 @@ class CWRReporter {
               repeatedData,
               writer,
               normalizedContributions[ip],
-              columns
-            )
+              columns,
+            ),
           );
         }
 
@@ -343,7 +346,7 @@ class CWRReporter {
             <span class="text-gray-500 dark:text-gray-400 font-medium">Title: ${repeatedData.workTitle}</span>
             <span class="text-blue-600 dark:text-blue-300 font-medium">
             No writers listed for this work
-            </span>`
+            </span>`,
           );
 
         rowCollection.push(...rows);
@@ -355,12 +358,12 @@ class CWRReporter {
 
   static generateIsrcReport(
     transmission: ParsedTransmission,
-    template: CWRTemplate
+    template: CWRTemplate,
   ) {
     const warnings: string[] = [];
     const rowCollection: Map<string, string | number>[] = [];
     const columns = template.fields.map(
-      (field: CWRTemplateField) => [field.key, ''] as [string, string]
+      (field: CWRTemplateField) => [field.key, ""] as [string, string],
     );
 
     for (const group of transmission.groups) {
@@ -373,10 +376,10 @@ class CWRReporter {
           if (!recording.fields.isrc) continue; // skip if REC has no ISRC
           const row = new Map<string, string | number>(columns);
           row.set(
-            'songCode',
-            transaction.work.header.fields.submitterWorkNumber
+            "songCode",
+            transaction.work.header.fields.submitterWorkNumber,
           );
-          row.set('isrc', recording.fields.isrc ?? '');
+          row.set("isrc", recording.fields.isrc ?? "");
           rows.push(row);
         }
         rowCollection.push(...rows);
@@ -387,12 +390,12 @@ class CWRReporter {
 
   static generateRecordingReport(
     transmission: ParsedTransmission,
-    template: CWRTemplate
+    template: CWRTemplate,
   ) {
     const warnings: string[] = [];
     const rowCollection: Map<string, string | number>[] = [];
     const columns = template.fields.map(
-      (field: CWRTemplateField) => [field.key, ''] as [string, string]
+      (field: CWRTemplateField) => [field.key, ""] as [string, string],
     );
 
     for (const group of transmission.groups) {
@@ -405,7 +408,7 @@ class CWRReporter {
           continue;
         } // skip if not REC/PER records
 
-        let performerName = '';
+        let performerName = "";
         if (transaction.work.pers?.length) {
           performerName = !transaction.work.pers[0].fields.artistFirstName
             ? transaction.work.pers[0].fields.artistLastName
@@ -415,19 +418,19 @@ class CWRReporter {
         for (const recording of transaction.work?.recs ?? []) {
           const row = new Map<string, string | number>(columns);
           row.set(
-            'songCode',
-            transaction.work.header.fields.submitterWorkNumber
+            "songCode",
+            transaction.work.header.fields.submitterWorkNumber,
           );
-          row.set('workTitle', transaction.work.header.fields.workTitle);
-          row.set('firstAlbumTitle', recording.fields.firstAlbumTitle ?? '');
-          row.set('recordingTitle', recording.fields.recordingTitle ?? '');
-          row.set('displayArtist', recording.fields.displayArtist ?? '');
-          row.set('performingArtist', performerName);
+          row.set("workTitle", transaction.work.header.fields.workTitle);
+          row.set("firstAlbumTitle", recording.fields.firstAlbumTitle ?? "");
+          row.set("recordingTitle", recording.fields.recordingTitle ?? "");
+          row.set("displayArtist", recording.fields.displayArtist ?? "");
+          row.set("performingArtist", performerName);
           row.set(
-            'firstReleaseCatalog',
-            recording.fields.firstReleaseCatalogNumber ?? ''
+            "firstReleaseCatalog",
+            recording.fields.firstReleaseCatalogNumber ?? "",
           );
-          row.set('firstReleaseDate', recording.fields.firstReleaseDate ?? '');
+          row.set("firstReleaseDate", recording.fields.firstReleaseDate ?? "");
           rows.push(row);
         }
         rowCollection.push(...rows);
@@ -438,27 +441,27 @@ class CWRReporter {
 
   static generateIswcReport(
     transmission: ParsedTransmission,
-    template: CWRTemplate
+    template: CWRTemplate,
   ) {
     const warnings: string[] = [];
     const rowCollection: Map<string, string | number>[] = [];
     const columns = template.fields.map(
-      (field: CWRTemplateField) => [field.key, ''] as [string, string]
+      (field: CWRTemplateField) => [field.key, ""] as [string, string],
     );
 
     for (const group of transmission.groups) {
       for (const transaction of group.transactions ?? []) {
         const rows: Map<string, string | number>[] = [];
-        const iswc = transaction.work?.header.fields.iswc ?? '';
+        const iswc = transaction.work?.header.fields.iswc ?? "";
         if (!iswc) {
           continue;
         }
         const row = new Map<string, string | number>(columns);
         row.set(
-          'songCode',
-          transaction.work?.header.fields.submitterWorkNumber ?? ''
+          "songCode",
+          transaction.work?.header.fields.submitterWorkNumber ?? "",
         );
-        row.set('iswc', iswc);
+        row.set("iswc", iswc);
         rows.push(row);
         rowCollection.push(...rows);
       }
@@ -468,28 +471,28 @@ class CWRReporter {
 
   static generateAkaReport(
     transmission: ParsedTransmission,
-    template: CWRTemplate
+    template: CWRTemplate,
   ) {
     function isRowDuplicate(
       row: Map<string, string | number>,
-      existingRows: Map<string, string | number>[]
+      existingRows: Map<string, string | number>[],
     ): boolean {
-      const songCode = row.get('songCode');
-      const aka = row.get('aka');
-      const lang = row.get('languageCode');
+      const songCode = row.get("songCode");
+      const aka = row.get("aka");
+      const lang = row.get("languageCode");
 
       return existingRows.some(
         (r) =>
-          r.get('songCode') === songCode &&
-          r.get('aka') === aka &&
-          r.get('languageCode') === lang
+          r.get("songCode") === songCode &&
+          r.get("aka") === aka &&
+          r.get("languageCode") === lang,
       );
     }
 
     const warnings: string[] = [];
     const rowCollection: Map<string, string | number>[] = [];
     const columns = template.fields.map(
-      (field: CWRTemplateField) => [field.key, ''] as [string, string]
+      (field: CWRTemplateField) => [field.key, ""] as [string, string],
     );
 
     for (const group of transmission.groups) {
@@ -501,12 +504,12 @@ class CWRReporter {
         for (const alternativeTitle of transaction.work.alts) {
           const row = new Map<string, string | number>(columns);
           row.set(
-            'songCode',
-            transaction.work.header.fields.submitterWorkNumber
+            "songCode",
+            transaction.work.header.fields.submitterWorkNumber,
           );
-          row.set('aka', alternativeTitle.fields.alternativeTitle);
-          row.set('languageCode', alternativeTitle.fields.languageCode ?? '');
-          row.set('workTitle', transaction.work.header.fields.workTitle);
+          row.set("aka", alternativeTitle.fields.alternativeTitle);
+          row.set("languageCode", alternativeTitle.fields.languageCode ?? "");
+          row.set("workTitle", transaction.work.header.fields.workTitle);
           // Only add the row if it's not a duplicate
           if (!isRowDuplicate(row, rows)) {
             rows.push(row);
@@ -520,21 +523,21 @@ class CWRReporter {
 
   static generateIpReport(
     transmission: ParsedTransmission,
-    template: CWRTemplate
+    template: CWRTemplate,
   ) {
     const rowCollection: Map<string, string | number>[] = [];
     const warnings: string[] = [];
 
     const columnKeys = template.fields.map(
-      (field: CWRTemplateField) => field.key
+      (field: CWRTemplateField) => field.key,
     );
 
     const seenKeys = new Set<string>();
 
     const addRowIfUnique = (row: Map<string, string | number>) => {
       // Create a unique key — adjust if more fields need to be included
-      const uniqueKey = `${row.get('ipNumber')}|${row.get('name')}|${row.get(
-        'ipiNumber'
+      const uniqueKey = `${row.get("ipNumber")}|${row.get("name")}|${row.get(
+        "ipiNumber",
       )}`;
       if (!seenKeys.has(uniqueKey)) {
         seenKeys.add(uniqueKey);
@@ -549,19 +552,19 @@ class CWRReporter {
           ...(transaction.work?.opus ?? []),
         ]) {
           const row = new Map<string, string | number>(
-            columnKeys.map((key: string) => [key, ''])
+            columnKeys.map((key: string) => [key, ""]),
           );
 
-          row.set('ipNumber', publisher.fields.interestedPartyNumber ?? '');
-          row.set('type', 'Publisher');
+          row.set("ipNumber", publisher.fields.interestedPartyNumber ?? "");
+          row.set("type", "Publisher");
           row.set(
-            'name',
+            "name",
             publisher.fields.publisherName
               ? publisher.fields.publisherName
-              : 'Unknown Publisher'
+              : "Unknown Publisher",
           );
-          row.set('ipiNumber', publisher.fields.ipiNameNumber ?? '');
-          row.set('pro', publisher.fields.prAffiliationSocietyNumber ?? 'NS');
+          row.set("ipiNumber", publisher.fields.ipiNameNumber ?? "");
+          row.set("pro", publisher.fields.prAffiliationSocietyNumber ?? "NS");
 
           addRowIfUnique(row);
         }
@@ -571,23 +574,23 @@ class CWRReporter {
           ...(transaction.work?.owrs ?? []),
         ]) {
           const row = new Map<string, string | number>(
-            columnKeys.map((key: string) => [key, ''])
+            columnKeys.map((key: string) => [key, ""]),
           );
 
-          row.set('ipNumber', writer.fields.interestedPartyNumber ?? '');
-          row.set('type', 'Writer');
+          row.set("ipNumber", writer.fields.interestedPartyNumber ?? "");
+          row.set("type", "Writer");
           row.set(
-            'name',
+            "name",
             writer.fields.writerLastName
               ? `${writer.fields.writerLastName}${
                   writer.fields.writerFirstName
                     ? `, ${writer.fields.writerFirstName}`
-                    : ''
+                    : ""
                 }`
-              : 'Unknown Writer'
+              : "Unknown Writer",
           );
-          row.set('ipiNumber', writer.fields.ipiNameNumber ?? '');
-          row.set('pro', writer.fields.prAffiliationSocietyNumber ?? 'NS');
+          row.set("ipiNumber", writer.fields.ipiNameNumber ?? "");
+          row.set("pro", writer.fields.prAffiliationSocietyNumber ?? "NS");
 
           addRowIfUnique(row);
         }
@@ -599,21 +602,23 @@ class CWRReporter {
 
   static generateCatImport(
     transmission: ParsedTransmission,
-    template: CWRTemplate
+    template: CWRTemplate,
   ) {
     const rowCollection: Map<string, string | number>[] = [];
     const warnings: string[] = [];
 
     // Collect all expected column keys from the template
     const columnKeys = template.fields.map(
-      (field: CWRTemplateField) => field.key
+      (field: CWRTemplateField) => field.key,
     );
 
     for (const group of transmission.groups) {
       for (const transaction of group.transactions ?? []) {
-        const iswc = transaction.work?.header.fields.iswc ?? '';
-        const workTitle = transaction.work?.header.fields.workTitle ?? '';
-        const songTypeCode = 'OG';
+        const submitterWorkNumber =
+          transaction.work?.header.fields.submitterWorkNumber;
+        const iswc = transaction.work?.header.fields.iswc ?? "";
+        const workTitle = transaction.work?.header.fields.workTitle ?? "";
+        const songTypeCode = "OG";
 
         let totalContribution = 0;
         const contributionLookup = this.buildContributionMap(transaction);
@@ -621,47 +626,51 @@ class CWRReporter {
           contributionLookup,
           100,
           0.01,
-          { absTol: 0.06 }
+          { absTol: 0.06 },
         );
 
         for (const aka of transaction.work?.alts ?? [
-          { fields: { alternativeTitle: '' } },
+          { fields: { alternativeTitle: "" } },
         ]) {
           totalContribution = 0;
           for (const ip of Object.keys(normalizedContributions)) {
             const row = new Map<string, string | number>(
-              columnKeys.map((key: string) => [key, ''])
+              columnKeys.map((key: string) => [key, ""]),
             );
             const writer = [
               ...(transaction.work?.swrs ?? []),
               ...(transaction.work?.owrs ?? []),
             ].find((w) => w.fields.interestedPartyNumber === ip)!;
-            const controlled = writer.fields.recordType === 'SWR' ? 'Y' : 'N';
+            const controlled = writer.fields.recordType === "SWR" ? "Y" : "N";
             totalContribution +=
               normalizedContributions[writer.fields.interestedPartyNumber];
             const contribution = normalizedContributions[
               writer.fields.interestedPartyNumber
             ]
               .toFixed(2) // ensures 2 decimal places
-              .padStart(6, '0'); // pads total length to 6 (e.g. "005.00")
+              .padStart(6, "0"); // pads total length to 6 (e.g. "005.00")
 
-            const patchSociety = ['099', '000', '', null].includes(
-              writer.fields.prAffiliationSocietyNumber
+            const patchSociety = ["099", "000", "", null].includes(
+              writer.fields.prAffiliationSocietyNumber,
             )
-              ? 'NS'
+              ? "NS"
               : writer.fields.prAffiliationSocietyNumber;
 
-            row.set('iswc', iswc);
-            row.set('workTitle', workTitle);
-            row.set('songTypeCode', songTypeCode);
-            row.set('lastName', writer.fields.writerLastName ?? '');
-            row.set('firstName', writer.fields.writerFirstName ?? '');
-            row.set('capacity', writer.fields.writerDesignationCode ?? '');
-            row.set('contribution', contribution);
-            row.set('controlled', controlled);
-            row.set('affiliation', patchSociety);
-            row.set('ipiNameNumber', writer.fields.ipiNameNumber ?? '');
-            row.set('aka', aka.fields.alternativeTitle);
+            row.set(
+              "submitterWorkNumber",
+              String(submitterWorkNumber?.replace(/^0+(?=\d)/, "")),
+            );
+            row.set("iswc", iswc);
+            row.set("workTitle", workTitle);
+            row.set("songTypeCode", songTypeCode);
+            row.set("lastName", writer.fields.writerLastName ?? "");
+            row.set("firstName", writer.fields.writerFirstName ?? "");
+            row.set("capacity", writer.fields.writerDesignationCode ?? "");
+            row.set("contribution", contribution);
+            row.set("controlled", controlled);
+            row.set("affiliation", patchSociety);
+            row.set("ipiNameNumber", writer.fields.ipiNameNumber ?? "");
+            row.set("aka", aka.fields.alternativeTitle);
             rowCollection.push(row);
           }
         }
@@ -671,7 +680,7 @@ class CWRReporter {
             <span class="text-gray-500 dark:text-gray-400 font-medium">Title: ${workTitle}</span>
             <span class="text-blue-600 dark:text-blue-300 font-medium">
             Contribution percentage total: ${totalContribution.toFixed(2)}
-            </span>`
+            </span>`,
           );
         }
         if (
@@ -683,7 +692,7 @@ class CWRReporter {
             <span class="text-gray-500 dark:text-gray-400 font-medium">Title: ${workTitle}</span>
             <span class="text-blue-600 dark:text-blue-300 font-medium">
             No writers listed for this work
-            </span>`
+            </span>`,
           );
       }
     }
@@ -693,12 +702,12 @@ class CWRReporter {
 
   static generateMsgReport(
     transmission: ParsedTransmission,
-    template: CWRTemplate
+    template: CWRTemplate,
   ) {
     const warnings: string[] = [];
     const rowCollection: Map<string, string | number>[] = [];
     const columns = template.fields.map(
-      (field: CWRTemplateField) => [field.key, ''] as [string, string]
+      (field: CWRTemplateField) => [field.key, ""] as [string, string],
     );
     for (const group of transmission.groups) {
       for (const transaction of group.transactions ?? []) {
@@ -706,13 +715,13 @@ class CWRReporter {
         const rows: Map<string, string | number>[] = [];
         for (const msg of transaction.msgs) {
           const row = new Map<string, string | number>(columns);
-          row.set('transactionSeqNum', msg.fields.transactionSequenceNumber);
-          row.set('recSeqNum', msg.fields.recordSequenceNumber);
-          row.set('ogRecSeqNum', msg.fields.originalRecordSequenceNumber);
-          row.set('ogRecType', msg.fields.originalRecordType);
-          row.set('msgLevel', msg.fields.messageLevel);
-          row.set('validationLevel', msg.fields.validationNumber);
-          row.set('msgText', msg.fields.messageText);
+          row.set("transactionSeqNum", msg.fields.transactionSequenceNumber);
+          row.set("recSeqNum", msg.fields.recordSequenceNumber);
+          row.set("ogRecSeqNum", msg.fields.originalRecordSequenceNumber);
+          row.set("ogRecType", msg.fields.originalRecordType);
+          row.set("msgLevel", msg.fields.messageLevel);
+          row.set("validationLevel", msg.fields.validationNumber);
+          row.set("msgText", msg.fields.messageText);
           rows.push(row);
         }
         rowCollection.push(...rows);
